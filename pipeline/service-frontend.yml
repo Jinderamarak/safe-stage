@@ -1,0 +1,28 @@
+.service-frontend-template: &service-frontend-template
+  image: node:18.18.0
+  before_script:
+    - cd service-app
+    - corepack enable
+    - corepack prepare pnpm@latest-8 --activate
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install
+  cache:
+    key:
+      files:
+        - service-app/pnpm-lock.yaml
+    paths:
+      - service-app/.pnpm-store
+
+service-frontend:lint:
+  <<: *service-frontend-template
+  stage: lint
+  script:
+    - pnpm run lint
+
+service-frontend:build:
+  <<: *service-frontend-template
+  stage: build
+  needs:
+    - service-frontend:lint
+  script:
+    - pnpm run build

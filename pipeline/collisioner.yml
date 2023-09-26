@@ -1,0 +1,71 @@
+.collisioner-template: &collisioner-template
+  variables:
+    CARGO_HOME: $CI_PROJECT_DIR/.cargo
+  before_script:
+    - cd collisioner
+
+.collisioner-latest: &collisioner-latest
+  <<: *collisioner-template
+  image: rust:latest
+  cache:
+    key: collisioner-latest-${CI_COMMIT_REF_SLUG}
+    paths:
+      - $CARGO_HOME
+      - collisioner/Cargo.lock
+
+.collisioner-nightly: &collisioner-nightly
+  <<: *collisioner-template
+  image: rustlang/rust:nightly
+  cache:
+    key: collisioner-nightly-${CI_COMMIT_REF_SLUG}
+    paths:
+      - $CARGO_HOME
+      - collisioner/Cargo.lock
+
+collisioner:lint:
+  <<: *collisioner-latest
+  stage: lint
+  script:
+    - rustup component add rustfmt
+    - cargo fmt -- --check
+    - rustup component add clippy
+    - cargo clippy -- -D warnings
+
+collisioner:build:
+  <<: *collisioner-latest
+  stage: build
+  needs:
+    - collisioner:lint
+  script:
+    - cargo build --verbose
+
+collisioner:build:nightly:
+  <<: *collisioner-nightly
+  stage: build
+  needs:
+    - collisioner:lint
+  script:
+    - cargo build --verbose
+  allow_failure: true
+
+collisioner:test:
+  <<: *collisioner-latest
+  stage: test
+  needs:
+    - collisioner:build
+  script:
+    - cargo test --verbose
+
+collisioner:test:nightly:
+  <<: *collisioner-nightly
+  stage: test
+  needs:
+    - collisioner:build:nightly
+  script:
+    - cargo install --root . cargo2junit
+    - cargo test -- -Z unstable-options --format json --report-time | bin/cargo2junit > report.xml
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - collisioner/report.xml
