@@ -1,0 +1,13 @@
+workflow:
+  rules:
+    - when: always
+
+stages:
+  - lint
+  - build
+  - test
+
+include:
+  - pipeline/collisioner.yml
+  - pipeline/service-backend.yml
+  - pipeline/service-frontend.yml

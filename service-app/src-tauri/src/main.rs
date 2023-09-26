@@ -5,7 +5,10 @@
 #[tauri::command]
 fn greet(name: &str) -> String {
     let result = collisioner::add(3, 8);
-    format!("Hello, {}! You've been greeted from Rust! 3 + 8 = {}", name, result)
+    format!(
+        "Hello, {}! You've been greeted from Rust! 3 + 8 = {}",
+        name, result
+    )
 }
 
 fn main() {
