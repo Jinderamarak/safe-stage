@@ -1,4 +1,5 @@
-mod common;
+pub mod colliders;
+pub mod common;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
