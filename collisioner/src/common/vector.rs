@@ -1,5 +1,22 @@
 use std::ops::{Add, Mul, Sub};
 
+/// # Vector 3D
+/// Struct representing a 3D vector / 3D point.
+///
+/// ## Example
+/// ```
+/// use collisioner::common::Vector3;
+///
+/// let v1 = Vector3::new(1.0, 2.0, 3.0);
+/// let v2 = Vector3::new(4.0, 5.0, 6.0);
+/// let v3 = v1 * 2.0;
+///
+/// let v1_v2 = v1 + v2;
+/// let v2_v3 = v2 - v3;
+///
+/// assert_eq!(v1_v2.x(), 5.0);
+/// assert_eq!(v2_v3.y(), 1.0);
+/// ```
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector3 {
     x: f64,

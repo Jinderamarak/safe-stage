@@ -1,6 +1,7 @@
 use crate::colliders::{AlignedBox, AlignedBoxCollision};
 use crate::common::Vector3 as Point;
 
+/// Determines if a point (`Vector3`) collides with other primitive
 pub trait PointCollision {
     fn collides(&self, other: &Point) -> bool;
 }

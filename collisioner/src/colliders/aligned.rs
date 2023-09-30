@@ -1,6 +1,18 @@
 use crate::colliders::PointCollision;
 use crate::common::Vector3;
 
+/// # Axis Aligned Box
+/// Basic primitive for collision detection good of bounding volumes.
+///
+/// ## Example
+/// ```
+/// use collisioner::colliders::AlignedBox;
+/// use collisioner::colliders::AlignedBoxCollision;
+/// use collisioner::common::Vector3;
+///
+/// let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
+/// let box2 = AlignedBox::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(2.0, 2.0, 2.0));
+/// assert!(AlignedBoxCollision::collides(&box1, &box2));
 #[derive(Debug, Clone, PartialEq)]
 pub struct AlignedBox {
     position: Vector3,
@@ -21,6 +33,7 @@ impl AlignedBox {
     }
 }
 
+/// Determines if a `AlignedBox` collides with other primitive
 pub trait AlignedBoxCollision {
     fn collides(&self, other: &AlignedBox) -> bool;
 }
