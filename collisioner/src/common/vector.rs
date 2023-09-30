@@ -29,7 +29,11 @@ impl Add<Vector3> for Vector3 {
     type Output = Vector3;
 
     fn add(self, other: Vector3) -> Vector3 {
-        Vector3::new(self.x() + other.x(), self.y() + other.y(), self.z() + other.z())
+        Vector3::new(
+            self.x() + other.x(),
+            self.y() + other.y(),
+            self.z() + other.z(),
+        )
     }
 }
 
@@ -37,7 +41,11 @@ impl Sub<Vector3> for Vector3 {
     type Output = Vector3;
 
     fn sub(self, other: Vector3) -> Vector3 {
-        Vector3::new(self.x() - other.x(), self.y() - other.y(), self.z() - other.z())
+        Vector3::new(
+            self.x() - other.x(),
+            self.y() - other.y(),
+            self.z() - other.z(),
+        )
     }
 }
 

@@ -1,5 +1,5 @@
-use crate::colliders::aligned::{AlignedBox, AlignedBoxCollision};
-use crate::common::vector::Vector3 as Point;
+use crate::colliders::{AlignedBox, AlignedBoxCollision};
+use crate::common::Vector3 as Point;
 
 pub trait PointCollision {
     fn collides(&self, other: &Point) -> bool;
@@ -28,7 +28,7 @@ mod tests {
 
         assert!(PointCollision::collides(&point, &other));
     }
-    
+
     #[test]
     fn test_different_points_dont_collide() {
         let point = Point::new(0.0, 0.0, 0.0);

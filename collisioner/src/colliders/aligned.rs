@@ -1,5 +1,5 @@
-use crate::colliders::point::PointCollision;
-use crate::common::vector::Vector3;
+use crate::colliders::PointCollision;
+use crate::common::Vector3;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct AlignedBox {
