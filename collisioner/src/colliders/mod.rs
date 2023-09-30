@@ -1,4 +1,6 @@
-/// Module for all the collider primitives
+//! # Colliders
+//! Module containing all the primitives for collisions
+
 mod aligned;
 pub use aligned::{AlignedBox, AlignedBoxCollision};
 
