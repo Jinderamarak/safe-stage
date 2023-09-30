@@ -4,11 +4,11 @@
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 fn greet(name: &str) -> String {
-    let result = collisioner::add(3, 8);
-    format!(
-        "Hello, {}! You've been greeted from Rust! 3 + 8 = {}",
-        name, result
-    )
+    let v1 = collisioner::common::Vector3::new(1.0, 2.0, 3.0);
+    let v2 = collisioner::common::Vector3::new(4.0, 5.0, 6.0);
+    let v3 = v1 + v2;
+
+    format!("Hello, {}! {:?} + {:?} = {:?}", name, v1, v2, v3)
 }
 
 fn main() {
