@@ -1,18 +1,19 @@
-use crate::colliders::PointCollision;
+use crate::colliders::{Collides, Point};
 use crate::common::Vector3;
 
 /// # Axis Aligned Box
-/// Basic primitive for collision detection good of bounding volumes.
+/// Basic primitive for collision detection of boxes.
 ///
 /// ## Example
 /// ```
 /// use collisioner::colliders::AlignedBox;
-/// use collisioner::colliders::AlignedBoxCollision;
+/// use collisioner::colliders::Collides;
 /// use collisioner::common::Vector3;
 ///
 /// let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
 /// let box2 = AlignedBox::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(2.0, 2.0, 2.0));
-/// assert!(AlignedBoxCollision::collides(&box1, &box2));
+/// assert!(box1.collides_with(&box2));
+/// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct AlignedBox {
     position: Vector3,
@@ -33,13 +34,8 @@ impl AlignedBox {
     }
 }
 
-/// Determines if a `AlignedBox` collides with other primitive
-pub trait AlignedBoxCollision {
-    fn collides(&self, other: &AlignedBox) -> bool;
-}
-
-impl AlignedBoxCollision for AlignedBox {
-    fn collides(&self, other: &AlignedBox) -> bool {
+impl Collides<Self> for AlignedBox {
+    fn collides_with(&self, other: &Self) -> bool {
         let self_min = self.position();
         let self_max = self.position() + self.size();
         let other_min = other.position();
@@ -54,8 +50,8 @@ impl AlignedBoxCollision for AlignedBox {
     }
 }
 
-impl PointCollision for AlignedBox {
-    fn collides(&self, point: &Vector3) -> bool {
+impl Collides<Point> for AlignedBox {
+    fn collides_with(&self, point: &Point) -> bool {
         let self_min = self.position();
         let self_max = self.position() + self.size();
 
@@ -77,7 +73,7 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let box2 = AlignedBox::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(AlignedBoxCollision::collides(&box1, &box2));
+        assert!(box1.collides_with(&box2));
     }
 
     #[test]
@@ -85,7 +81,7 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let box2 = AlignedBox::new(Vector3::new(1.0, 1.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(AlignedBoxCollision::collides(&box1, &box2));
+        assert!(box1.collides_with(&box2));
     }
 
     #[test]
@@ -93,7 +89,7 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let box2 = AlignedBox::new(Vector3::new(1.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(AlignedBoxCollision::collides(&box1, &box2));
+        assert!(box1.collides_with(&box2));
     }
 
     #[test]
@@ -101,7 +97,7 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let box2 = AlignedBox::new(Vector3::new(0.5, 0.5, 0.5), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(AlignedBoxCollision::collides(&box1, &box2));
+        assert!(box1.collides_with(&box2));
     }
 
     #[test]
@@ -109,7 +105,7 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let box2 = AlignedBox::new(Vector3::new(0.5, 0.5, 0.5), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(AlignedBoxCollision::collides(&box1, &box2));
+        assert!(box1.collides_with(&box2));
     }
 
     #[test]
@@ -117,7 +113,7 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let box2 = AlignedBox::new(Vector3::new(2.0, 2.0, 2.0), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(!AlignedBoxCollision::collides(&box1, &box2));
+        assert!(!box1.collides_with(&box2));
     }
 
     #[test]
@@ -125,7 +121,7 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let box2 = AlignedBox::new(Vector3::new(2.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(!AlignedBoxCollision::collides(&box1, &box2));
+        assert!(!box1.collides_with(&box2));
     }
 
     #[test]
@@ -133,7 +129,7 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let point = Vector3::new(1.0, 1.0, 1.0);
 
-        assert!(PointCollision::collides(&box1, &point));
+        assert!(box1.collides_with(&point));
     }
 
     #[test]
@@ -141,7 +137,7 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 2.0));
         let point = Vector3::new(1.0, 1.0, 1.0);
 
-        assert!(PointCollision::collides(&box1, &point));
+        assert!(box1.collides_with(&point));
     }
 
     #[test]
@@ -149,7 +145,7 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let point = Vector3::new(2.0, 1.0, 1.0);
 
-        assert!(PointCollision::collides(&box1, &point));
+        assert!(box1.collides_with(&point));
     }
 
     #[test]
@@ -157,7 +153,7 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let point = Vector3::new(1.0, 1.0, 1.0);
 
-        assert!(PointCollision::collides(&box1, &point));
+        assert!(box1.collides_with(&point));
     }
 
     #[test]
@@ -165,7 +161,7 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let point = Vector3::new(2.0, 2.0, 2.0);
 
-        assert!(!PointCollision::collides(&box1, &point));
+        assert!(!box1.collides_with(&point));
     }
 
     #[test]
@@ -173,6 +169,6 @@ mod tests {
         let box1 = AlignedBox::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let point = Vector3::new(3.0, 1.0, 1.0);
 
-        assert!(!PointCollision::collides(&box1, &point));
+        assert!(!box1.collides_with(&point));
     }
 }

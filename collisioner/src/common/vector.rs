@@ -1,6 +1,6 @@
 use std::ops::{Add, Mul, Sub};
 
-/// # Vector 3D
+/// # Vector 3
 /// Struct representing a 3D vector / 3D point.
 ///
 /// ## Example

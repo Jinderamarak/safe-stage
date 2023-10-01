@@ -1,20 +1,33 @@
-use crate::colliders::{AlignedBox, AlignedBoxCollision};
-use crate::common::Vector3 as Point;
+use crate::colliders::{AlignedBox, Collides};
 
-/// Determines if a point (`Vector3`) collides with other primitive
-pub trait PointCollision {
-    fn collides(&self, other: &Point) -> bool;
-}
+/// # Point
+/// Basic primitive for representing single point.
+/// Only alias for `Vector3`.
+///
+/// ## Example
+/// ```
+/// use collisioner::colliders::Point;
+/// use collisioner::colliders::Collides;
+///
+/// let point1 = Point::new(0.0, 0.0, 0.0);
+/// let point2 = Point::new(1.0, 1.0, 1.0);
+/// let point3 = Point::new(1.0, 1.0, 1.0);
+///
+/// assert!(!point1.collides_with(&point2));
+/// assert!(point2.collides_with(&point3));
+/// assert!(!point1.collides_with(&point3));
+/// ```
+pub use crate::common::Vector3 as Point;
 
-impl PointCollision for Point {
-    fn collides(&self, other: &Point) -> bool {
+impl Collides<Self> for Point {
+    fn collides_with(&self, other: &Self) -> bool {
         self == other
     }
 }
 
-impl AlignedBoxCollision for Point {
-    fn collides(&self, other: &AlignedBox) -> bool {
-        PointCollision::collides(other, self)
+impl Collides<AlignedBox> for Point {
+    fn collides_with(&self, other: &AlignedBox) -> bool {
+        other.collides_with(self)
     }
 }
 
@@ -27,7 +40,7 @@ mod tests {
         let point = Point::new(0.0, 0.0, 0.0);
         let other = Point::new(0.0, 0.0, 0.0);
 
-        assert!(PointCollision::collides(&point, &other));
+        assert!(point.collides_with(&other));
     }
 
     #[test]
@@ -35,6 +48,6 @@ mod tests {
         let point = Point::new(0.0, 0.0, 0.0);
         let other = Point::new(1.0, 1.0, 1.0);
 
-        assert!(!PointCollision::collides(&point, &other));
+        assert!(!point.collides_with(&other));
     }
 }
