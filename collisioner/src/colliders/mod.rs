@@ -9,3 +9,6 @@ pub use point::Point;
 
 mod aligned;
 pub use aligned::AlignedBox;
+
+mod collider;
+pub use collider::Collider;
