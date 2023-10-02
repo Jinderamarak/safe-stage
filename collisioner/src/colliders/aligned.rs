@@ -1,4 +1,4 @@
-use crate::colliders::{Collides, Point};
+use crate::colliders::{Bounded, Collides, Point};
 use crate::common::Vector3;
 
 /// # Axis Aligned Box
@@ -38,12 +38,22 @@ impl AlignedBox {
     }
 }
 
+impl Bounded for AlignedBox {
+    fn min(&self) -> Vector3 {
+        self.position()
+    }
+
+    fn max(&self) -> Vector3 {
+        self.position() + self.size()
+    }
+}
+
 impl Collides<Self> for AlignedBox {
     fn collides_with(&self, other: &Self) -> bool {
-        let self_min = self.position();
-        let self_max = self.position() + self.size();
-        let other_min = other.position();
-        let other_max = other.position() + other.size();
+        let self_min = self.min();
+        let self_max = self.max();
+        let other_min = other.min();
+        let other_max = other.max();
 
         self_min.x() <= other_max.x()
             && self_max.x() >= other_min.x()
@@ -56,8 +66,8 @@ impl Collides<Self> for AlignedBox {
 
 impl Collides<Point> for AlignedBox {
     fn collides_with(&self, point: &Point) -> bool {
-        let self_min = self.position();
-        let self_max = self.position() + self.size();
+        let self_min = self.min();
+        let self_max = self.max();
 
         self_min.x() <= point.x()
             && self_max.x() >= point.x()
@@ -71,6 +81,14 @@ impl Collides<Point> for AlignedBox {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_box_bounding_regular() {
+        let box1 = AlignedBox::new(Vector3::new(1.0, 2.0, 4.0), Vector3::new(3.0, 2.0, 1.0));
+
+        assert!(box1.min() == Vector3::new(1.0, 2.0, 4.0));
+        assert!(box1.max() == Vector3::new(4.0, 4.0, 5.0));
+    }
 
     #[test]
     fn test_boxes_corner_collide() {
