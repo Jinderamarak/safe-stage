@@ -22,6 +22,10 @@ pub struct AlignedBox {
 
 impl AlignedBox {
     pub fn new(position: Vector3, size: Vector3) -> Self {
+        assert!(size.x() >= 0.0);
+        assert!(size.y() >= 0.0);
+        assert!(size.z() >= 0.0);
+
         Self { position, size }
     }
 
