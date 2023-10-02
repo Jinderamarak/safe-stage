@@ -4,6 +4,9 @@
 mod collides;
 pub use collides::Collides;
 
+mod bounded;
+pub use bounded::Bounded;
+
 mod point;
 pub use point::Point;
 

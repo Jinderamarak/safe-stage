@@ -1,4 +1,4 @@
-use crate::colliders::{AlignedBox, Collides};
+use crate::colliders::{AlignedBox, Bounded, Collides};
 
 /// # Point
 /// Basic primitive for representing single point.
@@ -19,6 +19,16 @@ use crate::colliders::{AlignedBox, Collides};
 /// ```
 pub use crate::common::Vector3 as Point;
 
+impl Bounded for Point {
+    fn min(&self) -> Self {
+        *self
+    }
+
+    fn max(&self) -> Self {
+        *self
+    }
+}
+
 impl Collides<Self> for Point {
     fn collides_with(&self, other: &Self) -> bool {
         self == other
@@ -34,6 +44,14 @@ impl Collides<AlignedBox> for Point {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_point_bounding_volume() {
+        let point = Point::new(0.0, 0.0, 0.0);
+
+        assert_eq!(point.min(), point);
+        assert_eq!(point.max(), point);
+    }
 
     #[test]
     fn test_same_points_collide() {
