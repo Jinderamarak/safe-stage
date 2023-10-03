@@ -8,10 +8,10 @@ mod bounded;
 pub use bounded::Bounded;
 
 mod point;
-pub use point::Point;
+pub use point::PointCollider;
 
-mod aligned;
-pub use aligned::AlignedBox;
+mod aligned_box;
+pub use aligned_box::AlignedBoxCollider;
 
 mod collider;
 pub use collider::Collider;
