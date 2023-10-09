@@ -138,4 +138,63 @@ mod tests {
             )
         );
     }
+
+    #[test]
+    fn test_build_bhv_complex() {
+        let mut objects = vec![
+            boxac(0.0, 0.0, 0.0, 1.0, 1.0, 1.0),
+            boxac(2.0, 0.0, 0.0, 1.0, 1.0, 1.0),
+            boxac(0.0, 2.0, 0.0, 1.0, 1.0, 1.0),
+            boxac(2.0, 2.0, 0.0, 1.0, 1.0, 1.0),
+            boxac(0.0, 0.0, 2.0, 1.0, 1.0, 1.0),
+            boxac(2.0, 0.0, 2.0, 1.0, 1.0, 1.0),
+            boxac(0.0, 2.0, 2.0, 1.0, 1.0, 1.0),
+            boxac(2.0, 2.0, 2.0, 1.0, 1.0, 1.0),
+        ];
+
+        let tree = BvhTree::build(&mut objects[..]);
+
+        assert!(tree.is_some());
+
+        assert_eq!(
+            tree.unwrap(),
+            BvhTree::Branch(
+                boxc(0.0, 0.0, 0.0, 3.0, 3.0, 3.0),
+                Some(Box::new(BvhTree::Branch(
+                    boxc(0.0, 0.0, 0.0, 1.0, 3.0, 3.0),
+                    Some(Box::new(BvhTree::Branch(
+                        boxc(0.0, 0.0, 0.0, 1.0, 1.0, 3.0),
+                        Some(Box::new(BvhTree::Leaf(boxac(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)))),
+                        Some(Box::new(BvhTree::Leaf(boxac(0.0, 0.0, 2.0, 1.0, 1.0, 1.0)))),
+                    ))),
+                    Some(Box::new(BvhTree::Branch(
+                        boxc(0.0, 2.0, 0.0, 1.0, 1.0, 3.0),
+                        Some(Box::new(BvhTree::Leaf(boxac(0.0, 2.0, 0.0, 1.0, 1.0, 1.0)))),
+                        Some(Box::new(BvhTree::Leaf(boxac(0.0, 2.0, 2.0, 1.0, 1.0, 1.0)))),
+                    ))),
+                ))),
+                Some(Box::new(BvhTree::Branch(
+                    boxc(2.0, 0.0, 0.0, 1.0, 3.0, 3.0),
+                    Some(Box::new(BvhTree::Branch(
+                        boxc(2.0, 0.0, 0.0, 1.0, 1.0, 3.0),
+                        Some(Box::new(BvhTree::Leaf(boxac(2.0, 0.0, 0.0, 1.0, 1.0, 1.0)))),
+                        Some(Box::new(BvhTree::Leaf(boxac(2.0, 0.0, 2.0, 1.0, 1.0, 1.0)))),
+                    ))),
+                    Some(Box::new(BvhTree::Branch(
+                        boxc(2.0, 2.0, 0.0, 1.0, 1.0, 3.0),
+                        Some(Box::new(BvhTree::Leaf(boxac(2.0, 2.0, 0.0, 1.0, 1.0, 1.0)))),
+                        Some(Box::new(BvhTree::Leaf(boxac(2.0, 2.0, 2.0, 1.0, 1.0, 1.0)))),
+                    ))),
+                ))),
+            )
+        );
+    }
+
+    fn boxc(x: f64, y: f64, z: f64, w: f64, h: f64, d: f64) -> AlignedBoxCollider {
+        AlignedBoxCollider::new(Vector3::new(x, y, z), Vector3::new(w, h, d))
+    }
+
+    fn boxac(x: f64, y: f64, z: f64, w: f64, h: f64, d: f64) -> Collider {
+        Collider::from(boxc(x, y, z, w, h, d))
+    }
 }
