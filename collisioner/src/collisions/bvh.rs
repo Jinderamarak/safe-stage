@@ -87,9 +87,9 @@ mod tests {
     fn test_build_bhv_correct() {
         let mut objects = vec![
             Collider::from(PointCollider::new(Vector3::new(1.0, 1.0, 1.0))),
-            Collider::from(PointCollider::new(Vector3::new(1.0, 1.0, 1.0))),
-            Collider::from(PointCollider::new(Vector3::new(1.0, 1.0, 1.0))),
-            Collider::from(PointCollider::new(Vector3::new(1.0, 1.0, 1.0))),
+            Collider::from(PointCollider::new(Vector3::new(2.0, 2.0, 2.0))),
+            Collider::from(PointCollider::new(Vector3::new(3.0, 3.0, 3.0))),
+            Collider::from(PointCollider::new(Vector3::new(4.0, 4.0, 4.0))),
         ];
 
         let tree = BvhTree::build(&mut objects[..]);
@@ -99,29 +99,29 @@ mod tests {
         assert_eq!(
             tree.unwrap(),
             BvhTree::Branch(
-                AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(0.0, 0.0, 0.0)),
+                AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(3.0, 3.0, 3.0)),
                 Some(Box::new(BvhTree::Branch(
                     AlignedBoxCollider::new(
                         Vector3::new(1.0, 1.0, 1.0),
-                        Vector3::new(0.0, 0.0, 0.0)
+                        Vector3::new(1.0, 1.0, 1.0)
                     ),
                     Some(Box::new(BvhTree::Leaf(Collider::from(PointCollider::new(
                         Vector3::new(1.0, 1.0, 1.0)
                     ))))),
                     Some(Box::new(BvhTree::Leaf(Collider::from(PointCollider::new(
-                        Vector3::new(1.0, 1.0, 1.0)
+                        Vector3::new(2.0, 2.0, 2.0)
                     ))))),
                 ))),
                 Some(Box::new(BvhTree::Branch(
                     AlignedBoxCollider::new(
-                        Vector3::new(1.0, 1.0, 1.0),
-                        Vector3::new(0.0, 0.0, 0.0)
+                        Vector3::new(3.0, 3.0, 3.0),
+                        Vector3::new(1.0, 1.0, 1.0)
                     ),
                     Some(Box::new(BvhTree::Leaf(Collider::from(PointCollider::new(
-                        Vector3::new(1.0, 1.0, 1.0)
+                        Vector3::new(3.0, 3.0, 3.0)
                     ))))),
                     Some(Box::new(BvhTree::Leaf(Collider::from(PointCollider::new(
-                        Vector3::new(1.0, 1.0, 1.0)
+                        Vector3::new(4.0, 4.0, 4.0)
                     ))))),
                 ))),
             )
