@@ -1,6 +1,7 @@
-use std::ops::{Add, Mul, Sub};
+use crate::common::Axis;
+use std::ops::{Add, Div, Mul, Sub};
 
-/// # Vector 3D
+/// # Vector 3
 /// Struct representing a 3D vector / 3D point.
 ///
 /// ## Example
@@ -17,7 +18,7 @@ use std::ops::{Add, Mul, Sub};
 /// assert_eq!(v1_v2.x(), 5.0);
 /// assert_eq!(v2_v3.y(), 1.0);
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Vector3 {
     x: f64,
     y: f64,
@@ -39,6 +40,14 @@ impl Vector3 {
 
     pub fn z(&self) -> f64 {
         self.z
+    }
+
+    pub fn get(&self, axis: Axis) -> f64 {
+        match axis {
+            Axis::X => self.x,
+            Axis::Y => self.y,
+            Axis::Z => self.z,
+        }
     }
 }
 
@@ -74,15 +83,34 @@ impl Mul<f64> for Vector3 {
     }
 }
 
+impl Div<f64> for Vector3 {
+    type Output = Vector3;
+
+    fn div(self, scalar: f64) -> Vector3 {
+        Vector3::new(self.x() / scalar, self.y() / scalar, self.z() / scalar)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn vector3_correct() {
+    fn test_vector3_correct() {
         let vector = Vector3::new(1.0, 2.0, 3.0);
         assert_eq!(vector.x(), 1.0);
         assert_eq!(vector.y(), 2.0);
         assert_eq!(vector.z(), 3.0);
+    }
+
+    #[test]
+    fn test_vector3_add() {
+        let v1 = Vector3::new(1.0, 2.0, 3.0);
+        let v2 = Vector3::new(4.0, 5.0, 6.0);
+        let r = v1 + v2;
+
+        assert_eq!(r.x(), 5.0);
+        assert_eq!(r.y(), 7.0);
+        assert_eq!(r.z(), 9.0);
     }
 }

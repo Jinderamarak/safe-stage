@@ -1,20 +1,64 @@
-use crate::colliders::{AlignedBox, AlignedBoxCollision};
-use crate::common::Vector3 as Point;
+use crate::colliders::{AlignedBoxCollider, Bounded, Collides};
+use crate::common::Vector3;
 
-/// Determines if a point (`Vector3`) collides with other primitive
-pub trait PointCollision {
-    fn collides(&self, other: &Point) -> bool;
+/// # Point Collider
+/// Basic primitive for representing single point.
+/// Only alias for `Vector3`.
+///
+/// ## Example
+/// ```
+/// use collisioner::colliders::PointCollider;
+/// use collisioner::colliders::Collides;
+/// use collisioner::common::Vector3;
+///
+/// let point1 = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
+/// let point2 = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
+/// let point3 = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
+///
+/// assert!(!point1.collides_with(&point2));
+/// assert!(point2.collides_with(&point3));
+/// assert!(!point1.collides_with(&point3));
+/// ```
+#[derive(Debug, Clone, PartialEq)]
+pub struct PointCollider {
+    position: Vector3,
 }
 
-impl PointCollision for Point {
-    fn collides(&self, other: &Point) -> bool {
-        self == other
+impl PointCollider {
+    pub fn new(position: Vector3) -> Self {
+        Self { position }
+    }
+
+    pub fn position(&self) -> Vector3 {
+        self.position
     }
 }
 
-impl AlignedBoxCollision for Point {
-    fn collides(&self, other: &AlignedBox) -> bool {
-        PointCollision::collides(other, self)
+impl From<Vector3> for PointCollider {
+    fn from(position: Vector3) -> Self {
+        Self::new(position)
+    }
+}
+
+impl Bounded for PointCollider {
+    fn min(&self) -> Vector3 {
+        self.position()
+    }
+
+    fn max(&self) -> Vector3 {
+        self.position()
+    }
+}
+
+impl Collides<Self> for PointCollider {
+    fn collides_with(&self, other: &Self) -> bool {
+        self.position() == other.position()
+    }
+}
+
+impl Collides<AlignedBoxCollider> for PointCollider {
+    fn collides_with(&self, other: &AlignedBoxCollider) -> bool {
+        other.collides_with(self)
     }
 }
 
@@ -23,18 +67,26 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_same_points_collide() {
-        let point = Point::new(0.0, 0.0, 0.0);
-        let other = Point::new(0.0, 0.0, 0.0);
+    fn test_point_bounding_volume() {
+        let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 
-        assert!(PointCollision::collides(&point, &other));
+        assert_eq!(point.min(), point.position());
+        assert_eq!(point.max(), point.position());
+    }
+
+    #[test]
+    fn test_same_points_collide() {
+        let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
+        let other = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
+
+        assert!(point.collides_with(&other));
     }
 
     #[test]
     fn test_different_points_dont_collide() {
-        let point = Point::new(0.0, 0.0, 0.0);
-        let other = Point::new(1.0, 1.0, 1.0);
+        let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
+        let other = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(!PointCollision::collides(&point, &other));
+        assert!(!point.collides_with(&other));
     }
 }
