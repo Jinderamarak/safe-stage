@@ -97,43 +97,28 @@ mod tests {
     #[test]
     fn test_build_bhv_correct() {
         let mut objects = vec![
-            Collider::from(PointCollider::new(Vector3::new(1.0, 1.0, 1.0))),
-            Collider::from(PointCollider::new(Vector3::new(2.0, 2.0, 2.0))),
-            Collider::from(PointCollider::new(Vector3::new(3.0, 3.0, 3.0))),
-            Collider::from(PointCollider::new(Vector3::new(4.0, 4.0, 4.0))),
+            pointac(1.0, 1.0, 1.0),
+            pointac(2.0, 2.0, 2.0),
+            pointac(3.0, 3.0, 3.0),
+            pointac(4.0, 4.0, 4.0),
         ];
 
         let tree = BvhTree::build(&mut objects[..]);
 
         assert!(tree.is_some());
-
         assert_eq!(
             tree.unwrap(),
             BvhTree::Branch(
-                AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(3.0, 3.0, 3.0)),
+                boxc(1.0, 1.0, 1.0, 3.0, 3.0, 3.0),
                 Some(Box::new(BvhTree::Branch(
-                    AlignedBoxCollider::new(
-                        Vector3::new(1.0, 1.0, 1.0),
-                        Vector3::new(1.0, 1.0, 1.0)
-                    ),
-                    Some(Box::new(BvhTree::Leaf(Collider::from(PointCollider::new(
-                        Vector3::new(1.0, 1.0, 1.0)
-                    ))))),
-                    Some(Box::new(BvhTree::Leaf(Collider::from(PointCollider::new(
-                        Vector3::new(2.0, 2.0, 2.0)
-                    ))))),
+                    boxc(1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
+                    Some(Box::new(BvhTree::Leaf(pointac(1.0, 1.0, 1.0)))),
+                    Some(Box::new(BvhTree::Leaf(pointac(2.0, 2.0, 2.0)))),
                 ))),
                 Some(Box::new(BvhTree::Branch(
-                    AlignedBoxCollider::new(
-                        Vector3::new(3.0, 3.0, 3.0),
-                        Vector3::new(1.0, 1.0, 1.0)
-                    ),
-                    Some(Box::new(BvhTree::Leaf(Collider::from(PointCollider::new(
-                        Vector3::new(3.0, 3.0, 3.0)
-                    ))))),
-                    Some(Box::new(BvhTree::Leaf(Collider::from(PointCollider::new(
-                        Vector3::new(4.0, 4.0, 4.0)
-                    ))))),
+                    boxc(3.0, 3.0, 3.0, 1.0, 1.0, 1.0),
+                    Some(Box::new(BvhTree::Leaf(pointac(3.0, 3.0, 3.0)))),
+                    Some(Box::new(BvhTree::Leaf(pointac(4.0, 4.0, 4.0)))),
                 ))),
             )
         );
@@ -155,7 +140,6 @@ mod tests {
         let tree = BvhTree::build(&mut objects[..]);
 
         assert!(tree.is_some());
-
         assert_eq!(
             tree.unwrap(),
             BvhTree::Branch(
@@ -196,5 +180,9 @@ mod tests {
 
     fn boxac(x: f64, y: f64, z: f64, w: f64, h: f64, d: f64) -> Collider {
         Collider::from(boxc(x, y, z, w, h, d))
+    }
+
+    fn pointac(x: f64, y: f64, z: f64) -> Collider {
+        Collider::from(PointCollider::new(Vector3::new(x, y, z)))
     }
 }
