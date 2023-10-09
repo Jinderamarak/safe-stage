@@ -32,9 +32,9 @@ impl BvhTree {
             .unwrap();
 
         let diff = max - min;
-        let axis = if diff.x() > diff.y() && diff.x() > diff.z() {
+        let axis = if diff.x() >= diff.y() && diff.x() >= diff.z() {
             Axis::X
-        } else if diff.y() > diff.x() && diff.y() > diff.z() {
+        } else if diff.y() >= diff.x() && diff.y() >= diff.z() {
             Axis::Y
         } else {
             Axis::Z
