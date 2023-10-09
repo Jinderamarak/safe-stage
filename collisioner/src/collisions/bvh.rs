@@ -26,7 +26,7 @@ impl BvhTree {
 
         let (min, max) = objects
             .iter()
-            .map(collider_to_point)
+            .map(Self::collider_to_point)
             .minmax_by(|a, b| a.partial_cmp(b).unwrap())
             .into_option()
             .unwrap();
@@ -42,7 +42,7 @@ impl BvhTree {
 
         let mut ordered = objects
             .iter()
-            .map(|c| (c, collider_to_point(c).get(axis)))
+            .map(|c| (c, Self::collider_to_point(c).get(axis)))
             .collect::<Vec<(&Collider, f64)>>();
 
         ordered.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
@@ -57,7 +57,7 @@ impl BvhTree {
         let left = Self::build(&mut ordered[..half]);
         let right = Self::build(&mut ordered[half..]);
 
-        let bounding = self::colliders_to_bounding_box(objects);
+        let bounding = Self::colliders_to_bounding_box(objects);
 
         Some(BvhTree::Branch(
             bounding,
@@ -65,28 +65,28 @@ impl BvhTree {
             right.map(Box::new),
         ))
     }
-}
 
-fn collider_to_point(c: &Collider) -> Vector3 {
-    let min = c.min();
-    let max = c.max();
-    min + ((max - min) / 2.0)
-}
+    fn collider_to_point(c: &Collider) -> Vector3 {
+        let min = c.min();
+        let max = c.max();
+        min + ((max - min) / 2.0)
+    }
 
-fn colliders_to_bounding_box(colliders: &[Collider]) -> AlignedBoxCollider {
-    let min = colliders
-        .iter()
-        .map(|c| c.min())
-        .min_by(|a, b| a.partial_cmp(b).unwrap())
-        .unwrap();
+    fn colliders_to_bounding_box(colliders: &[Collider]) -> AlignedBoxCollider {
+        let min = colliders
+            .iter()
+            .map(|c| c.min())
+            .min_by(|a, b| a.partial_cmp(b).unwrap())
+            .unwrap();
 
-    let max = colliders
-        .iter()
-        .map(|c| c.max())
-        .max_by(|a, b| a.partial_cmp(b).unwrap())
-        .unwrap();
+        let max = colliders
+            .iter()
+            .map(|c| c.max())
+            .max_by(|a, b| a.partial_cmp(b).unwrap())
+            .unwrap();
 
-    AlignedBoxCollider::new(min, max - min)
+        AlignedBoxCollider::new(min, max - min)
+    }
 }
 
 #[cfg(test)]
