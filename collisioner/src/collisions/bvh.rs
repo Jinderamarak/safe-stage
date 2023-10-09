@@ -57,7 +57,7 @@ impl BvhTree {
         let left = Self::build(&mut ordered[..half]);
         let right = Self::build(&mut ordered[half..]);
 
-        let bounding = AlignedBoxCollider::new(min, max - min);
+        let bounding = self::colliders_to_bounding_box(objects);
 
         Some(BvhTree::Branch(
             bounding,
@@ -68,14 +68,25 @@ impl BvhTree {
 }
 
 fn collider_to_point(c: &Collider) -> Vector3 {
-    match c {
-        Collider::Point(p) => p.position(),
-        Collider::AlignedBox(b) => bound_to_point(b.min(), b.max()),
-    }
+    let min = c.min();
+    let max = c.max();
+    min + ((max - min) / 2.0)
 }
 
-fn bound_to_point(min: Vector3, max: Vector3) -> Vector3 {
-    min + ((max - min) / 2.0)
+fn colliders_to_bounding_box(colliders: &[Collider]) -> AlignedBoxCollider {
+    let min = colliders
+        .iter()
+        .map(|c| c.min())
+        .min_by(|a, b| a.partial_cmp(b).unwrap())
+        .unwrap();
+
+    let max = colliders
+        .iter()
+        .map(|c| c.max())
+        .max_by(|a, b| a.partial_cmp(b).unwrap())
+        .unwrap();
+
+    AlignedBoxCollider::new(min, max - min)
 }
 
 #[cfg(test)]
