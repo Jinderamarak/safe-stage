@@ -22,9 +22,21 @@ pub struct AlignedBoxCollider {
 
 impl AlignedBoxCollider {
     pub fn new(position: Vector3, size: Vector3) -> Self {
-        assert!(size.x() >= 0.0);
-        assert!(size.y() >= 0.0);
-        assert!(size.z() >= 0.0);
+        assert!(
+            size.x() >= 0.0,
+            "Size cannot be negative, x was '{}'",
+            size.x()
+        );
+        assert!(
+            size.y() >= 0.0,
+            "Size cannot be negative, y was '{}'",
+            size.y()
+        );
+        assert!(
+            size.z() >= 0.0,
+            "Size cannot be negative, z was '{}'",
+            size.z()
+        );
 
         Self { position, size }
     }
@@ -82,6 +94,24 @@ impl Collides<PointCollider> for AlignedBoxCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_size_x() {
+        let _ = AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(-1.0, 0.0, 0.0));
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_size_y() {
+        let _ = AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(0.0, -1.0, 0.0));
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_size_z() {
+        let _ = AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(0.0, 0.0, -1.0));
+    }
 
     #[test]
     fn test_box_bounding_regular() {
