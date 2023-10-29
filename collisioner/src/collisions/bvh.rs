@@ -93,6 +93,7 @@ impl BvhTree {
 mod tests {
     use super::*;
     use crate::colliders::{AlignedBoxCollider, PointCollider};
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn build_bhv_correct() {

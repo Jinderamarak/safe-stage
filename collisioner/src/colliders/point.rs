@@ -65,6 +65,7 @@ impl Collides<AlignedBoxCollider> for PointCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn bounding_volume() {
