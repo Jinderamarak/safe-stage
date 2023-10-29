@@ -1,4 +1,4 @@
-use crate::common::Axis;
+use crate::common::{Axis, Quaternion};
 use std::ops::{Add, Div, Mul, Sub};
 
 /// # Vector 3
@@ -48,6 +48,16 @@ impl Vector3 {
             Axis::Y => self.y,
             Axis::Z => self.z,
         }
+    }
+
+    pub fn rotate(&self, rotation: Quaternion) -> Self {
+        let rotated = rotation * self.into() * rotation.conjugate();
+        rotated.into()
+    }
+
+    pub fn rotate_around(&self, pivot: Vector3, rotation: Quaternion) -> Self {
+        let rotated = rotation * (*self - pivot).into() * rotation.conjugate();
+        pivot + rotated.into()
     }
 }
 
@@ -106,5 +116,67 @@ mod tests {
         assert_eq!(r.x(), 5.0);
         assert_eq!(r.y(), 7.0);
         assert_eq!(r.z(), 9.0);
+    }
+
+    #[test]
+    fn subtract() {
+        let v1 = Vector3::new(1.0, 2.0, 3.0);
+        let v2 = Vector3::new(4.0, 5.0, 6.0);
+        let r = v1 - v2;
+
+        assert_eq!(r.x(), -3.0);
+        assert_eq!(r.y(), -3.0);
+        assert_eq!(r.z(), -3.0);
+    }
+
+    #[test]
+    fn multiply() {
+        let v1 = Vector3::new(1.0, 2.0, 3.0);
+        let r = v1 * 2.0;
+
+        assert_eq!(r.x(), 2.0);
+        assert_eq!(r.y(), 4.0);
+        assert_eq!(r.z(), 6.0);
+    }
+
+    #[test]
+    fn divide() {
+        let v1 = Vector3::new(1.0, 2.0, 3.0);
+        let r = v1 / 2.0;
+
+        assert_eq!(r.x(), 0.5);
+        assert_eq!(r.y(), 1.0);
+        assert_eq!(r.z(), 1.5);
+    }
+
+    #[test]
+    fn rotate() {
+        let vector = Vector3::new(1.0, 0.0, 0.0);
+        let rotation = Quaternion::from_euler(Vector3::new(
+            0.0_f64.to_radians(),
+            0.0_f64.to_radians(),
+            90.0_f64.to_radians(),
+        ));
+        let rotated = vector.rotate(rotation);
+
+        assert_float_absolute_eq!(rotated.x(), 0.0);
+        assert_float_absolute_eq!(rotated.y(), 1.0);
+        assert_float_absolute_eq!(rotated.z(), 0.0);
+    }
+
+    #[test]
+    fn rotate_around() {
+        let vector = Vector3::new(1.0, 0.0, 0.0);
+        let pivot = Vector3::new(1.0, 1.0, 0.0);
+        let rotation = Quaternion::from_euler(Vector3::new(
+            0.0_f64.to_radians(),
+            0.0_f64.to_radians(),
+            90.0_f64.to_radians(),
+        ));
+        let rotated = vector.rotate_around(pivot, rotation);
+
+        assert_float_absolute_eq!(rotated.x(), 2.0);
+        assert_float_absolute_eq!(rotated.y(), 1.0);
+        assert_float_absolute_eq!(rotated.z(), 0.0);
     }
 }
