@@ -67,7 +67,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_point_bounding_volume() {
+    fn bounding_volume() {
         let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 
         assert_eq!(point.min(), point.position());
@@ -75,7 +75,7 @@ mod tests {
     }
 
     #[test]
-    fn test_same_points_collide() {
+    fn same_points_collide() {
         let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
         let other = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 
@@ -83,7 +83,7 @@ mod tests {
     }
 
     #[test]
-    fn test_different_points_dont_collide() {
+    fn different_points_dont_collide() {
         let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
         let other = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
 

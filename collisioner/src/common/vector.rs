@@ -16,7 +16,7 @@ use std::ops::{Add, Div, Mul, Sub};
 /// let v2_v3 = v2 - v3;
 ///
 /// assert_eq!(v1_v2.x(), 5.0);
-/// assert_eq!(v2_v3.y(), 1.0);
+/// assert_eq!(v2_v3.x(), 2.0);
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Vector3 {
@@ -86,9 +86,11 @@ impl Div<f64> for Vector3 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use assert_float_eq::*;
+    use pretty_assertions::assert_eq;
 
     #[test]
-    fn test_vector3_correct() {
+    fn create_correct() {
         let vector = Vector3::new(1.0, 2.0, 3.0);
         assert_eq!(vector.x(), 1.0);
         assert_eq!(vector.y(), 2.0);
@@ -96,7 +98,7 @@ mod tests {
     }
 
     #[test]
-    fn test_vector3_add() {
+    fn add() {
         let v1 = Vector3::new(1.0, 2.0, 3.0);
         let v2 = Vector3::new(4.0, 5.0, 6.0);
         let r = v1 + v2;

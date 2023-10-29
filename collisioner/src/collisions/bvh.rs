@@ -95,7 +95,7 @@ mod tests {
     use crate::colliders::{AlignedBoxCollider, PointCollider};
 
     #[test]
-    fn test_build_bhv_correct() {
+    fn build_bhv_correct() {
         let mut objects = vec![
             pointac(1.0, 1.0, 1.0),
             pointac(2.0, 2.0, 2.0),
@@ -125,7 +125,7 @@ mod tests {
     }
 
     #[test]
-    fn test_build_bhv_complex() {
+    fn build_bhv_complex() {
         let mut objects = vec![
             boxac(0.0, 0.0, 0.0, 1.0, 1.0, 1.0),
             boxac(2.0, 0.0, 0.0, 1.0, 1.0, 1.0),

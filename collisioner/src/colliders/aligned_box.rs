@@ -97,24 +97,24 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn test_invalid_size_x() {
+    fn invalid_size_x() {
         let _ = AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(-1.0, 0.0, 0.0));
     }
 
     #[test]
     #[should_panic]
-    fn test_invalid_size_y() {
+    fn invalid_size_y() {
         let _ = AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(0.0, -1.0, 0.0));
     }
 
     #[test]
     #[should_panic]
-    fn test_invalid_size_z() {
+    fn invalid_size_z() {
         let _ = AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(0.0, 0.0, -1.0));
     }
 
     #[test]
-    fn test_box_bounding_regular() {
+    fn box_bounding_regular() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(1.0, 2.0, 4.0), Vector3::new(3.0, 2.0, 1.0));
 
@@ -123,7 +123,7 @@ mod tests {
     }
 
     #[test]
-    fn test_boxes_corner_collide() {
+    fn boxes_corner_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let box2 =
@@ -133,7 +133,7 @@ mod tests {
     }
 
     #[test]
-    fn test_boxes_edge_collide() {
+    fn boxes_edge_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let box2 =
@@ -143,7 +143,7 @@ mod tests {
     }
 
     #[test]
-    fn test_boxes_face_collide() {
+    fn boxes_face_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let box2 =
@@ -153,7 +153,7 @@ mod tests {
     }
 
     #[test]
-    fn test_boxes_overlap_collide() {
+    fn boxes_overlap_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let box2 =
@@ -163,7 +163,7 @@ mod tests {
     }
 
     #[test]
-    fn test_boxes_inside_collide() {
+    fn boxes_inside_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let box2 =
@@ -173,7 +173,7 @@ mod tests {
     }
 
     #[test]
-    fn test_boxes_outside_dont_collide() {
+    fn boxes_outside_dont_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let box2 =
@@ -183,7 +183,7 @@ mod tests {
     }
 
     #[test]
-    fn test_boxes_close_dont_collide() {
+    fn boxes_close_dont_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let box2 =
@@ -193,7 +193,7 @@ mod tests {
     }
 
     #[test]
-    fn test_box_point_corner_collide() {
+    fn box_point_corner_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let point = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
@@ -202,7 +202,7 @@ mod tests {
     }
 
     #[test]
-    fn test_box_point_edge_collide() {
+    fn box_point_edge_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 2.0));
         let point = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
@@ -211,7 +211,7 @@ mod tests {
     }
 
     #[test]
-    fn test_box_point_face_collide() {
+    fn box_point_face_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let point = PointCollider::new(Vector3::new(2.0, 1.0, 1.0));
@@ -220,7 +220,7 @@ mod tests {
     }
 
     #[test]
-    fn test_box_point_inside_collide() {
+    fn box_point_inside_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let point = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
@@ -229,7 +229,7 @@ mod tests {
     }
 
     #[test]
-    fn test_box_point_outside_dont_collide() {
+    fn box_point_outside_dont_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let point = PointCollider::new(Vector3::new(2.0, 2.0, 2.0));
@@ -238,7 +238,7 @@ mod tests {
     }
 
     #[test]
-    fn test_box_point_close_dont_collide() {
+    fn box_point_close_dont_collide() {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let point = PointCollider::new(Vector3::new(3.0, 1.0, 1.0));
