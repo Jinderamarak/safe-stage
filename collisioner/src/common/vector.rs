@@ -102,9 +102,9 @@ mod tests {
     #[test]
     fn create_correct() {
         let vector = Vector3::new(1.0, 2.0, 3.0);
-        assert_eq!(vector.x(), 1.0);
-        assert_eq!(vector.y(), 2.0);
-        assert_eq!(vector.z(), 3.0);
+        assert_eq!(1.0, vector.x());
+        assert_eq!(2.0, vector.y());
+        assert_eq!(3.0, vector.z());
     }
 
     #[test]
@@ -113,9 +113,9 @@ mod tests {
         let v2 = Vector3::new(4.0, 5.0, 6.0);
         let r = v1 + v2;
 
-        assert_eq!(r.x(), 5.0);
-        assert_eq!(r.y(), 7.0);
-        assert_eq!(r.z(), 9.0);
+        assert_eq!(5.0, r.x());
+        assert_eq!(7.0, r.y());
+        assert_eq!(9.0, r.z());
     }
 
     #[test]
@@ -124,9 +124,9 @@ mod tests {
         let v2 = Vector3::new(4.0, 5.0, 6.0);
         let r = v1 - v2;
 
-        assert_eq!(r.x(), -3.0);
-        assert_eq!(r.y(), -3.0);
-        assert_eq!(r.z(), -3.0);
+        assert_eq!(-3.0, r.x());
+        assert_eq!(-3.0, r.y());
+        assert_eq!(-3.0, r.z());
     }
 
     #[test]
@@ -134,9 +134,9 @@ mod tests {
         let v1 = Vector3::new(1.0, 2.0, 3.0);
         let r = v1 * 2.0;
 
-        assert_eq!(r.x(), 2.0);
-        assert_eq!(r.y(), 4.0);
-        assert_eq!(r.z(), 6.0);
+        assert_eq!(2.0, r.x());
+        assert_eq!(4.0, r.y());
+        assert_eq!(6.0, r.z());
     }
 
     #[test]
@@ -144,9 +144,9 @@ mod tests {
         let v1 = Vector3::new(1.0, 2.0, 3.0);
         let r = v1 / 2.0;
 
-        assert_eq!(r.x(), 0.5);
-        assert_eq!(r.y(), 1.0);
-        assert_eq!(r.z(), 1.5);
+        assert_eq!(0.5, r.x());
+        assert_eq!(1.0, r.y());
+        assert_eq!(1.5, r.z());
     }
 
     #[test]
@@ -159,9 +159,9 @@ mod tests {
         ));
         let rotated = vector.rotate(rotation);
 
-        assert_float_absolute_eq!(rotated.x(), 0.0);
-        assert_float_absolute_eq!(rotated.y(), 1.0);
-        assert_float_absolute_eq!(rotated.z(), 0.0);
+        assert_float_absolute_eq!(0.0, rotated.x());
+        assert_float_absolute_eq!(1.0, rotated.y());
+        assert_float_absolute_eq!(0.0, rotated.z());
     }
 
     #[test]
@@ -175,8 +175,8 @@ mod tests {
         ));
         let rotated = vector.rotate_around(pivot, rotation);
 
-        assert_float_absolute_eq!(rotated.x(), 2.0);
-        assert_float_absolute_eq!(rotated.y(), 1.0);
-        assert_float_absolute_eq!(rotated.z(), 0.0);
+        assert_float_absolute_eq!(2.0, rotated.x());
+        assert_float_absolute_eq!(1.0, rotated.y());
+        assert_float_absolute_eq!(0.0, rotated.z());
     }
 }

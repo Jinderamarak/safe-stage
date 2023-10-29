@@ -119,8 +119,8 @@ mod tests {
         let box1 =
             AlignedBoxCollider::new(Vector3::new(1.0, 2.0, 4.0), Vector3::new(3.0, 2.0, 1.0));
 
-        assert_eq!(box1.min(), Vector3::new(1.0, 2.0, 4.0));
-        assert_eq!(box1.max(), Vector3::new(4.0, 4.0, 5.0));
+        assert_eq!(Vector3::new(1.0, 2.0, 4.0), box1.min());
+        assert_eq!(Vector3::new(4.0, 4.0, 5.0), box1.max());
     }
 
     #[test]

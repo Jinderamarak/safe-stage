@@ -132,10 +132,10 @@ mod tests {
     fn create_correct() {
         let quaternion = Quaternion::new(1.0, 2.0, 3.0, 4.0);
 
-        assert_eq!(quaternion.x(), 1.0);
-        assert_eq!(quaternion.y(), 2.0);
-        assert_eq!(quaternion.z(), 3.0);
-        assert_eq!(quaternion.w(), 4.0);
+        assert_eq!(1.0, quaternion.x());
+        assert_eq!(2.0, quaternion.y());
+        assert_eq!(3.0, quaternion.z());
+        assert_eq!(4.0, quaternion.w());
     }
 
     #[test]
@@ -147,10 +147,10 @@ mod tests {
         );
         let quaternion = Quaternion::from_euler(vector);
 
-        assert_eq!(quaternion.x(), -0.09229595564125731);
-        assert_eq!(quaternion.y(), 0.4304593345768794);
-        assert_eq!(quaternion.z(), 0.560985526796931);
-        assert_eq!(quaternion.w(), 0.7010573846499779);
+        assert_eq!(-0.09229595564125731, quaternion.x());
+        assert_eq!(0.4304593345768794, quaternion.y());
+        assert_eq!(0.560985526796931, quaternion.z());
+        assert_eq!(0.7010573846499779, quaternion.w());
     }
 
     #[test]
@@ -163,9 +163,9 @@ mod tests {
         );
         let vector: Vector3 = quaternion.to_euler();
 
-        assert_float_absolute_eq!(vector.x().to_degrees(), 30.0);
-        assert_float_absolute_eq!(vector.y().to_degrees(), 45.0);
-        assert_float_absolute_eq!(vector.z().to_degrees(), 90.0);
+        assert_float_absolute_eq!(30.0, vector.x().to_degrees());
+        assert_float_absolute_eq!(45.0, vector.y().to_degrees());
+        assert_float_absolute_eq!(90.0, vector.z().to_degrees());
     }
 
     #[test]
@@ -173,10 +173,10 @@ mod tests {
         let vector = Vector3::new(1.0, 2.0, 3.0);
         let quaternion: Quaternion = vector.into();
 
-        assert_eq!(quaternion.x(), 1.0);
-        assert_eq!(quaternion.y(), 2.0);
-        assert_eq!(quaternion.z(), 3.0);
-        assert_eq!(quaternion.w(), 0.0);
+        assert_eq!(1.0, quaternion.x());
+        assert_eq!(2.0, quaternion.y());
+        assert_eq!(3.0, quaternion.z());
+        assert_eq!(0.0, quaternion.w());
     }
 
     #[test]
@@ -184,9 +184,9 @@ mod tests {
         let quaternion = Quaternion::new(1.0, 2.0, 3.0, 4.0);
         let vector: Vector3 = quaternion.into();
 
-        assert_eq!(vector.x(), 1.0);
-        assert_eq!(vector.y(), 2.0);
-        assert_eq!(vector.z(), 3.0);
+        assert_eq!(1.0, vector.x());
+        assert_eq!(2.0, vector.y());
+        assert_eq!(3.0, vector.z());
     }
 
     #[test]
@@ -194,10 +194,10 @@ mod tests {
         let quaternion = Quaternion::new(1.0, 2.0, 3.0, 4.0);
         let conjugate = quaternion.conjugate();
 
-        assert_eq!(conjugate.x(), -1.0);
-        assert_eq!(conjugate.y(), -2.0);
-        assert_eq!(conjugate.z(), -3.0);
-        assert_eq!(conjugate.w(), 4.0);
+        assert_eq!(-1.0, conjugate.x());
+        assert_eq!(-2.0, conjugate.y());
+        assert_eq!(-3.0, conjugate.z());
+        assert_eq!(4.0, conjugate.w());
     }
 
     #[test]
@@ -206,9 +206,9 @@ mod tests {
         let q2 = Quaternion::new(5.0, 6.0, 7.0, 8.0);
         let q3 = q1 * q2;
 
-        assert_eq!(q3.x(), 24.0);
-        assert_eq!(q3.y(), 48.0);
-        assert_eq!(q3.z(), 48.0);
-        assert_eq!(q3.w(), -6.0);
+        assert_eq!(24.0, q3.x());
+        assert_eq!(48.0, q3.y());
+        assert_eq!(48.0, q3.z());
+        assert_eq!(-6.0, q3.w());
     }
 }

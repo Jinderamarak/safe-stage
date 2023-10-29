@@ -108,7 +108,6 @@ mod tests {
 
         assert!(tree.is_some());
         assert_eq!(
-            tree.unwrap(),
             BvhTree::Branch(
                 boxc(1.0, 1.0, 1.0, 3.0, 3.0, 3.0),
                 Some(Box::new(BvhTree::Branch(
@@ -121,7 +120,8 @@ mod tests {
                     Some(Box::new(BvhTree::Leaf(pointac(3.0, 3.0, 3.0)))),
                     Some(Box::new(BvhTree::Leaf(pointac(4.0, 4.0, 4.0)))),
                 ))),
-            )
+            ),
+            tree.unwrap()
         );
     }
 
@@ -142,7 +142,6 @@ mod tests {
 
         assert!(tree.is_some());
         assert_eq!(
-            tree.unwrap(),
             BvhTree::Branch(
                 boxc(0.0, 0.0, 0.0, 3.0, 3.0, 3.0),
                 Some(Box::new(BvhTree::Branch(
@@ -171,7 +170,8 @@ mod tests {
                         Some(Box::new(BvhTree::Leaf(boxac(2.0, 2.0, 2.0, 1.0, 1.0, 1.0)))),
                     ))),
                 ))),
-            )
+            ),
+            tree.unwrap()
         );
     }
 

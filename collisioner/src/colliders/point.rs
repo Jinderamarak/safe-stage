@@ -71,8 +71,8 @@ mod tests {
     fn bounding_volume() {
         let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 
-        assert_eq!(point.min(), point.position());
-        assert_eq!(point.max(), point.position());
+        assert_eq!(point.position(), point.min());
+        assert_eq!(point.position(), point.max());
     }
 
     #[test]
