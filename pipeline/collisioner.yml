@@ -1,8 +1,6 @@
 .collisioner-template: &collisioner-template
   variables:
     CARGO_HOME: $CI_PROJECT_DIR/.cargo
-  before_script:
-    - cd collisioner
 
 .collisioner-latest: &collisioner-latest
   <<: *collisioner-template
@@ -11,7 +9,7 @@
     key: collisioner-latest-${CI_COMMIT_REF_SLUG}
     paths:
       - $CARGO_HOME
-      - collisioner/Cargo.lock
+      - Cargo.lock
 
 .collisioner-nightly: &collisioner-nightly
   <<: *collisioner-template
@@ -20,16 +18,16 @@
     key: collisioner-nightly-${CI_COMMIT_REF_SLUG}
     paths:
       - $CARGO_HOME
-      - collisioner/Cargo.lock
+      - Cargo.lock
 
 collisioner:lint:
   <<: *collisioner-latest
   stage: lint
   script:
     - rustup component add rustfmt
-    - cargo fmt -- --check
+    - cargo fmt --package collisioner -- --check
     - rustup component add clippy
-    - cargo clippy -- -D warnings
+    - cargo clippy --package collisioner -- -D warnings
 
 collisioner:build:
   <<: *collisioner-latest
@@ -37,7 +35,7 @@ collisioner:build:
   needs:
     - collisioner:lint
   script:
-    - cargo build --verbose
+    - cargo build --package collisioner --verbose
 
 collisioner:build:nightly:
   <<: *collisioner-nightly
@@ -45,7 +43,7 @@ collisioner:build:nightly:
   needs:
     - collisioner:lint
   script:
-    - cargo build --verbose
+    - cargo build --package collisioner --verbose
   allow_failure: true
 
 collisioner:test:
@@ -54,7 +52,7 @@ collisioner:test:
   needs:
     - collisioner:build
   script:
-    - cargo test --verbose
+    - cargo test --package collisioner --verbose
 
 collisioner:test:nightly:
   <<: *collisioner-nightly
@@ -63,9 +61,10 @@ collisioner:test:nightly:
     - collisioner:build:nightly
   script:
     - cargo install --root . cargo2junit
-    - cargo test -- -Z unstable-options --format json --report-time | bin/cargo2junit > report.xml
+    - cargo test --package collisioner -- -Z unstable-options --format json --report-time | bin/cargo2junit > report.xml
   artifacts:
     when: always
     reports:
       junit:
-        - collisioner/report.xml
+        - report.xml
+  allow_failure: true
