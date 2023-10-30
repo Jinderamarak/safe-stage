@@ -93,6 +93,18 @@ impl Div<f64> for Vector3 {
     }
 }
 
+impl From<&Quaternion> for Vector3 {
+    fn from(quaternion: &Quaternion) -> Self {
+        Self::new(quaternion.x(), quaternion.y(), quaternion.z())
+    }
+}
+
+impl From<Quaternion> for Vector3 {
+    fn from(quaternion: Quaternion) -> Self {
+        Self::from(&quaternion)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -178,5 +190,15 @@ mod tests {
         assert_float_absolute_eq!(2.0, rotated.x());
         assert_float_absolute_eq!(1.0, rotated.y());
         assert_float_absolute_eq!(0.0, rotated.z());
+    }
+
+    #[test]
+    fn from_quaternion() {
+        let quaternion = Quaternion::new(1.0, 2.0, 3.0, 4.0);
+        let vector: Vector3 = quaternion.into();
+
+        assert_eq!(1.0, vector.x());
+        assert_eq!(2.0, vector.y());
+        assert_eq!(3.0, vector.z());
     }
 }

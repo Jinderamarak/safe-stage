@@ -103,12 +103,6 @@ impl From<Vector3> for Quaternion {
     }
 }
 
-impl Into<Vector3> for Quaternion {
-    fn into(self) -> Vector3 {
-        Vector3::new(self.x(), self.y(), self.z())
-    }
-}
-
 impl Mul<Quaternion> for Quaternion {
     type Output = Quaternion;
 
@@ -154,7 +148,7 @@ mod tests {
     }
 
     #[test]
-    fn into_euler_angles() {
+    fn to_euler_angles() {
         let quaternion = Quaternion::new(
             -0.09229595564125731,
             0.4304593345768794,
@@ -177,16 +171,6 @@ mod tests {
         assert_eq!(2.0, quaternion.y());
         assert_eq!(3.0, quaternion.z());
         assert_eq!(0.0, quaternion.w());
-    }
-
-    #[test]
-    fn into_vector() {
-        let quaternion = Quaternion::new(1.0, 2.0, 3.0, 4.0);
-        let vector: Vector3 = quaternion.into();
-
-        assert_eq!(1.0, vector.x());
-        assert_eq!(2.0, vector.y());
-        assert_eq!(3.0, vector.z());
     }
 
     #[test]
