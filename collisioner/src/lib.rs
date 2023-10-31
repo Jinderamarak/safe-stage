@@ -4,3 +4,6 @@
 pub mod colliders;
 pub mod collisions;
 pub mod common;
+
+#[cfg(test)]
+mod tests;
