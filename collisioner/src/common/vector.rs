@@ -64,6 +64,14 @@ impl Vector3 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
+    pub fn cross(&self, other: Vector3) -> Vector3 {
+        Vector3::new(
+            self.y * other.z - self.z * other.y,
+            self.z * other.x - self.x * other.z,
+            self.x * other.y - self.y * other.x,
+        )
+    }
+
     pub fn len(&self) -> f64 {
         self.dot(*self).sqrt()
     }
@@ -215,6 +223,17 @@ mod tests {
 
         assert_float_absolute_eq!(expected, actual);
         assert_float_absolute_eq!(expected, commutative);
+    }
+
+    #[test]
+    fn cross_product() {
+        let v1 = Vector3::new(3.0, 0.0, 2.0);
+        let v2 = Vector3::new(-1.0, 4.0, 2.0);
+
+        let expected = Vector3::new(-8.0, -8.0, 12.0);
+        let actual = v1.cross(v2);
+
+        assert_eq!(expected, actual);
     }
 
     #[test]
