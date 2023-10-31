@@ -59,6 +59,18 @@ impl Vector3 {
         let rotated = rotation * (*self - pivot).into() * rotation.conjugate();
         pivot + rotated.into()
     }
+
+    pub fn dot(&self, other: Vector3) -> f64 {
+        self.x * other.x + self.y * other.y + self.z * other.z
+    }
+
+    pub fn len(&self) -> f64 {
+        self.dot(*self).sqrt()
+    }
+
+    pub fn unit(&self) -> Self {
+        *self / self.len()
+    }
 }
 
 impl Add<Vector3> for Vector3 {
@@ -190,6 +202,40 @@ mod tests {
         assert_float_absolute_eq!(2.0, rotated.x());
         assert_float_absolute_eq!(1.0, rotated.y());
         assert_float_absolute_eq!(0.0, rotated.z());
+    }
+
+    #[test]
+    fn dot_product() {
+        let v1 = Vector3::new(1.0, 2.0, 3.0);
+        let v2 = Vector3::new(4.0, 5.0, 6.0);
+
+        let expected = 32.0;
+        let actual = v1.dot(v2);
+        let commutative = v2.dot(v1);
+
+        assert_float_absolute_eq!(expected, actual);
+        assert_float_absolute_eq!(expected, commutative);
+    }
+
+    #[test]
+    fn length() {
+        let vector = Vector3::new(1.0, 2.0, 3.0);
+
+        let expected = 14.0_f64.sqrt();
+        let actual = vector.len();
+
+        assert_float_absolute_eq!(expected, actual);
+    }
+
+    #[test]
+    fn unit() {
+        let vector = Vector3::new(1.0, 2.0, 3.0);
+        let unit = vector.unit();
+
+        let expected = 1.0;
+        let actual = unit.len();
+
+        assert_float_absolute_eq!(expected, actual);
     }
 
     #[test]
