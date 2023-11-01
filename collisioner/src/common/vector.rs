@@ -76,7 +76,7 @@ impl Vector3 {
         self.dot(*self).sqrt()
     }
 
-    pub fn unit(&self) -> Self {
+    pub fn normalize(&self) -> Self {
         *self / self.len()
     }
 }
@@ -247,9 +247,9 @@ mod tests {
     }
 
     #[test]
-    fn unit() {
+    fn normalize() {
         let vector = Vector3::new(1.0, 2.0, 3.0);
-        let unit = vector.unit();
+        let unit = vector.normalize();
 
         let expected = 1.0;
         let actual = unit.len();
