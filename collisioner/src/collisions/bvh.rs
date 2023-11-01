@@ -85,7 +85,8 @@ impl BvhTree {
             .max_by(|a, b| a.partial_cmp(b).unwrap())
             .unwrap();
 
-        AlignedBoxCollider::new(min, max - min)
+        let size = max - min;
+        AlignedBoxCollider::new(min + size / 2.0, size)
     }
 }
 
@@ -109,14 +110,14 @@ mod tests {
         assert!(tree.is_some());
         assert_eq!(
             BvhTree::Branch(
-                boxc(1.0, 1.0, 1.0, 3.0, 3.0, 3.0),
+                boxc(2.5, 2.5, 2.5, 3.0, 3.0, 3.0),
                 Some(Box::new(BvhTree::Branch(
-                    boxc(1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
+                    boxc(1.5, 1.5, 1.5, 1.0, 1.0, 1.0),
                     Some(Box::new(BvhTree::Leaf(pointac(1.0, 1.0, 1.0)))),
                     Some(Box::new(BvhTree::Leaf(pointac(2.0, 2.0, 2.0)))),
                 ))),
                 Some(Box::new(BvhTree::Branch(
-                    boxc(3.0, 3.0, 3.0, 1.0, 1.0, 1.0),
+                    boxc(3.5, 3.5, 3.5, 1.0, 1.0, 1.0),
                     Some(Box::new(BvhTree::Leaf(pointac(3.0, 3.0, 3.0)))),
                     Some(Box::new(BvhTree::Leaf(pointac(4.0, 4.0, 4.0)))),
                 ))),
@@ -143,29 +144,29 @@ mod tests {
         assert!(tree.is_some());
         assert_eq!(
             BvhTree::Branch(
-                boxc(0.0, 0.0, 0.0, 3.0, 3.0, 3.0),
+                boxc(1.0, 1.0, 1.0, 3.0, 3.0, 3.0),
                 Some(Box::new(BvhTree::Branch(
-                    boxc(0.0, 0.0, 0.0, 1.0, 3.0, 3.0),
+                    boxc(0.0, 1.0, 1.0, 1.0, 3.0, 3.0),
                     Some(Box::new(BvhTree::Branch(
-                        boxc(0.0, 0.0, 0.0, 1.0, 1.0, 3.0),
+                        boxc(0.0, 0.0, 1.0, 1.0, 1.0, 3.0),
                         Some(Box::new(BvhTree::Leaf(boxac(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)))),
                         Some(Box::new(BvhTree::Leaf(boxac(0.0, 0.0, 2.0, 1.0, 1.0, 1.0)))),
                     ))),
                     Some(Box::new(BvhTree::Branch(
-                        boxc(0.0, 2.0, 0.0, 1.0, 1.0, 3.0),
+                        boxc(0.0, 2.0, 1.0, 1.0, 1.0, 3.0),
                         Some(Box::new(BvhTree::Leaf(boxac(0.0, 2.0, 0.0, 1.0, 1.0, 1.0)))),
                         Some(Box::new(BvhTree::Leaf(boxac(0.0, 2.0, 2.0, 1.0, 1.0, 1.0)))),
                     ))),
                 ))),
                 Some(Box::new(BvhTree::Branch(
-                    boxc(2.0, 0.0, 0.0, 1.0, 3.0, 3.0),
+                    boxc(2.0, 1.0, 1.0, 1.0, 3.0, 3.0),
                     Some(Box::new(BvhTree::Branch(
-                        boxc(2.0, 0.0, 0.0, 1.0, 1.0, 3.0),
+                        boxc(2.0, 0.0, 1.0, 1.0, 1.0, 3.0),
                         Some(Box::new(BvhTree::Leaf(boxac(2.0, 0.0, 0.0, 1.0, 1.0, 1.0)))),
                         Some(Box::new(BvhTree::Leaf(boxac(2.0, 0.0, 2.0, 1.0, 1.0, 1.0)))),
                     ))),
                     Some(Box::new(BvhTree::Branch(
-                        boxc(2.0, 2.0, 0.0, 1.0, 1.0, 3.0),
+                        boxc(2.0, 2.0, 1.0, 1.0, 1.0, 3.0),
                         Some(Box::new(BvhTree::Leaf(boxac(2.0, 2.0, 0.0, 1.0, 1.0, 1.0)))),
                         Some(Box::new(BvhTree::Leaf(boxac(2.0, 2.0, 2.0, 1.0, 1.0, 1.0)))),
                     ))),

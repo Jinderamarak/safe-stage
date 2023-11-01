@@ -1,4 +1,4 @@
-use crate::colliders::{AlignedBoxCollider, Bounded, Collides};
+use crate::colliders::{AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, Projectable};
 use crate::common::Vector3;
 
 /// # Point Collider
@@ -50,6 +50,13 @@ impl Bounded for PointCollider {
     }
 }
 
+impl Projectable for PointCollider {
+    fn project(&self, axis: Vector3) -> (f64, f64) {
+        let projection = self.position().dot(axis);
+        (projection, projection)
+    }
+}
+
 impl Collides<Self> for PointCollider {
     fn collides_with(&self, other: &Self) -> bool {
         self.position() == other.position()
@@ -58,6 +65,12 @@ impl Collides<Self> for PointCollider {
 
 impl Collides<AlignedBoxCollider> for PointCollider {
     fn collides_with(&self, other: &AlignedBoxCollider) -> bool {
+        other.collides_with(self)
+    }
+}
+
+impl Collides<OrientedBoxCollider> for PointCollider {
+    fn collides_with(&self, other: &OrientedBoxCollider) -> bool {
         other.collides_with(self)
     }
 }

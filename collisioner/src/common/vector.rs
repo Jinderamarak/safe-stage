@@ -77,7 +77,12 @@ impl Vector3 {
     }
 
     pub fn normalize(&self) -> Self {
-        *self / self.len()
+        let len = self.len();
+        if len > 0.0 {
+            *self / len
+        } else {
+            *self
+        }
     }
 }
 
