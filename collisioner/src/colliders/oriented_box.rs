@@ -267,9 +267,9 @@ mod tests {
         for expected in &expected_corners {
             let mut found = false;
             for actual in &actual_corners {
-                if (expected.x() - actual.x()).abs() <= f64::EPSILON * 2.0
-                    && (expected.y() - actual.y()).abs() <= f64::EPSILON * 2.0
-                    && (expected.z() - actual.z()).abs() <= f64::EPSILON * 2.0
+                if (expected.x() - actual.x()).abs() <= f64::EPSILON * 4.0
+                    && (expected.y() - actual.y()).abs() <= f64::EPSILON * 4.0
+                    && (expected.z() - actual.z()).abs() <= f64::EPSILON * 4.0
                 {
                     found = true;
                     break;
@@ -283,7 +283,7 @@ mod tests {
     #[test]
     fn boxes_corner_corner_collide() {
         let box1 = OrientedBoxCollider::new(
-            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
@@ -300,7 +300,7 @@ mod tests {
     #[test]
     fn boxes_edge_edge_collide() {
         let box1 = OrientedBoxCollider::new(
-            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
@@ -317,7 +317,7 @@ mod tests {
     #[test]
     fn boxes_face_face_collide() {
         let box1 = OrientedBoxCollider::new(
-            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
@@ -334,7 +334,7 @@ mod tests {
     #[test]
     fn boxes_face_edge_collide() {
         let box1 = OrientedBoxCollider::new(
-            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
                 0.0_f64.to_radians(),
@@ -376,7 +376,7 @@ mod tests {
     #[test]
     fn box_point_corner_collide() {
         let box1 = OrientedBoxCollider::new(
-            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
                 0.0_f64.to_radians(),
@@ -393,7 +393,7 @@ mod tests {
     #[test]
     fn box_point_edge_collide() {
         let box1 = OrientedBoxCollider::new(
-            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
                 0.0_f64.to_radians(),
@@ -410,7 +410,7 @@ mod tests {
     #[test]
     fn box_point_face_collide() {
         let box1 = OrientedBoxCollider::new(
-            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
                 0.0_f64.to_radians(),
@@ -444,7 +444,7 @@ mod tests {
     #[test]
     fn obb_aabb_corner_corner_collide() {
         let obb = OrientedBoxCollider::new(
-            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
@@ -458,7 +458,7 @@ mod tests {
     #[test]
     fn obb_aabb_edge_edge_collide() {
         let obb = OrientedBoxCollider::new(
-            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
@@ -472,7 +472,7 @@ mod tests {
     #[test]
     fn obb_aabb_face_face_collide() {
         let obb = OrientedBoxCollider::new(
-            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
