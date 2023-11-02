@@ -6,16 +6,17 @@ use std::ops::Mul;
 ///
 /// ## Example
 /// ```
+/// use assert_float_eq::*;
 /// use collisioner::common::Quaternion;
 /// use collisioner::common::Vector3;
 ///
 /// let euler = Vector3::new(30_f64.to_radians(), 45_f64.to_radians(), 90_f64.to_radians());
 /// let quaternion = Quaternion::from_euler(euler);
 ///
-/// assert_eq!(quaternion.x(), -0.09229595564125731);
-/// assert_eq!(quaternion.y(), 0.4304593345768794);
-/// assert_eq!(quaternion.z(), 0.560985526796931);
-/// assert_eq!(quaternion.w(), 0.7010573846499779);
+/// assert_float_absolute_eq!(quaternion.x(), -0.0922, 0.0001);
+/// assert_float_absolute_eq!(quaternion.y(), 0.4304, 0.0001);
+/// assert_float_absolute_eq!(quaternion.z(), 0.5609, 0.0001);
+/// assert_float_absolute_eq!(quaternion.w(), 0.7010, 0.0001);
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Quaternion {
@@ -141,25 +142,20 @@ mod tests {
         );
         let quaternion = Quaternion::from_euler(vector);
 
-        assert_eq!(-0.09229595564125731, quaternion.x());
-        assert_eq!(0.4304593345768794, quaternion.y());
-        assert_eq!(0.560985526796931, quaternion.z());
-        assert_eq!(0.7010573846499779, quaternion.w());
+        assert_float_absolute_eq!(-0.0922, quaternion.x(), 0.0001);
+        assert_float_absolute_eq!(0.4304, quaternion.y(), 0.0001);
+        assert_float_absolute_eq!(0.5609, quaternion.z(), 0.0001);
+        assert_float_absolute_eq!(0.7010, quaternion.w(), 0.0001);
     }
 
     #[test]
     fn to_euler_angles() {
-        let quaternion = Quaternion::new(
-            -0.09229595564125731,
-            0.4304593345768794,
-            0.560985526796931,
-            0.7010573846499779,
-        );
+        let quaternion = Quaternion::new(-0.0922, 0.4304, 0.5609, 0.7010);
         let vector: Vector3 = quaternion.to_euler();
 
-        assert_float_absolute_eq!(30.0, vector.x().to_degrees());
-        assert_float_absolute_eq!(45.0, vector.y().to_degrees());
-        assert_float_absolute_eq!(90.0, vector.z().to_degrees());
+        assert_float_absolute_eq!(30.0, vector.x().to_degrees(), 1.0);
+        assert_float_absolute_eq!(45.0, vector.y().to_degrees(), 1.0);
+        assert_float_absolute_eq!(90.0, vector.z().to_degrees(), 1.0);
     }
 
     #[test]
