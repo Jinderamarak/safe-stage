@@ -15,3 +15,9 @@ pub use aligned_box::AlignedBoxCollider;
 
 mod collider;
 pub use collider::Collider;
+
+mod oriented_box;
+pub use oriented_box::OrientedBoxCollider;
+
+mod projectable;
+pub use projectable::Projectable;

@@ -1,4 +1,4 @@
-use crate::colliders::{AlignedBoxCollider, Bounded, Collides};
+use crate::colliders::{AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, Projectable};
 use crate::common::Vector3;
 
 /// # Point Collider
@@ -50,6 +50,13 @@ impl Bounded for PointCollider {
     }
 }
 
+impl Projectable for PointCollider {
+    fn project(&self, axis: Vector3) -> (f64, f64) {
+        let projection = self.position().dot(axis);
+        (projection, projection)
+    }
+}
+
 impl Collides<Self> for PointCollider {
     fn collides_with(&self, other: &Self) -> bool {
         self.position() == other.position()
@@ -62,20 +69,27 @@ impl Collides<AlignedBoxCollider> for PointCollider {
     }
 }
 
+impl Collides<OrientedBoxCollider> for PointCollider {
+    fn collides_with(&self, other: &OrientedBoxCollider) -> bool {
+        other.collides_with(self)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pretty_assertions::assert_eq;
 
     #[test]
-    fn test_point_bounding_volume() {
+    fn bounding_volume() {
         let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 
-        assert_eq!(point.min(), point.position());
-        assert_eq!(point.max(), point.position());
+        assert_eq!(point.position(), point.min());
+        assert_eq!(point.position(), point.max());
     }
 
     #[test]
-    fn test_same_points_collide() {
+    fn same_points_collide() {
         let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
         let other = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 
@@ -83,7 +97,7 @@ mod tests {
     }
 
     #[test]
-    fn test_different_points_dont_collide() {
+    fn different_points_dont_collide() {
         let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
         let other = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
 

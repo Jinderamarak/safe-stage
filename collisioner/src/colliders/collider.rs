@@ -1,4 +1,4 @@
-use crate::colliders::{AlignedBoxCollider, Bounded, Collides, PointCollider};
+use crate::colliders::{AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, PointCollider};
 use crate::common::Vector3;
 
 /// # Collider
@@ -20,6 +20,7 @@ use crate::common::Vector3;
 pub enum Collider {
     Point(PointCollider),
     AlignedBox(AlignedBoxCollider),
+    OrientedBox(OrientedBoxCollider),
 }
 
 impl From<PointCollider> for Collider {
@@ -34,6 +35,12 @@ impl From<AlignedBoxCollider> for Collider {
     }
 }
 
+impl From<OrientedBoxCollider> for Collider {
+    fn from(oriented_box: OrientedBoxCollider) -> Self {
+        Self::OrientedBox(oriented_box)
+    }
+}
+
 impl Collides<Collider> for Collider {
     fn collides_with(&self, other: &Collider) -> bool {
         match (self, other) {
@@ -43,11 +50,26 @@ impl Collides<Collider> for Collider {
             (Collider::Point(point), Collider::AlignedBox(aligned_box)) => {
                 point.collides_with(aligned_box)
             }
+            (Collider::Point(point), Collider::OrientedBox(oriented_box)) => {
+                point.collides_with(oriented_box)
+            }
             (Collider::AlignedBox(aligned_box), Collider::Point(point)) => {
                 aligned_box.collides_with(point)
             }
             (Collider::AlignedBox(aligned_box), Collider::AlignedBox(other_aligned_box)) => {
                 aligned_box.collides_with(other_aligned_box)
+            }
+            (Collider::AlignedBox(aligned_box), Collider::OrientedBox(oriented_box)) => {
+                aligned_box.collides_with(oriented_box)
+            }
+            (Collider::OrientedBox(oriented_box), Collider::Point(point)) => {
+                oriented_box.collides_with(point)
+            }
+            (Collider::OrientedBox(oriented_box), Collider::AlignedBox(aligned_box)) => {
+                oriented_box.collides_with(aligned_box)
+            }
+            (Collider::OrientedBox(oriented_box), Collider::OrientedBox(other_oriented_box)) => {
+                oriented_box.collides_with(other_oriented_box)
             }
         }
     }
@@ -58,6 +80,7 @@ impl Bounded for Collider {
         match self {
             Collider::Point(point) => point.min(),
             Collider::AlignedBox(aligned_box) => aligned_box.min(),
+            Collider::OrientedBox(oriented_box) => oriented_box.min(),
         }
     }
 
@@ -65,6 +88,7 @@ impl Bounded for Collider {
         match self {
             Collider::Point(point) => point.max(),
             Collider::AlignedBox(aligned_box) => aligned_box.max(),
+            Collider::OrientedBox(oriented_box) => oriented_box.max(),
         }
     }
 }
