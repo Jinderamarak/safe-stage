@@ -3,11 +3,15 @@ workflow:
     - when: always
 
 stages:
+  - cache
+  - setup
   - lint
   - build
   - test
 
 include:
+  - pipeline/templates.yml
+  - pipeline/caching.yml
   - pipeline/collisioner.yml
   - pipeline/service-backend.yml
   - pipeline/service-frontend.yml

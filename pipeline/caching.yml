@@ -1,0 +1,24 @@
+include:
+  - pipeline/templates.yml
+
+cache:cargo:
+  extends: .rust-template
+  stage: cache
+  rules:
+    - changes:
+      - Cargo.lock
+  cache:
+    policy: pull-push
+  script:
+    - cargo fetch --locked
+
+cache:pnpm:
+  extends: .node-template
+  stage: cache
+  rules:
+    - changes:
+      - service-app/pnpm-lock.yaml
+  cache:
+    policy: pull-push
+  script:
+    - pnpm --version
