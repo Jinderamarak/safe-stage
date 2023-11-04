@@ -1,0 +1,27 @@
+.rust-template:
+  image: rust:latest
+  variables:
+    CARGO_HOME: $CI_PROJECT_DIR/.cargo
+  cache:
+    key:
+      files:
+        - Cargo.lock
+    paths:
+      - $CARGO_HOME/
+    policy: pull
+
+.node-template:
+  image: node:18.18.0
+  before_script:
+    - cd service-app
+    - corepack enable
+    - corepack prepare pnpm@latest-8 --activate
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install
+  cache:
+    key:
+      files:
+        - service-app/pnpm-lock.yaml
+    paths:
+      - service-app/.pnpm-store
+    policy: pull

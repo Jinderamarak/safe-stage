@@ -1,6 +1,12 @@
+include:
+  - pipeline/templates.yml
+
 service-backend:lint:
+  extends: .rust-template
   stage: lint
-  image: rust:latest
+  needs:
+    - job: cache:cargo
+      optional: true
   script:
     - rustup component add rustfmt
-    - cargo fmt --package service-app -- --check
+    - cargo fmt -p service-app -- --check

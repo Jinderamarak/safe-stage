@@ -1,0 +1,7 @@
+[profile.default]
+fail-fast = false
+
+[profile.default.junit]
+path = "junit-report.xml"
+store-success-output = true
+store-failure-output = true
