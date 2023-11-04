@@ -21,7 +21,7 @@ collisioner:build:
     - job: cache:cargo
       optional: true
   script:
-    - cargo build -p collisioner --locked --frozen
+    - cargo build -p collisioner --locked
 
 collisioner:test:
   extends: .rust-template
@@ -31,8 +31,11 @@ collisioner:test:
     - collisioner:build
     - job: cache:cargo
       optional: true
+  before_script:
+    - mkdir -p ${CARGO_HOME}/bin
+    - curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME}/bin
   script:
-    - cargo nextest run --config-file .nextest.toml -p collisioner --locked --frozen
+    - cargo nextest run --config-file .nextest.toml -p collisioner --locked
   artifacts:
     when: always
     reports:
@@ -48,7 +51,7 @@ collisioner:test-docs:
     - job: cache:cargo
       optional: true
   script:
-    - cargo test -p collisioner --doc --locked --frozen
+    - cargo test -p collisioner --doc --locked
 
 # Optional build on nightly channel
 collisioner:build:nightly:
