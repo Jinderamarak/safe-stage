@@ -1,5 +1,6 @@
 use crate::colliders::{
     AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, PointCollider, SphereCollider,
+    AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, PointCollider, Projectable,
 };
 use crate::common::{Quaternion, Vector3};
 
@@ -151,6 +152,17 @@ impl Bounded for Collider {
             Collider::Sphere(sphere) => sphere.max(),
             Collider::AlignedBox(aligned_box) => aligned_box.max(),
             Collider::OrientedBox(oriented_box) => oriented_box.max(),
+        }
+    }
+}
+
+impl Projectable for Collider {
+    fn project(&self, axis: Vector3) -> (f64, f64) {
+        match self {
+            Collider::Point(point) => point.project(axis),
+            Collider::Sphere(sphere) => sphere.project(axis),
+            Collider::AlignedBox(aligned_box) => aligned_box.project(axis),
+            Collider::OrientedBox(oriented_box) => oriented_box.project(axis),
         }
     }
 }
