@@ -1,7 +1,7 @@
 use crate::colliders::{
     AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, PointCollider, SphereCollider,
 };
-use crate::common::Vector3;
+use crate::common::{Quaternion, Vector3};
 
 /// # Generic Collider
 /// Enum representing all possible collider primitives.
@@ -13,8 +13,7 @@ use crate::common::Vector3;
 /// let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 /// let collider_point = Collider::from(point);
 ///
-/// let aligned_box = AlignedBoxCollider::new(Vector3::new(-1.0, -1.0, -1.0), Vector3::new(2.0, 2.0, 2.0));
-/// let collider_box = Collider::from(aligned_box);
+/// let collider_box = Collider::aligned_box(-1.0, -1.0, -1.0, 2.0, 2.0, 2.0);
 ///
 /// assert!(collider_point.collides_with(&collider_box));
 /// ```
@@ -24,6 +23,41 @@ pub enum Collider {
     Sphere(SphereCollider),
     AlignedBox(AlignedBoxCollider),
     OrientedBox(OrientedBoxCollider),
+}
+
+impl Collider {
+    pub fn point(x: f64, y: f64, z: f64) -> Self {
+        Self::Point(PointCollider::new(Vector3::new(x, y, z)))
+    }
+
+    pub fn sphere(x: f64, y: f64, z: f64, r: f64) -> Self {
+        Self::Sphere(SphereCollider::new(Vector3::new(x, y, z), r))
+    }
+
+    pub fn aligned_box(x: f64, y: f64, z: f64, w: f64, h: f64, d: f64) -> Self {
+        Self::AlignedBox(AlignedBoxCollider::new(
+            Vector3::new(x, y, z),
+            Vector3::new(w, h, d),
+        ))
+    }
+
+    pub fn oriented_box(
+        x: f64,
+        y: f64,
+        z: f64,
+        w: f64,
+        h: f64,
+        d: f64,
+        rx: f64,
+        ry: f64,
+        rz: f64,
+    ) -> Self {
+        Self::OrientedBox(OrientedBoxCollider::new(
+            Vector3::new(x, y, z),
+            Vector3::new(w, h, d),
+            Quaternion::from_euler(Vector3::new(rx, ry, rz)),
+        ))
+    }
 }
 
 impl From<PointCollider> for Collider {
