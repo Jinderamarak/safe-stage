@@ -202,6 +202,21 @@ mod tests {
     }
 
     #[test]
+    fn rotate_inverse() {
+        let vector = Vector3::new(1.0, 0.0, 0.0);
+        let rotation = Quaternion::from_euler(Vector3::new(
+            0.0_f64.to_radians(),
+            0.0_f64.to_radians(),
+            90.0_f64.to_radians(),
+        ));
+        let rotated = vector.rotate(rotation.conjugate());
+
+        assert_float_absolute_eq!(0.0, rotated.x());
+        assert_float_absolute_eq!(-1.0, rotated.y());
+        assert_float_absolute_eq!(0.0, rotated.z());
+    }
+
+    #[test]
     fn rotate_around() {
         let vector = Vector3::new(1.0, 0.0, 0.0);
         let pivot = Vector3::new(1.0, 1.0, 0.0);
