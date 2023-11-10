@@ -3,6 +3,20 @@ use crate::colliders::{
 };
 use crate::common::Vector3;
 
+/// # Sphere Collider
+/// Primitive for representing sphere.
+///
+/// ## Example
+/// ```
+/// use collisioner::colliders::SphereCollider;
+/// use collisioner::colliders::Collides;
+/// use collisioner::common::Vector3;
+///
+/// let sphere1 = SphereCollider::new(Vector3::new(0.0, 0.0, 0.0), 1.0);
+/// let sphere2 = SphereCollider::new(Vector3::new(1.0, 1.0, 1.0), 1.0);
+///
+/// assert!(sphere1.collides_with(&sphere2));
+/// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct SphereCollider {
     position: Vector3,

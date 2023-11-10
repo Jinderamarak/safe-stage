@@ -3,7 +3,7 @@ use crate::colliders::{
 };
 use crate::common::Vector3;
 
-/// # Collider
+/// # Generic Collider
 /// Enum representing all possible collider primitives.
 /// ## Example
 /// ```

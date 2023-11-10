@@ -5,7 +5,6 @@ use crate::common::Vector3;
 
 /// # Point Collider
 /// Basic primitive for representing single point.
-/// Only alias for `Vector3`.
 ///
 /// ## Example
 /// ```

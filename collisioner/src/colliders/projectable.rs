@@ -1,5 +1,6 @@
 use crate::common::Vector3;
 
+/// Object projection onto single axis
 pub trait Projectable {
     fn project(&self, axis: Vector3) -> (f64, f64);
     fn intersects(&self, other: &impl Projectable, axis: Vector3) -> bool {
