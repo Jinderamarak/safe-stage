@@ -304,59 +304,59 @@ mod tests {
     }
 
     #[test]
-    fn boxes_corner_corner_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn obb_corner_corner_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
-        let box2 = OrientedBoxCollider::new(
+        let other_obb = OrientedBoxCollider::new(
             Vector3::new(1.0, 1.0, 1.0),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
 
-        assert!(box1.collides_with(&box2));
-        assert!(box2.collides_with(&box1));
+        assert!(obb.collides_with(&other_obb));
+        assert!(other_obb.collides_with(&obb));
     }
 
     #[test]
-    fn boxes_edge_edge_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn obb_edge_edge_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
-        let box2 = OrientedBoxCollider::new(
+        let other_obb = OrientedBoxCollider::new(
             Vector3::new(1.0, 1.0, 0.0),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
 
-        assert!(box1.collides_with(&box2));
-        assert!(box2.collides_with(&box1));
+        assert!(obb.collides_with(&other_obb));
+        assert!(other_obb.collides_with(&obb));
     }
 
     #[test]
-    fn boxes_face_face_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn obb_face_face_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
-        let box2 = OrientedBoxCollider::new(
+        let other_obb = OrientedBoxCollider::new(
             Vector3::new(1.0, 0.0, 0.0),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
 
-        assert!(box1.collides_with(&box2));
-        assert!(box2.collides_with(&box1));
+        assert!(obb.collides_with(&other_obb));
+        assert!(other_obb.collides_with(&obb));
     }
 
     #[test]
-    fn boxes_face_edge_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn obb_face_edge_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -365,19 +365,19 @@ mod tests {
                 45.0_f64.to_radians(),
             )),
         );
-        let box2 = OrientedBoxCollider::new(
+        let other_obb = OrientedBoxCollider::new(
             Vector3::new(0.7, 0.7, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::new(0.0, 0.0, 0.0, 0.0),
         );
 
-        assert!(box1.collides_with(&box2));
-        assert!(box2.collides_with(&box1));
+        assert!(obb.collides_with(&other_obb));
+        assert!(other_obb.collides_with(&obb));
     }
 
     #[test]
-    fn boxes_dont_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn obb_dont_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -386,19 +386,19 @@ mod tests {
                 45.0_f64.to_radians(),
             )),
         );
-        let box2 = OrientedBoxCollider::new(
+        let other_obb = OrientedBoxCollider::new(
             Vector3::new(0.71, 0.71, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::new(0.0, 0.0, 0.0, 0.0),
         );
 
-        assert!(!box1.collides_with(&box2));
-        assert!(!box2.collides_with(&box1));
+        assert!(!obb.collides_with(&other_obb));
+        assert!(!other_obb.collides_with(&obb));
     }
 
     #[test]
-    fn box_point_corner_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn point_corner_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -409,13 +409,13 @@ mod tests {
         );
         let point = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(box1.collides_with(&point));
-        assert!(point.collides_with(&box1));
+        assert!(obb.collides_with(&point));
+        assert!(point.collides_with(&obb));
     }
 
     #[test]
-    fn box_point_edge_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn point_edge_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -426,13 +426,13 @@ mod tests {
         );
         let point = PointCollider::new(Vector3::new(1.0, 0.0, 1.0));
 
-        assert!(box1.collides_with(&point));
-        assert!(point.collides_with(&box1));
+        assert!(obb.collides_with(&point));
+        assert!(point.collides_with(&obb));
     }
 
     #[test]
-    fn box_point_face_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn point_face_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -443,13 +443,13 @@ mod tests {
         );
         let point = PointCollider::new(Vector3::new(1.0, 0.0, 0.0));
 
-        assert!(box1.collides_with(&point));
-        assert!(point.collides_with(&box1));
+        assert!(obb.collides_with(&point));
+        assert!(point.collides_with(&obb));
     }
 
     #[test]
-    fn box_point_dont_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn point_dont_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -460,12 +460,12 @@ mod tests {
         );
         let point = PointCollider::new(Vector3::new(0.71, 0.71, 0.0));
 
-        assert!(!box1.collides_with(&point));
-        assert!(!point.collides_with(&box1));
+        assert!(!obb.collides_with(&point));
+        assert!(!point.collides_with(&obb));
     }
 
     #[test]
-    fn obb_sphere_corner_collide() {
+    fn sphere_corner_collide() {
         let obb = OrientedBoxCollider::new(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
@@ -482,7 +482,7 @@ mod tests {
     }
 
     #[test]
-    fn obb_sphere_corner_dont_collide() {
+    fn sphere_corner_dont_collide() {
         let obb = OrientedBoxCollider::new(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
@@ -499,7 +499,7 @@ mod tests {
     }
 
     #[test]
-    fn obb_sphere_edge_collide() {
+    fn sphere_edge_collide() {
         let obb = OrientedBoxCollider::new(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
@@ -516,7 +516,7 @@ mod tests {
     }
 
     #[test]
-    fn obb_sphere_edge_dont_collide() {
+    fn sphere_edge_dont_collide() {
         let obb = OrientedBoxCollider::new(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
@@ -533,7 +533,7 @@ mod tests {
     }
 
     #[test]
-    fn obb_sphere_face_collide() {
+    fn sphere_face_collide() {
         let obb = OrientedBoxCollider::new(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
@@ -550,7 +550,7 @@ mod tests {
     }
 
     #[test]
-    fn obb_sphere_inside_collide() {
+    fn sphere_inside_collide() {
         let obb = OrientedBoxCollider::new(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
@@ -567,7 +567,7 @@ mod tests {
     }
 
     #[test]
-    fn obb_aabb_corner_corner_collide() {
+    fn aabb_corner_corner_collide() {
         let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
@@ -581,7 +581,7 @@ mod tests {
     }
 
     #[test]
-    fn obb_aabb_edge_edge_collide() {
+    fn aabb_edge_edge_collide() {
         let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
@@ -595,7 +595,7 @@ mod tests {
     }
 
     #[test]
-    fn obb_aabb_face_face_collide() {
+    fn aabb_face_face_collide() {
         let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
@@ -609,8 +609,8 @@ mod tests {
     }
 
     #[test]
-    fn obb_aabb_dont_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn aabb_dont_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -619,10 +619,10 @@ mod tests {
                 45.0_f64.to_radians(),
             )),
         );
-        let box2 =
+        let other_obb =
             AlignedBoxCollider::new(Vector3::new(1.21, 1.21, 0.0), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(!box1.collides_with(&box2));
-        assert!(!box2.collides_with(&box1));
+        assert!(!obb.collides_with(&other_obb));
+        assert!(!other_obb.collides_with(&obb));
     }
 }

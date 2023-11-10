@@ -89,7 +89,7 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     #[test]
-    fn bounding_volume() {
+    fn bounds_regular() {
         let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 
         assert_eq!(point.position(), point.min());

@@ -72,7 +72,7 @@ mod tests {
     use crate::tests::asserts::*;
 
     #[test]
-    fn bounding_regular() {
+    fn bounds_regular() {
         let sphere = SphereCollider::new(Vector3::new(0.0, 0.0, 0.0), 1.0);
 
         assert_vector(Vector3::new(-1.0, -1.0, -1.0), sphere.min());
