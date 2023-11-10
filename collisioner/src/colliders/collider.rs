@@ -1,4 +1,6 @@
-use crate::colliders::{AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, PointCollider};
+use crate::colliders::{
+    AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, PointCollider, SphereCollider,
+};
 use crate::common::Vector3;
 
 /// # Collider
@@ -19,6 +21,7 @@ use crate::common::Vector3;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Collider {
     Point(PointCollider),
+    Sphere(SphereCollider),
     AlignedBox(AlignedBoxCollider),
     OrientedBox(OrientedBoxCollider),
 }
@@ -26,6 +29,12 @@ pub enum Collider {
 impl From<PointCollider> for Collider {
     fn from(point: PointCollider) -> Self {
         Self::Point(point)
+    }
+}
+
+impl From<SphereCollider> for Collider {
+    fn from(sphere: SphereCollider) -> Self {
+        Self::Sphere(sphere)
     }
 }
 
@@ -47,14 +56,28 @@ impl Collides<Collider> for Collider {
             (Collider::Point(point), Collider::Point(other_point)) => {
                 point.collides_with(other_point)
             }
+            (Collider::Point(point), Collider::Sphere(sphere)) => point.collides_with(sphere),
             (Collider::Point(point), Collider::AlignedBox(aligned_box)) => {
                 point.collides_with(aligned_box)
             }
             (Collider::Point(point), Collider::OrientedBox(oriented_box)) => {
                 point.collides_with(oriented_box)
             }
+            (Collider::Sphere(sphere), Collider::Point(point)) => sphere.collides_with(point),
+            (Collider::Sphere(sphere), Collider::Sphere(other_sphere)) => {
+                sphere.collides_with(other_sphere)
+            }
+            (Collider::Sphere(sphere), Collider::AlignedBox(aligned_box)) => {
+                sphere.collides_with(aligned_box)
+            }
+            (Collider::Sphere(sphere), Collider::OrientedBox(oriented_box)) => {
+                sphere.collides_with(oriented_box)
+            }
             (Collider::AlignedBox(aligned_box), Collider::Point(point)) => {
                 aligned_box.collides_with(point)
+            }
+            (Collider::AlignedBox(aligned_box), Collider::Sphere(sphere)) => {
+                aligned_box.collides_with(sphere)
             }
             (Collider::AlignedBox(aligned_box), Collider::AlignedBox(other_aligned_box)) => {
                 aligned_box.collides_with(other_aligned_box)
@@ -64,6 +87,9 @@ impl Collides<Collider> for Collider {
             }
             (Collider::OrientedBox(oriented_box), Collider::Point(point)) => {
                 oriented_box.collides_with(point)
+            }
+            (Collider::OrientedBox(oriented_box), Collider::Sphere(sphere)) => {
+                oriented_box.collides_with(sphere)
             }
             (Collider::OrientedBox(oriented_box), Collider::AlignedBox(aligned_box)) => {
                 oriented_box.collides_with(aligned_box)
@@ -79,6 +105,7 @@ impl Bounded for Collider {
     fn min(&self) -> Vector3 {
         match self {
             Collider::Point(point) => point.min(),
+            Collider::Sphere(sphere) => sphere.min(),
             Collider::AlignedBox(aligned_box) => aligned_box.min(),
             Collider::OrientedBox(oriented_box) => oriented_box.min(),
         }
@@ -87,6 +114,7 @@ impl Bounded for Collider {
     fn max(&self) -> Vector3 {
         match self {
             Collider::Point(point) => point.max(),
+            Collider::Sphere(sphere) => sphere.max(),
             Collider::AlignedBox(aligned_box) => aligned_box.max(),
             Collider::OrientedBox(oriented_box) => oriented_box.max(),
         }

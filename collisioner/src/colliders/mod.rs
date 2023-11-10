@@ -21,3 +21,6 @@ pub use oriented_box::OrientedBoxCollider;
 
 mod projectable;
 pub use projectable::Projectable;
+
+mod sphere;
+pub use sphere::SphereCollider;
