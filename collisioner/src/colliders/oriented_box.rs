@@ -58,11 +58,11 @@ impl OrientedBoxCollider {
     }
 
     fn corners(&self) -> [Vector3; 8] {
-        let half_size = (self.size() / 2.0).rotate(self.rotation);
+        let half_size = self.size() / 2.0;
         let negative_pos = self.position - half_size;
         let positive_pos = self.position + half_size;
 
-        [
+        let corners = [
             Vector3::new(negative_pos.x(), negative_pos.y(), negative_pos.z()),
             Vector3::new(positive_pos.x(), negative_pos.y(), negative_pos.z()),
             Vector3::new(negative_pos.x(), positive_pos.y(), negative_pos.z()),
@@ -71,7 +71,14 @@ impl OrientedBoxCollider {
             Vector3::new(positive_pos.x(), negative_pos.y(), positive_pos.z()),
             Vector3::new(negative_pos.x(), positive_pos.y(), positive_pos.z()),
             Vector3::new(positive_pos.x(), positive_pos.y(), positive_pos.z()),
-        ]
+        ];
+
+        corners
+            .into_iter()
+            .map(|c| c.rotate_around(self.rotation, self.position))
+            .collect_vec()
+            .try_into()
+            .unwrap()
     }
 
     fn separating_axes(&self) -> (Vector3, Vector3, Vector3) {
