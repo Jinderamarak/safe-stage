@@ -35,27 +35,28 @@ impl Collider {
         Self::Sphere(SphereCollider::new(Vector3::new(x, y, z), r))
     }
 
-    pub fn aligned_box(x: f64, y: f64, z: f64, w: f64, h: f64, d: f64) -> Self {
+    pub fn aligned_box(x: f64, y: f64, z: f64, sx: f64, sy: f64, sz: f64) -> Self {
         Self::AlignedBox(AlignedBoxCollider::new(
             Vector3::new(x, y, z),
-            Vector3::new(w, h, d),
+            Vector3::new(sx, sy, sz),
         ))
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn oriented_box(
         x: f64,
         y: f64,
         z: f64,
-        w: f64,
-        h: f64,
-        d: f64,
+        sx: f64,
+        sy: f64,
+        sz: f64,
         rx: f64,
         ry: f64,
         rz: f64,
     ) -> Self {
         Self::OrientedBox(OrientedBoxCollider::new(
             Vector3::new(x, y, z),
-            Vector3::new(w, h, d),
+            Vector3::new(sx, sy, sz),
             Quaternion::from_euler(Vector3::new(rx, ry, rz)),
         ))
     }
