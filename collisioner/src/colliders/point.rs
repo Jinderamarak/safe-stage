@@ -1,7 +1,8 @@
 use crate::colliders::{
-    AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, Projectable, SphereCollider,
+    AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, Projectable, Rotation,
+    SphereCollider,
 };
-use crate::common::Vector3;
+use crate::common::{Quaternion, Vector3};
 
 /// # Point Collider
 /// Basic primitive for representing single point.
@@ -58,6 +59,16 @@ impl Projectable for PointCollider {
     }
 }
 
+impl Rotation for PointCollider {
+    fn rotate(&self, _: Quaternion) -> Self {
+        self.clone()
+    }
+
+    fn rotate_around(&self, rotation: Quaternion, pivot: Vector3) -> Self {
+        Self::new(self.position.rotate_around(rotation, pivot))
+    }
+}
+
 impl Collides<Self> for PointCollider {
     fn collides_with(&self, other: &Self) -> bool {
         self.position() == other.position()
@@ -85,6 +96,7 @@ impl Collides<OrientedBoxCollider> for PointCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tests::asserts::assert_vector;
     use pretty_assertions::assert_eq;
 
     #[test]
@@ -93,6 +105,33 @@ mod tests {
 
         assert_eq!(point.position(), point.min());
         assert_eq!(point.position(), point.max());
+    }
+
+    #[test]
+    fn rotation() {
+        let point = PointCollider::new(Vector3::new(1.0, 2.0, 3.0));
+        let rotation = Quaternion::from_euler(Vector3::new(
+            10.0_f64.to_radians(),
+            20.0_f64.to_radians(),
+            30.0_f64.to_radians(),
+        ));
+        let rotated = point.rotate(rotation);
+
+        assert_eq!(point.position(), rotated.position());
+    }
+
+    #[test]
+    fn pivot_rotation() {
+        let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
+        let pivot = Vector3::new(1.0, 1.0, 1.0);
+        let rotation = Quaternion::from_euler(Vector3::new(
+            0.0_f64.to_radians(),
+            0.0_f64.to_radians(),
+            90.0_f64.to_radians(),
+        ));
+        let rotated = point.rotate_around(rotation, pivot);
+
+        assert_vector(Vector3::new(2.0, 0.0, 0.0), rotated.position());
     }
 
     #[test]

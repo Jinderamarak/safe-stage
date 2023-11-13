@@ -1,5 +1,5 @@
 use crate::colliders::{
-    AlignedBoxCollider, Bounded, Collides, PointCollider, Projectable, SphereCollider,
+    AlignedBoxCollider, Bounded, Collides, PointCollider, Projectable, Rotation, SphereCollider,
 };
 use crate::common::{Quaternion, Vector3};
 use itertools::Itertools;
@@ -48,13 +48,6 @@ impl OrientedBoxCollider {
 
     pub fn rotation(&self) -> Quaternion {
         self.rotation
-    }
-
-    pub fn rotate_around(&self, pivot: Vector3, rotation: Quaternion) -> Self {
-        let new_position = (self.position - pivot).rotate(rotation) + pivot;
-        let new_rotation = self.rotation * rotation;
-
-        Self::new(new_position, self.size, new_rotation)
     }
 
     fn corners(&self) -> [Vector3; 8] {
@@ -129,12 +122,25 @@ impl Projectable for OrientedBoxCollider {
     }
 }
 
-impl From<AlignedBoxCollider> for OrientedBoxCollider {
-    fn from(value: AlignedBoxCollider) -> Self {
+impl Rotation for OrientedBoxCollider {
+    fn rotate(&self, rotation: Quaternion) -> Self {
+        self.rotate_around(rotation, self.position)
+    }
+
+    fn rotate_around(&self, rotation: Quaternion, pivot: Vector3) -> Self {
+        let new_position = self.position.rotate_around(rotation, pivot);
+        let new_rotation = self.rotation * rotation;
+
+        Self::new(new_position, self.size, new_rotation)
+    }
+}
+
+impl From<&AlignedBoxCollider> for OrientedBoxCollider {
+    fn from(value: &AlignedBoxCollider) -> Self {
         OrientedBoxCollider::new(
             value.position(),
             value.size(),
-            Quaternion::new(0.0, 0.0, 0.0, 0.0),
+            Quaternion::new(0.0, 0.0, 0.0, 1.0),
         )
     }
 }
@@ -239,7 +245,7 @@ mod tests {
     use crate::tests::asserts::*;
 
     #[test]
-    fn rotate_around_pivot() {
+    fn pivot_rotation() {
         let collider = OrientedBoxCollider::new(
             Vector3::new(5.0, 0.0, 0.0),
             Vector3::new(1.0, 1.0, 1.0),
@@ -251,12 +257,12 @@ mod tests {
         );
 
         let rotated = collider.rotate_around(
-            Vector3::new(0.0, 0.0, 0.0),
             Quaternion::from_euler(Vector3::new(
                 0.0_f64.to_radians(),
                 0.0_f64.to_radians(),
                 90.0_f64.to_radians(),
             )),
+            Vector3::new(0.0, 0.0, 0.0),
         );
 
         let position = Vector3::new(0.0, 5.0, 0.0);
@@ -375,7 +381,7 @@ mod tests {
         let other_obb = OrientedBoxCollider::new(
             Vector3::new(0.7, 0.7, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
-            Quaternion::new(0.0, 0.0, 0.0, 0.0),
+            Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
 
         assert!(obb.collides_with(&other_obb));
@@ -394,9 +400,9 @@ mod tests {
             )),
         );
         let other_obb = OrientedBoxCollider::new(
-            Vector3::new(0.71, 0.71, 0.0),
+            Vector3::new(1.71, 1.71, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
-            Quaternion::new(0.0, 0.0, 0.0, 0.0),
+            Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
 
         assert!(!obb.collides_with(&other_obb));

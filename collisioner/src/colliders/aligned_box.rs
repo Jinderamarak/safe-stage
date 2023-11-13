@@ -1,7 +1,7 @@
 use crate::colliders::{
-    Bounded, Collides, OrientedBoxCollider, PointCollider, Projectable, SphereCollider,
+    Bounded, Collides, OrientedBoxCollider, PointCollider, Projectable, Rotation, SphereCollider,
 };
-use crate::common::Vector3;
+use crate::common::{Quaternion, Vector3};
 use itertools::Itertools;
 
 /// # Axis Aligned Box Collider
@@ -78,6 +78,16 @@ impl Projectable for AlignedBoxCollider {
     }
 }
 
+impl Rotation<OrientedBoxCollider> for AlignedBoxCollider {
+    fn rotate(&self, rotation: Quaternion) -> OrientedBoxCollider {
+        OrientedBoxCollider::from(self).rotate(rotation)
+    }
+
+    fn rotate_around(&self, rotation: Quaternion, point: Vector3) -> OrientedBoxCollider {
+        OrientedBoxCollider::from(self).rotate_around(rotation, point)
+    }
+}
+
 impl Collides<Self> for AlignedBoxCollider {
     fn collides_with(&self, other: &Self) -> bool {
         let self_min = self.min();
@@ -133,6 +143,7 @@ impl Collides<OrientedBoxCollider> for AlignedBoxCollider {
 mod tests {
     use super::*;
     use crate::tests::asserts::assert_vector;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn bounds_regular() {
@@ -141,6 +152,42 @@ mod tests {
 
         assert_vector(Vector3::new(-0.5, 1.0, 3.5), aabb.min());
         assert_vector(Vector3::new(2.5, 3.0, 4.5), aabb.max());
+    }
+
+    #[test]
+    fn projection() {
+        let aabb =
+            AlignedBoxCollider::new(Vector3::new(1.0, 2.0, 4.0), Vector3::new(3.0, 2.0, 1.0));
+
+        assert_eq!((-0.5, 2.5), aabb.project(Vector3::new(1.0, 0.0, 0.0)));
+        assert_eq!((1.0, 3.0), aabb.project(Vector3::new(0.0, 1.0, 0.0)));
+        assert_eq!((3.5, 4.5), aabb.project(Vector3::new(0.0, 0.0, 1.0)));
+    }
+
+    #[test]
+    fn rotation() {
+        let aabb =
+            AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(2.0, 2.0, 4.0));
+        let rotation = Quaternion::from_euler(Vector3::new(0.0, 90.0_f64.to_radians(), 0.0));
+
+        let rotated = aabb.rotate(rotation);
+
+        assert_vector(Vector3::new(1.0, 1.0, 1.0), rotated.position());
+        assert_vector(Vector3::new(-1.0, 0.0, 0.0), rotated.min());
+        assert_vector(Vector3::new(3.0, 2.0, 2.0), rotated.max());
+    }
+
+    #[test]
+    fn pivot_rotation() {
+        let aabb =
+            AlignedBoxCollider::new(Vector3::new(2.0, 2.0, 1.0), Vector3::new(2.0, 2.0, 4.0));
+        let rotation = Quaternion::from_euler(Vector3::new(0.0, 90.0_f64.to_radians(), 0.0));
+
+        let rotated = aabb.rotate_around(rotation, Vector3::new(1.0, 1.0, 1.0));
+
+        assert_vector(Vector3::new(1.0, 2.0, 0.0), rotated.position());
+        assert_vector(Vector3::new(-1.0, 1.0, -1.0), rotated.min());
+        assert_vector(Vector3::new(3.0, 3.0, 1.0), rotated.max());
     }
 
     #[test]

@@ -1,6 +1,6 @@
 use crate::colliders::{
-    AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, PointCollider, SphereCollider,
     AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, PointCollider, Projectable,
+    Rotation, SphereCollider,
 };
 use crate::common::{Quaternion, Vector3};
 
@@ -163,6 +163,34 @@ impl Projectable for Collider {
             Collider::Sphere(sphere) => sphere.project(axis),
             Collider::AlignedBox(aligned_box) => aligned_box.project(axis),
             Collider::OrientedBox(oriented_box) => oriented_box.project(axis),
+        }
+    }
+}
+
+impl Rotation for Collider {
+    fn rotate(&self, rotation: Quaternion) -> Self {
+        match self {
+            Collider::Point(point) => Collider::Point(point.rotate(rotation)),
+            Collider::Sphere(sphere) => Collider::Sphere(sphere.rotate(rotation)),
+            Collider::AlignedBox(aligned_box) => {
+                Collider::OrientedBox(aligned_box.rotate(rotation))
+            }
+            Collider::OrientedBox(oriented_box) => {
+                Collider::OrientedBox(oriented_box.rotate(rotation))
+            }
+        }
+    }
+
+    fn rotate_around(&self, rotation: Quaternion, pivot: Vector3) -> Self {
+        match self {
+            Collider::Point(point) => Collider::Point(point.rotate_around(rotation, pivot)),
+            Collider::Sphere(sphere) => Collider::Sphere(sphere.rotate_around(rotation, pivot)),
+            Collider::AlignedBox(aligned_box) => {
+                Collider::OrientedBox(aligned_box.rotate_around(rotation, pivot))
+            }
+            Collider::OrientedBox(oriented_box) => {
+                Collider::OrientedBox(oriented_box.rotate_around(rotation, pivot))
+            }
         }
     }
 }

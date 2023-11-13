@@ -16,6 +16,7 @@ mod collides;
 mod oriented_box;
 mod point;
 mod projectable;
+mod rotation;
 mod sphere;
 
 pub use collider::Collider;
@@ -28,3 +29,4 @@ pub use sphere::SphereCollider;
 pub use bounded::Bounded;
 pub use collides::Collides;
 pub use projectable::Projectable;
+pub use rotation::Rotation;
