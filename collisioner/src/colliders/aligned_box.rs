@@ -1,5 +1,7 @@
-use crate::colliders::{Bounded, Collides, OrientedBoxCollider, PointCollider, Projectable};
-use crate::common::Vector3;
+use crate::colliders::{
+    Bounded, Collides, OrientedBoxCollider, PointCollider, Projectable, Rotation, SphereCollider,
+};
+use crate::common::{Quaternion, Vector3};
 use itertools::Itertools;
 
 /// # Axis Aligned Box Collider
@@ -76,6 +78,16 @@ impl Projectable for AlignedBoxCollider {
     }
 }
 
+impl Rotation<OrientedBoxCollider> for AlignedBoxCollider {
+    fn rotate(&self, rotation: Quaternion) -> OrientedBoxCollider {
+        OrientedBoxCollider::from(self).rotate(rotation)
+    }
+
+    fn rotate_around(&self, rotation: Quaternion, point: Vector3) -> OrientedBoxCollider {
+        OrientedBoxCollider::from(self).rotate_around(rotation, point)
+    }
+}
+
 impl Collides<Self> for AlignedBoxCollider {
     fn collides_with(&self, other: &Self) -> bool {
         let self_min = self.min();
@@ -107,6 +119,20 @@ impl Collides<PointCollider> for AlignedBoxCollider {
     }
 }
 
+impl Collides<SphereCollider> for AlignedBoxCollider {
+    fn collides_with(&self, other: &SphereCollider) -> bool {
+        let min = self.min();
+        let max = self.max();
+        let center = other.position();
+
+        let distance_squared = (min.x().max(center.x()).min(max.x()) - center.x()).powi(2)
+            + (min.y().max(center.y()).min(max.y()) - center.y()).powi(2)
+            + (min.z().max(center.z()).min(max.z()) - center.z()).powi(2);
+
+        distance_squared < other.radius().powi(2)
+    }
+}
+
 impl Collides<OrientedBoxCollider> for AlignedBoxCollider {
     fn collides_with(&self, other: &OrientedBoxCollider) -> bool {
         other.collides_with(self)
@@ -116,138 +142,235 @@ impl Collides<OrientedBoxCollider> for AlignedBoxCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tests::asserts::assert_vector;
     use pretty_assertions::assert_eq;
 
     #[test]
-    fn box_bounding_regular() {
-        let box1 =
+    fn bounds_regular() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(1.0, 2.0, 4.0), Vector3::new(3.0, 2.0, 1.0));
 
-        assert_eq!(Vector3::new(-0.5, 1.0, 3.5), box1.min());
-        assert_eq!(Vector3::new(2.5, 3.0, 4.5), box1.max());
+        assert_vector(Vector3::new(-0.5, 1.0, 3.5), aabb.min());
+        assert_vector(Vector3::new(2.5, 3.0, 4.5), aabb.max());
     }
 
     #[test]
-    fn boxes_corner_collide() {
-        let box1 =
+    fn projection() {
+        let aabb =
+            AlignedBoxCollider::new(Vector3::new(1.0, 2.0, 4.0), Vector3::new(3.0, 2.0, 1.0));
+
+        assert_eq!((-0.5, 2.5), aabb.project(Vector3::new(1.0, 0.0, 0.0)));
+        assert_eq!((1.0, 3.0), aabb.project(Vector3::new(0.0, 1.0, 0.0)));
+        assert_eq!((3.5, 4.5), aabb.project(Vector3::new(0.0, 0.0, 1.0)));
+    }
+
+    #[test]
+    fn rotation() {
+        let aabb =
+            AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(2.0, 2.0, 4.0));
+        let rotation = Quaternion::from_euler(Vector3::new(0.0, 90.0_f64.to_radians(), 0.0));
+
+        let rotated = aabb.rotate(rotation);
+
+        assert_vector(Vector3::new(1.0, 1.0, 1.0), rotated.position());
+        assert_vector(Vector3::new(-1.0, 0.0, 0.0), rotated.min());
+        assert_vector(Vector3::new(3.0, 2.0, 2.0), rotated.max());
+    }
+
+    #[test]
+    fn pivot_rotation() {
+        let aabb =
+            AlignedBoxCollider::new(Vector3::new(2.0, 2.0, 1.0), Vector3::new(2.0, 2.0, 4.0));
+        let rotation = Quaternion::from_euler(Vector3::new(0.0, 90.0_f64.to_radians(), 0.0));
+
+        let rotated = aabb.rotate_around(rotation, Vector3::new(1.0, 1.0, 1.0));
+
+        assert_vector(Vector3::new(1.0, 2.0, 0.0), rotated.position());
+        assert_vector(Vector3::new(-1.0, 1.0, -1.0), rotated.min());
+        assert_vector(Vector3::new(3.0, 3.0, 1.0), rotated.max());
+    }
+
+    #[test]
+    fn aabb_corner_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
-        let box2 =
+        let other_aabb =
             AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(box1.collides_with(&box2));
+        assert!(aabb.collides_with(&other_aabb));
     }
 
     #[test]
-    fn boxes_edge_collide() {
-        let box1 =
+    fn aabb_edge_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
-        let box2 =
+        let other_aabb =
             AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(box1.collides_with(&box2));
+        assert!(aabb.collides_with(&other_aabb));
     }
 
     #[test]
-    fn boxes_face_collide() {
-        let box1 =
+    fn aabb_face_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
-        let box2 =
+        let other_aabb =
             AlignedBoxCollider::new(Vector3::new(1.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(box1.collides_with(&box2));
+        assert!(aabb.collides_with(&other_aabb));
     }
 
     #[test]
-    fn boxes_overlap_collide() {
-        let box1 =
+    fn aabb_overlap_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
-        let box2 =
+        let other_aabb =
             AlignedBoxCollider::new(Vector3::new(0.5, 0.5, 0.5), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(box1.collides_with(&box2));
+        assert!(aabb.collides_with(&other_aabb));
     }
 
     #[test]
-    fn boxes_inside_collide() {
-        let box1 =
+    fn aabb_inside_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
-        let box2 =
+        let other_aabb =
             AlignedBoxCollider::new(Vector3::new(0.5, 0.5, 0.5), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(box1.collides_with(&box2));
+        assert!(aabb.collides_with(&other_aabb));
     }
 
     #[test]
-    fn boxes_outside_dont_collide() {
-        let box1 =
+    fn aabb_outside_dont_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
-        let box2 =
+        let other_aabb =
             AlignedBoxCollider::new(Vector3::new(2.0, 2.0, 2.0), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(!box1.collides_with(&box2));
+        assert!(!aabb.collides_with(&other_aabb));
     }
 
     #[test]
-    fn boxes_close_dont_collide() {
-        let box1 =
+    fn aabb_close_dont_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
-        let box2 =
+        let other_aabb =
             AlignedBoxCollider::new(Vector3::new(2.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(!box1.collides_with(&box2));
+        assert!(!aabb.collides_with(&other_aabb));
     }
 
     #[test]
-    fn box_point_corner_collide() {
-        let box1 =
+    fn point_corner_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let point = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(box1.collides_with(&point));
+        assert!(aabb.collides_with(&point));
     }
 
     #[test]
-    fn box_point_edge_collide() {
-        let box1 =
+    fn point_edge_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let point = PointCollider::new(Vector3::new(1.0, 1.0, 0.0));
 
-        assert!(box1.collides_with(&point));
+        assert!(aabb.collides_with(&point));
     }
 
     #[test]
-    fn box_point_face_collide() {
-        let box1 =
+    fn point_face_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let point = PointCollider::new(Vector3::new(1.0, 0.0, 0.0));
 
-        assert!(box1.collides_with(&point));
+        assert!(aabb.collides_with(&point));
     }
 
     #[test]
-    fn box_point_inside_collide() {
-        let box1 =
+    fn point_inside_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 
-        assert!(box1.collides_with(&point));
+        assert!(aabb.collides_with(&point));
     }
 
     #[test]
-    fn box_point_outside_dont_collide() {
-        let box1 =
+    fn point_outside_dont_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
         let point = PointCollider::new(Vector3::new(2.0, 2.0, 2.0));
 
-        assert!(!box1.collides_with(&point));
+        assert!(!aabb.collides_with(&point));
     }
 
     #[test]
-    fn box_point_close_dont_collide() {
-        let box1 =
+    fn point_close_dont_collide() {
+        let aabb =
             AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
         let point = PointCollider::new(Vector3::new(3.0, 1.0, 1.0));
 
-        assert!(!box1.collides_with(&point));
+        assert!(!aabb.collides_with(&point));
+    }
+
+    #[test]
+    fn sphere_corner_collide() {
+        let aabb =
+            AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
+        let sphere = SphereCollider::new(Vector3::new(2.0, 2.0, 2.0), 1.733);
+
+        assert!(aabb.collides_with(&sphere));
+        assert!(sphere.collides_with(&aabb));
+    }
+
+    #[test]
+    fn sphere_corner_dont_collide() {
+        let aabb =
+            AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
+        let sphere = SphereCollider::new(Vector3::new(2.0, 2.0, 2.0), 1.73);
+
+        assert!(!aabb.collides_with(&sphere));
+        assert!(!sphere.collides_with(&aabb));
+    }
+
+    #[test]
+    fn sphere_edge_collide() {
+        let aabb =
+            AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
+        let sphere = SphereCollider::new(Vector3::new(1.70, 1.70, 0.0), 1.0);
+
+        assert!(aabb.collides_with(&sphere));
+        assert!(sphere.collides_with(&aabb));
+    }
+
+    #[test]
+    fn sphere_edge_dont_collide() {
+        let aabb =
+            AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
+        let sphere = SphereCollider::new(Vector3::new(1.71, 1.71, 0.0), 1.0);
+
+        assert!(!aabb.collides_with(&sphere));
+        assert!(!sphere.collides_with(&aabb));
+    }
+
+    #[test]
+    fn sphere_face_collide() {
+        let aabb =
+            AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
+        let sphere = SphereCollider::new(Vector3::new(1.0, 0.0, 0.0), 1.0);
+
+        assert!(aabb.collides_with(&sphere));
+        assert!(sphere.collides_with(&aabb));
+    }
+
+    #[test]
+    fn sphere_inside_collide() {
+        let aabb =
+            AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
+        let sphere = SphereCollider::new(Vector3::new(0.0, 0.0, 0.0), 1.0);
+
+        assert!(aabb.collides_with(&sphere));
+        assert!(sphere.collides_with(&aabb));
     }
 }

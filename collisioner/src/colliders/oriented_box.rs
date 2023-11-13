@@ -1,4 +1,6 @@
-use crate::colliders::{AlignedBoxCollider, Bounded, Collides, PointCollider, Projectable};
+use crate::colliders::{
+    AlignedBoxCollider, Bounded, Collides, PointCollider, Projectable, Rotation, SphereCollider,
+};
 use crate::common::{Quaternion, Vector3};
 use itertools::Itertools;
 
@@ -48,19 +50,12 @@ impl OrientedBoxCollider {
         self.rotation
     }
 
-    pub fn rotate_around(&self, pivot: Vector3, rotation: Quaternion) -> Self {
-        let new_position = (self.position - pivot).rotate(rotation) + pivot;
-        let new_rotation = self.rotation * rotation;
-
-        Self::new(new_position, self.size, new_rotation)
-    }
-
     fn corners(&self) -> [Vector3; 8] {
-        let half_size = (self.size() / 2.0).rotate(self.rotation);
+        let half_size = self.size() / 2.0;
         let negative_pos = self.position - half_size;
         let positive_pos = self.position + half_size;
 
-        [
+        let corners = [
             Vector3::new(negative_pos.x(), negative_pos.y(), negative_pos.z()),
             Vector3::new(positive_pos.x(), negative_pos.y(), negative_pos.z()),
             Vector3::new(negative_pos.x(), positive_pos.y(), negative_pos.z()),
@@ -69,7 +64,14 @@ impl OrientedBoxCollider {
             Vector3::new(positive_pos.x(), negative_pos.y(), positive_pos.z()),
             Vector3::new(negative_pos.x(), positive_pos.y(), positive_pos.z()),
             Vector3::new(positive_pos.x(), positive_pos.y(), positive_pos.z()),
-        ]
+        ];
+
+        corners
+            .into_iter()
+            .map(|c| c.rotate_around(self.rotation, self.position))
+            .collect_vec()
+            .try_into()
+            .unwrap()
     }
 
     fn separating_axes(&self) -> (Vector3, Vector3, Vector3) {
@@ -120,12 +122,25 @@ impl Projectable for OrientedBoxCollider {
     }
 }
 
-impl From<AlignedBoxCollider> for OrientedBoxCollider {
-    fn from(value: AlignedBoxCollider) -> Self {
+impl Rotation for OrientedBoxCollider {
+    fn rotate(&self, rotation: Quaternion) -> Self {
+        self.rotate_around(rotation, self.position)
+    }
+
+    fn rotate_around(&self, rotation: Quaternion, pivot: Vector3) -> Self {
+        let new_position = self.position.rotate_around(rotation, pivot);
+        let new_rotation = self.rotation * rotation;
+
+        Self::new(new_position, self.size, new_rotation)
+    }
+}
+
+impl From<&AlignedBoxCollider> for OrientedBoxCollider {
+    fn from(value: &AlignedBoxCollider) -> Self {
         OrientedBoxCollider::new(
             value.position(),
             value.size(),
-            Quaternion::new(0.0, 0.0, 0.0, 0.0),
+            Quaternion::new(0.0, 0.0, 0.0, 1.0),
         )
     }
 }
@@ -171,6 +186,27 @@ impl Collides<PointCollider> for OrientedBoxCollider {
     }
 }
 
+impl Collides<SphereCollider> for OrientedBoxCollider {
+    fn collides_with(&self, other: &SphereCollider) -> bool {
+        let halfs = self.size / 2.0;
+        let max = self.position + halfs;
+        let min = self.position - halfs;
+
+        let inverse_center = other.position().rotate(self.rotation.conjugate());
+
+        let clamped = Vector3::new(
+            inverse_center.x().clamp(min.x(), max.x()),
+            inverse_center.y().clamp(min.y(), max.y()),
+            inverse_center.z().clamp(min.z(), max.z()),
+        );
+
+        let closest = clamped.rotate(self.rotation);
+        let distance = (closest - other.position()).len();
+
+        distance <= other.radius()
+    }
+}
+
 impl Collides<AlignedBoxCollider> for OrientedBoxCollider {
     fn collides_with(&self, other: &AlignedBoxCollider) -> bool {
         let (ax, ay, az) = self.separating_axes();
@@ -209,7 +245,7 @@ mod tests {
     use crate::tests::asserts::*;
 
     #[test]
-    fn rotate_around_pivot() {
+    fn pivot_rotation() {
         let collider = OrientedBoxCollider::new(
             Vector3::new(5.0, 0.0, 0.0),
             Vector3::new(1.0, 1.0, 1.0),
@@ -221,12 +257,12 @@ mod tests {
         );
 
         let rotated = collider.rotate_around(
-            Vector3::new(0.0, 0.0, 0.0),
             Quaternion::from_euler(Vector3::new(
                 0.0_f64.to_radians(),
                 0.0_f64.to_radians(),
                 90.0_f64.to_radians(),
             )),
+            Vector3::new(0.0, 0.0, 0.0),
         );
 
         let position = Vector3::new(0.0, 5.0, 0.0);
@@ -281,59 +317,59 @@ mod tests {
     }
 
     #[test]
-    fn boxes_corner_corner_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn obb_corner_corner_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
-        let box2 = OrientedBoxCollider::new(
+        let other_obb = OrientedBoxCollider::new(
             Vector3::new(1.0, 1.0, 1.0),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
 
-        assert!(box1.collides_with(&box2));
-        assert!(box2.collides_with(&box1));
+        assert!(obb.collides_with(&other_obb));
+        assert!(other_obb.collides_with(&obb));
     }
 
     #[test]
-    fn boxes_edge_edge_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn obb_edge_edge_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
-        let box2 = OrientedBoxCollider::new(
+        let other_obb = OrientedBoxCollider::new(
             Vector3::new(1.0, 1.0, 0.0),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
 
-        assert!(box1.collides_with(&box2));
-        assert!(box2.collides_with(&box1));
+        assert!(obb.collides_with(&other_obb));
+        assert!(other_obb.collides_with(&obb));
     }
 
     #[test]
-    fn boxes_face_face_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn obb_face_face_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
-        let box2 = OrientedBoxCollider::new(
+        let other_obb = OrientedBoxCollider::new(
             Vector3::new(1.0, 0.0, 0.0),
             Vector3::new(1.0, 1.0, 1.0),
             Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
 
-        assert!(box1.collides_with(&box2));
-        assert!(box2.collides_with(&box1));
+        assert!(obb.collides_with(&other_obb));
+        assert!(other_obb.collides_with(&obb));
     }
 
     #[test]
-    fn boxes_face_edge_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn obb_face_edge_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -342,19 +378,19 @@ mod tests {
                 45.0_f64.to_radians(),
             )),
         );
-        let box2 = OrientedBoxCollider::new(
+        let other_obb = OrientedBoxCollider::new(
             Vector3::new(0.7, 0.7, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
-            Quaternion::new(0.0, 0.0, 0.0, 0.0),
+            Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
 
-        assert!(box1.collides_with(&box2));
-        assert!(box2.collides_with(&box1));
+        assert!(obb.collides_with(&other_obb));
+        assert!(other_obb.collides_with(&obb));
     }
 
     #[test]
-    fn boxes_dont_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn obb_dont_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -363,19 +399,19 @@ mod tests {
                 45.0_f64.to_radians(),
             )),
         );
-        let box2 = OrientedBoxCollider::new(
-            Vector3::new(0.71, 0.71, 0.0),
+        let other_obb = OrientedBoxCollider::new(
+            Vector3::new(1.71, 1.71, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
-            Quaternion::new(0.0, 0.0, 0.0, 0.0),
+            Quaternion::new(0.0, 0.0, 0.0, 1.0),
         );
 
-        assert!(!box1.collides_with(&box2));
-        assert!(!box2.collides_with(&box1));
+        assert!(!obb.collides_with(&other_obb));
+        assert!(!other_obb.collides_with(&obb));
     }
 
     #[test]
-    fn box_point_corner_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn point_corner_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -386,13 +422,13 @@ mod tests {
         );
         let point = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(box1.collides_with(&point));
-        assert!(point.collides_with(&box1));
+        assert!(obb.collides_with(&point));
+        assert!(point.collides_with(&obb));
     }
 
     #[test]
-    fn box_point_edge_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn point_edge_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -403,13 +439,13 @@ mod tests {
         );
         let point = PointCollider::new(Vector3::new(1.0, 0.0, 1.0));
 
-        assert!(box1.collides_with(&point));
-        assert!(point.collides_with(&box1));
+        assert!(obb.collides_with(&point));
+        assert!(point.collides_with(&obb));
     }
 
     #[test]
-    fn box_point_face_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn point_face_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -420,13 +456,13 @@ mod tests {
         );
         let point = PointCollider::new(Vector3::new(1.0, 0.0, 0.0));
 
-        assert!(box1.collides_with(&point));
-        assert!(point.collides_with(&box1));
+        assert!(obb.collides_with(&point));
+        assert!(point.collides_with(&obb));
     }
 
     #[test]
-    fn box_point_dont_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn point_dont_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -437,12 +473,114 @@ mod tests {
         );
         let point = PointCollider::new(Vector3::new(0.71, 0.71, 0.0));
 
-        assert!(!box1.collides_with(&point));
-        assert!(!point.collides_with(&box1));
+        assert!(!obb.collides_with(&point));
+        assert!(!point.collides_with(&obb));
     }
 
     #[test]
-    fn obb_aabb_corner_corner_collide() {
+    fn sphere_corner_collide() {
+        let obb = OrientedBoxCollider::new(
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(2.0, 2.0, 2.0),
+            Quaternion::from_euler(Vector3::new(
+                90.0_f64.to_radians(),
+                90.0_f64.to_radians(),
+                90.0_f64.to_radians(),
+            )),
+        );
+        let sphere = SphereCollider::new(Vector3::new(2.0, 2.0, 2.0), 1.733);
+
+        assert!(obb.collides_with(&sphere));
+        assert!(sphere.collides_with(&obb));
+    }
+
+    #[test]
+    fn sphere_corner_dont_collide() {
+        let obb = OrientedBoxCollider::new(
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(2.0, 2.0, 2.0),
+            Quaternion::from_euler(Vector3::new(
+                90.0_f64.to_radians(),
+                90.0_f64.to_radians(),
+                90.0_f64.to_radians(),
+            )),
+        );
+        let sphere = SphereCollider::new(Vector3::new(2.0, 2.0, 2.0), 1.73);
+
+        assert!(!obb.collides_with(&sphere));
+        assert!(!sphere.collides_with(&obb));
+    }
+
+    #[test]
+    fn sphere_edge_collide() {
+        let obb = OrientedBoxCollider::new(
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(2.0, 2.0, 2.0),
+            Quaternion::from_euler(Vector3::new(
+                90.0_f64.to_radians(),
+                90.0_f64.to_radians(),
+                90.0_f64.to_radians(),
+            )),
+        );
+        let sphere = SphereCollider::new(Vector3::new(1.70, 1.70, 0.0), 1.0);
+
+        assert!(obb.collides_with(&sphere));
+        assert!(sphere.collides_with(&obb));
+    }
+
+    #[test]
+    fn sphere_edge_dont_collide() {
+        let obb = OrientedBoxCollider::new(
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(2.0, 2.0, 2.0),
+            Quaternion::from_euler(Vector3::new(
+                90.0_f64.to_radians(),
+                90.0_f64.to_radians(),
+                90.0_f64.to_radians(),
+            )),
+        );
+        let sphere = SphereCollider::new(Vector3::new(1.71, 1.71, 0.0), 1.0);
+
+        assert!(!obb.collides_with(&sphere));
+        assert!(!sphere.collides_with(&obb));
+    }
+
+    #[test]
+    fn sphere_face_collide() {
+        let obb = OrientedBoxCollider::new(
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(2.0, 2.0, 2.0),
+            Quaternion::from_euler(Vector3::new(
+                90.0_f64.to_radians(),
+                90.0_f64.to_radians(),
+                90.0_f64.to_radians(),
+            )),
+        );
+        let sphere = SphereCollider::new(Vector3::new(1.0, 0.0, 0.0), 1.0);
+
+        assert!(obb.collides_with(&sphere));
+        assert!(sphere.collides_with(&obb));
+    }
+
+    #[test]
+    fn sphere_inside_collide() {
+        let obb = OrientedBoxCollider::new(
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(2.0, 2.0, 2.0),
+            Quaternion::from_euler(Vector3::new(
+                90.0_f64.to_radians(),
+                90.0_f64.to_radians(),
+                90.0_f64.to_radians(),
+            )),
+        );
+        let sphere = SphereCollider::new(Vector3::new(0.0, 0.0, 0.0), 1.0);
+
+        assert!(obb.collides_with(&sphere));
+        assert!(sphere.collides_with(&obb));
+    }
+
+    #[test]
+    fn aabb_corner_corner_collide() {
         let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
@@ -456,7 +594,7 @@ mod tests {
     }
 
     #[test]
-    fn obb_aabb_edge_edge_collide() {
+    fn aabb_edge_edge_collide() {
         let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
@@ -470,7 +608,7 @@ mod tests {
     }
 
     #[test]
-    fn obb_aabb_face_face_collide() {
+    fn aabb_face_face_collide() {
         let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
@@ -484,8 +622,8 @@ mod tests {
     }
 
     #[test]
-    fn obb_aabb_dont_collide() {
-        let box1 = OrientedBoxCollider::new(
+    fn aabb_dont_collide() {
+        let obb = OrientedBoxCollider::new(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
             Quaternion::from_euler(Vector3::new(
@@ -494,10 +632,10 @@ mod tests {
                 45.0_f64.to_radians(),
             )),
         );
-        let box2 =
+        let other_obb =
             AlignedBoxCollider::new(Vector3::new(1.21, 1.21, 0.0), Vector3::new(1.0, 1.0, 1.0));
 
-        assert!(!box1.collides_with(&box2));
-        assert!(!box2.collides_with(&box1));
+        assert!(!obb.collides_with(&other_obb));
+        assert!(!other_obb.collides_with(&obb));
     }
 }
