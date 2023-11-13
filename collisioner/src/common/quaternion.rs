@@ -47,6 +47,7 @@ impl Quaternion {
         self.w
     }
 
+    /// Creates a quaternion from euler angles according to the right hand thumb rule.
     pub fn from_euler(euler: Vector3) -> Self {
         let half = euler / 2.0;
 
