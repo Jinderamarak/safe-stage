@@ -27,8 +27,12 @@ pub struct Quaternion {
 }
 
 impl Quaternion {
-    pub fn new(x: f64, y: f64, z: f64, w: f64) -> Self {
+    pub fn raw(x: f64, y: f64, z: f64, w: f64) -> Self {
         Self { x, y, z, w }
+    }
+
+    pub fn normalized(x: f64, y: f64, z: f64, w: f64) -> Self {
+        Self::raw(x, y, z, w).normalize()
     }
 
     pub fn x(&self) -> f64 {
@@ -63,7 +67,7 @@ impl Quaternion {
         let z = rc * pc * ys - rs * ps * yc;
         let w = rc * pc * yc + rs * ps * ys;
 
-        Self::new(x, y, z, w)
+        Self::normalized(x, y, z, w)
     }
 
     pub fn to_euler(self) -> Vector3 {
@@ -89,13 +93,26 @@ impl Quaternion {
     }
 
     pub fn conjugate(self) -> Self {
-        Self::new(-self.x, -self.y, -self.z, self.w)
+        Self::raw(-self.x, -self.y, -self.z, self.w)
+    }
+
+    pub fn len(&self) -> f64 {
+        self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w
+    }
+
+    pub fn normalize(&self) -> Self {
+        let len = self.len();
+        if len == 0.0 {
+            *self
+        } else {
+            Self::raw(self.x / len, self.y / len, self.z / len, self.w / len)
+        }
     }
 }
 
 impl From<&Vector3> for Quaternion {
     fn from(vector: &Vector3) -> Self {
-        Self::new(vector.x(), vector.y(), vector.z(), 0.0)
+        Self::raw(vector.x(), vector.y(), vector.z(), 0.0)
     }
 }
 
@@ -125,13 +142,23 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     #[test]
-    fn create_correct() {
-        let quaternion = Quaternion::new(1.0, 2.0, 3.0, 4.0);
+    fn raw() {
+        let quaternion = Quaternion::raw(1.0, 2.0, 3.0, 4.0);
 
         assert_eq!(1.0, quaternion.x());
         assert_eq!(2.0, quaternion.y());
         assert_eq!(3.0, quaternion.z());
         assert_eq!(4.0, quaternion.w());
+    }
+
+    #[test]
+    fn normalized() {
+        let quaternion = Quaternion::normalized(1.0, 2.0, 3.0, 4.0);
+
+        assert_float_absolute_eq!(0.0333, quaternion.x(), 1e-3);
+        assert_float_absolute_eq!(0.0666, quaternion.y(), 1e-3);
+        assert_float_absolute_eq!(0.0999, quaternion.z(), 1e-3);
+        assert_float_absolute_eq!(0.1333, quaternion.w(), 1e-3);
     }
 
     #[test]
@@ -151,7 +178,7 @@ mod tests {
 
     #[test]
     fn to_euler_angles() {
-        let quaternion = Quaternion::new(-0.0922, 0.4304, 0.5609, 0.7010);
+        let quaternion = Quaternion::normalized(-0.0922, 0.4304, 0.5609, 0.7010);
         let vector: Vector3 = quaternion.to_euler();
 
         assert_float_absolute_eq!(30.0, vector.x().to_degrees(), 1.0);
@@ -172,7 +199,7 @@ mod tests {
 
     #[test]
     fn conjugate() {
-        let quaternion = Quaternion::new(1.0, 2.0, 3.0, 4.0);
+        let quaternion = Quaternion::raw(1.0, 2.0, 3.0, 4.0);
         let conjugate = quaternion.conjugate();
 
         assert_eq!(-1.0, conjugate.x());
@@ -183,13 +210,43 @@ mod tests {
 
     #[test]
     fn multiply() {
-        let q1 = Quaternion::new(1.0, 2.0, 3.0, 4.0);
-        let q2 = Quaternion::new(5.0, 6.0, 7.0, 8.0);
+        let q1 = Quaternion::raw(1.0, 2.0, 3.0, 4.0);
+        let q2 = Quaternion::raw(5.0, 6.0, 7.0, 8.0);
         let q3 = q1 * q2;
 
         assert_eq!(24.0, q3.x());
         assert_eq!(48.0, q3.y());
         assert_eq!(48.0, q3.z());
         assert_eq!(-6.0, q3.w());
+    }
+
+    #[test]
+    fn length() {
+        let quaternion = Quaternion::raw(1.0, 2.0, 3.0, 4.0);
+        let len = quaternion.len();
+
+        assert_eq!(30.0, len);
+    }
+
+    #[test]
+    fn normalize() {
+        let quaternion = Quaternion::raw(1.0, 2.0, 3.0, 4.0);
+        let normalized = quaternion.normalize();
+
+        assert_float_absolute_eq!(0.0333, normalized.x(), 1e-3);
+        assert_float_absolute_eq!(0.0666, normalized.y(), 1e-3);
+        assert_float_absolute_eq!(0.0999, normalized.z(), 1e-3);
+        assert_float_absolute_eq!(0.1333, normalized.w(), 1e-3);
+    }
+
+    #[test]
+    fn normalize_zero_length() {
+        let quaternion = Quaternion::raw(0.0, 0.0, 0.0, 0.0);
+        let normalized = quaternion.normalize();
+
+        assert_eq!(0.0, normalized.x());
+        assert_eq!(0.0, normalized.y());
+        assert_eq!(0.0, normalized.z());
+        assert_eq!(0.0, normalized.w());
     }
 }

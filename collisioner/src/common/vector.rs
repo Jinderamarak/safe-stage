@@ -332,7 +332,7 @@ mod tests {
 
     #[test]
     fn from_quaternion() {
-        let quaternion = Quaternion::new(1.0, 2.0, 3.0, 4.0);
+        let quaternion = Quaternion::raw(1.0, 2.0, 3.0, 4.0);
         let vector: Vector3 = quaternion.into();
 
         assert_eq!(1.0, vector.x());
