@@ -1,4 +1,4 @@
-use crate::colliders::{AlignedBoxCollider, Bounded, Collider};
+use crate::colliders::{Bounded, Collider};
 use crate::common::{Axis, Vector3};
 use itertools::Itertools;
 
@@ -6,16 +6,12 @@ use itertools::Itertools;
 /// A tree structure that allows for efficient collision detection.
 #[derive(Debug, PartialEq)]
 pub enum BvhTree {
-    Branch(
-        AlignedBoxCollider,
-        Option<Box<BvhTree>>,
-        Option<Box<BvhTree>>,
-    ),
+    Branch(Collider, Option<Box<BvhTree>>, Option<Box<BvhTree>>),
     Leaf(Collider),
 }
 
 impl BvhTree {
-    pub fn build(objects: &mut [Collider]) -> Option<BvhTree> {
+    pub fn build(objects: &[Collider]) -> Option<BvhTree> {
         if objects.is_empty() {
             return None;
         }
@@ -47,17 +43,17 @@ impl BvhTree {
 
         ordered.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
 
-        let mut ordered = ordered
+        let ordered = ordered
             .into_iter()
             .map(|(c, _)| c.clone())
             .collect::<Vec<Collider>>();
 
         let half = ordered.len() / 2;
 
-        let left = Self::build(&mut ordered[..half]);
-        let right = Self::build(&mut ordered[half..]);
+        let left = Self::build(&ordered[..half]);
+        let right = Self::build(&ordered[half..]);
 
-        let bounding = Self::colliders_to_bounding_box(objects);
+        let bounding = Self::colliders_to_bounding(objects);
 
         Some(BvhTree::Branch(
             bounding,
@@ -72,7 +68,7 @@ impl BvhTree {
         min + ((max - min) / 2.0)
     }
 
-    fn colliders_to_bounding_box(colliders: &[Collider]) -> AlignedBoxCollider {
+    fn colliders_to_bounding(colliders: &[Collider]) -> Collider {
         let min = colliders
             .iter()
             .map(|c| c.min())
@@ -86,40 +82,40 @@ impl BvhTree {
             .unwrap();
 
         let size = max - min;
-        AlignedBoxCollider::new(min + size / 2.0, size)
+        let pos = min + size / 2.0;
+        Collider::aligned_box(pos.x(), pos.y(), pos.z(), size.x(), size.y(), size.z())
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::colliders::{AlignedBoxCollider, PointCollider};
     use pretty_assertions::assert_eq;
 
     #[test]
     fn build_bhv_correct() {
-        let mut objects = vec![
-            pointac(1.0, 1.0, 1.0),
-            pointac(2.0, 2.0, 2.0),
-            pointac(3.0, 3.0, 3.0),
-            pointac(4.0, 4.0, 4.0),
+        let objects = vec![
+            cpoint(1.0, 1.0, 1.0),
+            cpoint(2.0, 2.0, 2.0),
+            cpoint(3.0, 3.0, 3.0),
+            cpoint(4.0, 4.0, 4.0),
         ];
 
-        let tree = BvhTree::build(&mut objects[..]);
+        let tree = BvhTree::build(&objects[..]);
 
         assert!(tree.is_some());
         assert_eq!(
             BvhTree::Branch(
-                boxc(2.5, 2.5, 2.5, 3.0, 3.0, 3.0),
+                cbox(2.5, 2.5, 2.5, 3.0, 3.0, 3.0),
                 Some(Box::new(BvhTree::Branch(
-                    boxc(1.5, 1.5, 1.5, 1.0, 1.0, 1.0),
-                    Some(Box::new(BvhTree::Leaf(pointac(1.0, 1.0, 1.0)))),
-                    Some(Box::new(BvhTree::Leaf(pointac(2.0, 2.0, 2.0)))),
+                    cbox(1.5, 1.5, 1.5, 1.0, 1.0, 1.0),
+                    Some(Box::new(BvhTree::Leaf(cpoint(1.0, 1.0, 1.0)))),
+                    Some(Box::new(BvhTree::Leaf(cpoint(2.0, 2.0, 2.0)))),
                 ))),
                 Some(Box::new(BvhTree::Branch(
-                    boxc(3.5, 3.5, 3.5, 1.0, 1.0, 1.0),
-                    Some(Box::new(BvhTree::Leaf(pointac(3.0, 3.0, 3.0)))),
-                    Some(Box::new(BvhTree::Leaf(pointac(4.0, 4.0, 4.0)))),
+                    cbox(3.5, 3.5, 3.5, 1.0, 1.0, 1.0),
+                    Some(Box::new(BvhTree::Leaf(cpoint(3.0, 3.0, 3.0)))),
+                    Some(Box::new(BvhTree::Leaf(cpoint(4.0, 4.0, 4.0)))),
                 ))),
             ),
             tree.unwrap()
@@ -129,14 +125,14 @@ mod tests {
     #[test]
     fn build_bhv_complex() {
         let mut objects = vec![
-            boxac(0.0, 0.0, 0.0, 1.0, 1.0, 1.0),
-            boxac(2.0, 0.0, 0.0, 1.0, 1.0, 1.0),
-            boxac(0.0, 2.0, 0.0, 1.0, 1.0, 1.0),
-            boxac(2.0, 2.0, 0.0, 1.0, 1.0, 1.0),
-            boxac(0.0, 0.0, 2.0, 1.0, 1.0, 1.0),
-            boxac(2.0, 0.0, 2.0, 1.0, 1.0, 1.0),
-            boxac(0.0, 2.0, 2.0, 1.0, 1.0, 1.0),
-            boxac(2.0, 2.0, 2.0, 1.0, 1.0, 1.0),
+            cbox(0.0, 0.0, 0.0, 1.0, 1.0, 1.0),
+            cbox(2.0, 0.0, 0.0, 1.0, 1.0, 1.0),
+            cbox(0.0, 2.0, 0.0, 1.0, 1.0, 1.0),
+            cbox(2.0, 2.0, 0.0, 1.0, 1.0, 1.0),
+            cbox(0.0, 0.0, 2.0, 1.0, 1.0, 1.0),
+            cbox(2.0, 0.0, 2.0, 1.0, 1.0, 1.0),
+            cbox(0.0, 2.0, 2.0, 1.0, 1.0, 1.0),
+            cbox(2.0, 2.0, 2.0, 1.0, 1.0, 1.0),
         ];
 
         let tree = BvhTree::build(&mut objects[..]);
@@ -144,31 +140,31 @@ mod tests {
         assert!(tree.is_some());
         assert_eq!(
             BvhTree::Branch(
-                boxc(1.0, 1.0, 1.0, 3.0, 3.0, 3.0),
+                cbox(1.0, 1.0, 1.0, 3.0, 3.0, 3.0),
                 Some(Box::new(BvhTree::Branch(
-                    boxc(0.0, 1.0, 1.0, 1.0, 3.0, 3.0),
+                    cbox(0.0, 1.0, 1.0, 1.0, 3.0, 3.0),
                     Some(Box::new(BvhTree::Branch(
-                        boxc(0.0, 0.0, 1.0, 1.0, 1.0, 3.0),
-                        Some(Box::new(BvhTree::Leaf(boxac(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)))),
-                        Some(Box::new(BvhTree::Leaf(boxac(0.0, 0.0, 2.0, 1.0, 1.0, 1.0)))),
+                        cbox(0.0, 0.0, 1.0, 1.0, 1.0, 3.0),
+                        Some(Box::new(BvhTree::Leaf(cbox(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)))),
+                        Some(Box::new(BvhTree::Leaf(cbox(0.0, 0.0, 2.0, 1.0, 1.0, 1.0)))),
                     ))),
                     Some(Box::new(BvhTree::Branch(
-                        boxc(0.0, 2.0, 1.0, 1.0, 1.0, 3.0),
-                        Some(Box::new(BvhTree::Leaf(boxac(0.0, 2.0, 0.0, 1.0, 1.0, 1.0)))),
-                        Some(Box::new(BvhTree::Leaf(boxac(0.0, 2.0, 2.0, 1.0, 1.0, 1.0)))),
+                        cbox(0.0, 2.0, 1.0, 1.0, 1.0, 3.0),
+                        Some(Box::new(BvhTree::Leaf(cbox(0.0, 2.0, 0.0, 1.0, 1.0, 1.0)))),
+                        Some(Box::new(BvhTree::Leaf(cbox(0.0, 2.0, 2.0, 1.0, 1.0, 1.0)))),
                     ))),
                 ))),
                 Some(Box::new(BvhTree::Branch(
-                    boxc(2.0, 1.0, 1.0, 1.0, 3.0, 3.0),
+                    cbox(2.0, 1.0, 1.0, 1.0, 3.0, 3.0),
                     Some(Box::new(BvhTree::Branch(
-                        boxc(2.0, 0.0, 1.0, 1.0, 1.0, 3.0),
-                        Some(Box::new(BvhTree::Leaf(boxac(2.0, 0.0, 0.0, 1.0, 1.0, 1.0)))),
-                        Some(Box::new(BvhTree::Leaf(boxac(2.0, 0.0, 2.0, 1.0, 1.0, 1.0)))),
+                        cbox(2.0, 0.0, 1.0, 1.0, 1.0, 3.0),
+                        Some(Box::new(BvhTree::Leaf(cbox(2.0, 0.0, 0.0, 1.0, 1.0, 1.0)))),
+                        Some(Box::new(BvhTree::Leaf(cbox(2.0, 0.0, 2.0, 1.0, 1.0, 1.0)))),
                     ))),
                     Some(Box::new(BvhTree::Branch(
-                        boxc(2.0, 2.0, 1.0, 1.0, 1.0, 3.0),
-                        Some(Box::new(BvhTree::Leaf(boxac(2.0, 2.0, 0.0, 1.0, 1.0, 1.0)))),
-                        Some(Box::new(BvhTree::Leaf(boxac(2.0, 2.0, 2.0, 1.0, 1.0, 1.0)))),
+                        cbox(2.0, 2.0, 1.0, 1.0, 1.0, 3.0),
+                        Some(Box::new(BvhTree::Leaf(cbox(2.0, 2.0, 0.0, 1.0, 1.0, 1.0)))),
+                        Some(Box::new(BvhTree::Leaf(cbox(2.0, 2.0, 2.0, 1.0, 1.0, 1.0)))),
                     ))),
                 ))),
             ),
@@ -176,15 +172,11 @@ mod tests {
         );
     }
 
-    fn boxc(x: f64, y: f64, z: f64, w: f64, h: f64, d: f64) -> AlignedBoxCollider {
-        AlignedBoxCollider::new(Vector3::new(x, y, z), Vector3::new(w, h, d))
+    fn cbox(x: f64, y: f64, z: f64, w: f64, h: f64, d: f64) -> Collider {
+        Collider::aligned_box(x, y, z, w, h, d)
     }
 
-    fn boxac(x: f64, y: f64, z: f64, w: f64, h: f64, d: f64) -> Collider {
-        Collider::from(boxc(x, y, z, w, h, d))
-    }
-
-    fn pointac(x: f64, y: f64, z: f64) -> Collider {
-        Collider::from(PointCollider::new(Vector3::new(x, y, z)))
+    fn cpoint(x: f64, y: f64, z: f64) -> Collider {
+        Collider::point(x, y, z)
     }
 }
