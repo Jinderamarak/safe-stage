@@ -176,29 +176,24 @@ impl Collides<Self> for OrientedBoxCollider {
 
 impl Collides<PointCollider> for OrientedBoxCollider {
     fn collides_with(&self, other: &PointCollider) -> bool {
-        let (ax, ay, az) = self.separating_axes();
+        let halfs = self.size / 2.0;
+        let min = self.position - halfs;
+        let max = self.position + halfs;
 
-        let axes = [ax, ay, az];
+        let inverse_point = other.position().rotate(self.rotation.conjugate());
 
-        axes.iter()
-            .map(Vector3::normalize)
-            .all(|axis| self.intersects(other, axis))
+        inverse_point >= min && inverse_point <= max
     }
 }
 
 impl Collides<SphereCollider> for OrientedBoxCollider {
     fn collides_with(&self, other: &SphereCollider) -> bool {
         let halfs = self.size / 2.0;
-        let max = self.position + halfs;
         let min = self.position - halfs;
+        let max = self.position + halfs;
 
         let inverse_center = other.position().rotate(self.rotation.conjugate());
-
-        let clamped = Vector3::new(
-            inverse_center.x().clamp(min.x(), max.x()),
-            inverse_center.y().clamp(min.y(), max.y()),
-            inverse_center.z().clamp(min.z(), max.z()),
-        );
+        let clamped = inverse_center.clamp(&min, &max);
 
         let closest = clamped.rotate(self.rotation);
         let distance = (closest - other.position()).len();
