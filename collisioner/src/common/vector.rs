@@ -83,6 +83,14 @@ impl Vector3 {
             *self
         }
     }
+
+    pub fn clamp(&self, min: &Vector3, max: &Vector3) -> Vector3 {
+        Vector3::new(
+            self.x.clamp(min.x, max.x),
+            self.y.clamp(min.y, max.y),
+            self.z.clamp(min.z, max.z),
+        )
+    }
 }
 
 impl Add<Vector3> for Vector3 {
@@ -332,11 +340,23 @@ mod tests {
 
     #[test]
     fn from_quaternion() {
-        let quaternion = Quaternion::new(1.0, 2.0, 3.0, 4.0);
+        let quaternion = Quaternion::raw(1.0, 2.0, 3.0, 4.0);
         let vector: Vector3 = quaternion.into();
 
         assert_eq!(1.0, vector.x());
         assert_eq!(2.0, vector.y());
         assert_eq!(3.0, vector.z());
+    }
+
+    #[test]
+    fn clamp() {
+        let vector = Vector3::new(2.0, 1.0, 0.0);
+        let min = Vector3::new(-1.0, 0.0, 1.0);
+        let max = Vector3::new(1.0, 1.0, 2.0);
+        let clamped = vector.clamp(&min, &max);
+
+        assert_eq!(1.0, clamped.x());
+        assert_eq!(1.0, clamped.y());
+        assert_eq!(1.0, clamped.z());
     }
 }

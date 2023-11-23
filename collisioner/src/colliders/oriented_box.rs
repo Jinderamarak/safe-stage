@@ -140,7 +140,7 @@ impl From<&AlignedBoxCollider> for OrientedBoxCollider {
         OrientedBoxCollider::new(
             value.position(),
             value.size(),
-            Quaternion::new(0.0, 0.0, 0.0, 1.0),
+            Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         )
     }
 }
@@ -176,29 +176,24 @@ impl Collides<Self> for OrientedBoxCollider {
 
 impl Collides<PointCollider> for OrientedBoxCollider {
     fn collides_with(&self, other: &PointCollider) -> bool {
-        let (ax, ay, az) = self.separating_axes();
+        let halfs = self.size / 2.0;
+        let min = self.position - halfs;
+        let max = self.position + halfs;
 
-        let axes = [ax, ay, az];
+        let inverse_point = other.position().rotate(self.rotation.conjugate());
 
-        axes.iter()
-            .map(Vector3::normalize)
-            .all(|axis| self.intersects(other, axis))
+        inverse_point >= min && inverse_point <= max
     }
 }
 
 impl Collides<SphereCollider> for OrientedBoxCollider {
     fn collides_with(&self, other: &SphereCollider) -> bool {
         let halfs = self.size / 2.0;
-        let max = self.position + halfs;
         let min = self.position - halfs;
+        let max = self.position + halfs;
 
         let inverse_center = other.position().rotate(self.rotation.conjugate());
-
-        let clamped = Vector3::new(
-            inverse_center.x().clamp(min.x(), max.x()),
-            inverse_center.y().clamp(min.y(), max.y()),
-            inverse_center.z().clamp(min.z(), max.z()),
-        );
+        let clamped = inverse_center.clamp(&min, &max);
 
         let closest = clamped.rotate(self.rotation);
         let distance = (closest - other.position()).len();
@@ -321,12 +316,12 @@ mod tests {
         let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
-            Quaternion::new(0.0, 0.0, 0.0, 1.0),
+            Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         );
         let other_obb = OrientedBoxCollider::new(
             Vector3::new(1.0, 1.0, 1.0),
             Vector3::new(1.0, 1.0, 1.0),
-            Quaternion::new(0.0, 0.0, 0.0, 1.0),
+            Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         );
 
         assert!(obb.collides_with(&other_obb));
@@ -338,12 +333,12 @@ mod tests {
         let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
-            Quaternion::new(0.0, 0.0, 0.0, 1.0),
+            Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         );
         let other_obb = OrientedBoxCollider::new(
             Vector3::new(1.0, 1.0, 0.0),
             Vector3::new(1.0, 1.0, 1.0),
-            Quaternion::new(0.0, 0.0, 0.0, 1.0),
+            Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         );
 
         assert!(obb.collides_with(&other_obb));
@@ -355,12 +350,12 @@ mod tests {
         let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
-            Quaternion::new(0.0, 0.0, 0.0, 1.0),
+            Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         );
         let other_obb = OrientedBoxCollider::new(
             Vector3::new(1.0, 0.0, 0.0),
             Vector3::new(1.0, 1.0, 1.0),
-            Quaternion::new(0.0, 0.0, 0.0, 1.0),
+            Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         );
 
         assert!(obb.collides_with(&other_obb));
@@ -381,7 +376,7 @@ mod tests {
         let other_obb = OrientedBoxCollider::new(
             Vector3::new(0.7, 0.7, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
-            Quaternion::new(0.0, 0.0, 0.0, 1.0),
+            Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         );
 
         assert!(obb.collides_with(&other_obb));
@@ -402,7 +397,7 @@ mod tests {
         let other_obb = OrientedBoxCollider::new(
             Vector3::new(1.71, 1.71, 0.0),
             Vector3::new(2.0, 2.0, 2.0),
-            Quaternion::new(0.0, 0.0, 0.0, 1.0),
+            Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         );
 
         assert!(!obb.collides_with(&other_obb));
@@ -584,7 +579,7 @@ mod tests {
         let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
-            Quaternion::new(0.0, 0.0, 0.0, 1.0),
+            Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         );
         let aabb =
             AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(1.0, 1.0, 1.0));
@@ -598,7 +593,7 @@ mod tests {
         let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
-            Quaternion::new(0.0, 0.0, 0.0, 1.0),
+            Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         );
         let aabb =
             AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
@@ -612,7 +607,7 @@ mod tests {
         let obb = OrientedBoxCollider::new(
             Vector3::new(f64::EPSILON, f64::EPSILON, f64::EPSILON),
             Vector3::new(1.0, 1.0, 1.0),
-            Quaternion::new(0.0, 0.0, 0.0, 1.0),
+            Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         );
         let aabb =
             AlignedBoxCollider::new(Vector3::new(1.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
