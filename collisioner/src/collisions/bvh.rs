@@ -20,33 +20,8 @@ impl BvhTree {
             return Some(BvhTree::Leaf(objects[0].clone()));
         }
 
-        let (min, max) = objects
-            .iter()
-            .map(Self::collider_to_point)
-            .minmax_by(|a, b| a.partial_cmp(b).unwrap())
-            .into_option()
-            .unwrap();
-
-        let diff = max - min;
-        let axis = if diff.x() >= diff.y() && diff.x() >= diff.z() {
-            Axis::X
-        } else if diff.y() >= diff.x() && diff.y() >= diff.z() {
-            Axis::Y
-        } else {
-            Axis::Z
-        };
-
-        let mut ordered = objects
-            .iter()
-            .map(|c| (c, Self::collider_to_point(c).get(axis)))
-            .collect::<Vec<(&Collider, f64)>>();
-
-        ordered.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
-
-        let ordered = ordered
-            .into_iter()
-            .map(|(c, _)| c.clone())
-            .collect::<Vec<Collider>>();
+        let axis = Self::longest_axis(objects);
+        let ordered = Self::order_by_axis(objects, axis);
 
         let half = ordered.len() / 2;
 
@@ -60,6 +35,38 @@ impl BvhTree {
             left.map(Box::new),
             right.map(Box::new),
         ))
+    }
+
+    fn longest_axis(colliders: &[Collider]) -> Axis {
+        let (min, max) = colliders
+            .iter()
+            .map(Self::collider_to_point)
+            .minmax_by(|a, b| a.partial_cmp(b).unwrap())
+            .into_option()
+            .unwrap();
+
+        let diff = max - min;
+        if diff.x() >= diff.y() && diff.x() >= diff.z() {
+            Axis::X
+        } else if diff.y() >= diff.x() && diff.y() >= diff.z() {
+            Axis::Y
+        } else {
+            Axis::Z
+        }
+    }
+
+    fn order_by_axis(colliders: &[Collider], axis: Axis) -> Vec<Collider> {
+        let mut ordered = colliders
+            .iter()
+            .map(|c| (c, Self::collider_to_point(c).get(axis)))
+            .collect::<Vec<(&Collider, f64)>>();
+
+        ordered.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+
+        ordered
+            .into_iter()
+            .map(|(c, _)| c.clone())
+            .collect::<Vec<Collider>>()
     }
 
     fn collider_to_point(c: &Collider) -> Vector3 {
