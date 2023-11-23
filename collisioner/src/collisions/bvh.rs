@@ -1,4 +1,4 @@
-use crate::colliders::{Bounded, Collider};
+use crate::colliders::{Bounded, Collider, Collides};
 use crate::common::{Axis, Vector3};
 use itertools::Itertools;
 
@@ -91,6 +91,40 @@ impl BvhTree {
         let size = max - min;
         let pos = min + size / 2.0;
         Collider::aligned_box(pos.x(), pos.y(), pos.z(), size.x(), size.y(), size.z())
+    }
+
+    fn nodes_collide(a: &Option<Box<BvhTree>>, b: &Option<Box<BvhTree>>) -> bool {
+        match (a, b) {
+            (Some(a), Some(b)) => a.collides_with(b),
+            _ => false,
+        }
+    }
+}
+
+impl Collides<Self> for BvhTree {
+    fn collides_with(&self, other: &BvhTree) -> bool {
+        match (self, other) {
+            (Self::Leaf(c1), Self::Leaf(c2)) => c1.collides_with(c2),
+            (leaf @ Self::Leaf(c1), Self::Branch(c2, left, right))
+            | (Self::Branch(c1, left, right), leaf @ Self::Leaf(c2)) => {
+                c1.collides_with(c2)
+                    && (left
+                        .as_ref()
+                        .map(|l| l.collides_with(leaf))
+                        .unwrap_or(false)
+                        || right
+                            .as_ref()
+                            .map(|r| r.collides_with(leaf))
+                            .unwrap_or(false))
+            }
+            (Self::Branch(c1, left1, right1), Self::Branch(c2, left2, right2)) => {
+                c1.collides_with(c2)
+                    && (Self::nodes_collide(left1, left2)
+                        || Self::nodes_collide(left1, right2)
+                        || Self::nodes_collide(right1, left2)
+                        || Self::nodes_collide(right1, right2))
+            }
+        }
     }
 }
 
