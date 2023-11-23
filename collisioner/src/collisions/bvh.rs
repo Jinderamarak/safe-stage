@@ -168,6 +168,7 @@ impl Rotation for BvhTree {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tests::asserts::assert_vector;
     use pretty_assertions::assert_eq;
 
     fn cbox(x: f64, y: f64, z: f64, w: f64, h: f64, d: f64) -> Collider {
@@ -349,5 +350,102 @@ mod tests {
         );
 
         assert!(branch_a.collides_with(&branch_b));
+    }
+
+    #[test]
+    fn bounded_leaf() {
+        let leaf = BvhTree::Leaf(cpoint(1.0, 2.0, 3.0));
+
+        assert_eq!(Vector3::new(1.0, 2.0, 3.0), leaf.min());
+        assert_eq!(Vector3::new(1.0, 2.0, 3.0), leaf.max());
+    }
+
+    #[test]
+    fn bounded_branch() {
+        let branch = BvhTree::Branch(
+            cbox(1.0, 2.0, 3.0, 4.0, 5.0, 6.0),
+            Some(Box::new(BvhTree::Leaf(cpoint(1.0, 2.0, 3.0)))),
+            Some(Box::new(BvhTree::Leaf(cpoint(1.0, 2.0, 3.0)))),
+        );
+
+        assert_eq!(Vector3::new(-1.0, -0.5, 0.0), branch.min());
+        assert_eq!(Vector3::new(3.0, 4.5, 6.0), branch.max());
+    }
+
+    #[test]
+    fn rotate_leaf() {
+        let leaf = BvhTree::Leaf(cbox(1.0, 1.0, 1.0, 4.0, 2.0, 2.0));
+        let rotated = leaf.rotate(Quaternion::from_euler(Vector3::new(
+            0.0,
+            0.0,
+            90.0_f64.to_radians(),
+        )));
+
+        assert_vector(Vector3::new(0.0, -1.0, 0.0), rotated.min());
+        assert_vector(Vector3::new(2.0, 3.0, 2.0), rotated.max());
+    }
+
+    #[test]
+    fn rotate_branch() {
+        let branch = BvhTree::Branch(
+            cbox(0.0, 0.0, 0.0, 2.0, 2.0, 2.0),
+            Some(Box::new(BvhTree::Leaf(cpoint(1.0, 1.0, 1.0)))),
+            Some(Box::new(BvhTree::Leaf(cpoint(-1.0, -1.0, -1.0)))),
+        );
+        let rotated = branch.rotate(Quaternion::from_euler(Vector3::new(
+            0.0,
+            0.0,
+            90.0_f64.to_radians(),
+        )));
+
+        assert_vector(Vector3::new(-1.0, -1.0, -1.0), rotated.min());
+        assert_vector(Vector3::new(1.0, 1.0, 1.0), rotated.max());
+
+        match rotated {
+            BvhTree::Branch(_, Some(left), Some(right)) => {
+                assert_vector(Vector3::new(-1.0, 1.0, 1.0), left.min());
+                assert_vector(Vector3::new(-1.0, 1.0, 1.0), left.max());
+                assert_vector(Vector3::new(1.0, -1.0, -1.0), right.min());
+                assert_vector(Vector3::new(1.0, -1.0, -1.0), right.max());
+            }
+            _ => assert!(false),
+        }
+    }
+
+    #[test]
+    fn rotate_around_leaf() {
+        let leaf = BvhTree::Leaf(cpoint(1.0, 1.0, 1.0));
+        let rotated = leaf.rotate_around(
+            Quaternion::from_euler(Vector3::new(0.0, 0.0, 90.0_f64.to_radians())),
+            Vector3::new(0.0, 0.0, 0.0),
+        );
+
+        assert_vector(Vector3::new(-1.0, 1.0, 1.0), rotated.min());
+    }
+
+    #[test]
+    fn rotate_around_branch() {
+        let branch = BvhTree::Branch(
+            cbox(0.0, 0.0, 0.0, 2.0, 2.0, 2.0),
+            Some(Box::new(BvhTree::Leaf(cpoint(1.0, 1.0, 1.0)))),
+            Some(Box::new(BvhTree::Leaf(cpoint(-1.0, -1.0, -1.0)))),
+        );
+        let rotated = branch.rotate_around(
+            Quaternion::from_euler(Vector3::new(0.0, 0.0, 90.0_f64.to_radians())),
+            Vector3::new(1.0, 1.0, 1.0),
+        );
+
+        assert_vector(Vector3::new(1.0, -1.0, -1.0), rotated.min());
+        assert_vector(Vector3::new(3.0, 1.0, 1.0), rotated.max());
+
+        match rotated {
+            BvhTree::Branch(_, Some(left), Some(right)) => {
+                assert_vector(Vector3::new(1.0, 1.0, 1.0), left.min());
+                assert_vector(Vector3::new(1.0, 1.0, 1.0), left.max());
+                assert_vector(Vector3::new(3.0, -1.0, -1.0), right.min());
+                assert_vector(Vector3::new(3.0, -1.0, -1.0), right.max());
+            }
+            _ => assert!(false),
+        }
     }
 }
