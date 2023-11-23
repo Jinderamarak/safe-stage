@@ -1,5 +1,5 @@
-use crate::colliders::{Bounded, Collider, Collides};
-use crate::common::{Axis, Vector3};
+use crate::colliders::{Bounded, Collider, Collides, Rotation};
+use crate::common::{Axis, Quaternion, Vector3};
 use itertools::Itertools;
 
 /// # Bounding Volume Hierarchy
@@ -124,6 +124,43 @@ impl Collides<Self> for BvhTree {
                         || Self::nodes_collide(right1, left2)
                         || Self::nodes_collide(right1, right2))
             }
+        }
+    }
+}
+
+impl Bounded for BvhTree {
+    fn min(&self) -> Vector3 {
+        match self {
+            Self::Branch(c, _, _) => c.min(),
+            Self::Leaf(c) => c.min(),
+        }
+    }
+
+    fn max(&self) -> Vector3 {
+        match self {
+            Self::Branch(c, _, _) => c.max(),
+            Self::Leaf(c) => c.max(),
+        }
+    }
+}
+
+impl Rotation for BvhTree {
+    fn rotate(&self, rotation: Quaternion) -> Self {
+        let pivot = self.min() + ((self.max() - self.min()) / 2.0);
+        self.rotate_around(rotation, pivot)
+    }
+
+    fn rotate_around(&self, rotation: Quaternion, pivot: Vector3) -> Self {
+        match self {
+            Self::Branch(c, left, right) => Self::Branch(
+                c.rotate_around(rotation, pivot),
+                left.as_ref()
+                    .map(|l| Box::new(l.rotate_around(rotation, pivot))),
+                right
+                    .as_ref()
+                    .map(|r| Box::new(r.rotate_around(rotation, pivot))),
+            ),
+            Self::Leaf(c) => Self::Leaf(c.rotate_around(rotation, pivot)),
         }
     }
 }
