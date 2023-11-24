@@ -1,4 +1,4 @@
-use crate::common::Vector3;
+use crate::math::Vector3;
 
 /// Objects bounding volume
 pub trait Bounded {

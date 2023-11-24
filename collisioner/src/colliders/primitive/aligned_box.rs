@@ -1,7 +1,6 @@
-use crate::colliders::{
-    Bounded, Collides, OrientedBoxCollider, PointCollider, Projectable, Rotation, SphereCollider,
-};
-use crate::common::{Quaternion, Vector3};
+use crate::colliders::common::{Bounded, Collides, Projectable, Rotation};
+use crate::colliders::primitive::{OrientedBoxCollider, PointCollider, SphereCollider};
+use crate::math::{Quaternion, Vector3};
 use itertools::Itertools;
 
 /// # Axis Aligned Box Collider
@@ -9,9 +8,9 @@ use itertools::Itertools;
 ///
 /// ## Example
 /// ```
-/// use collisioner::colliders::AlignedBoxCollider;
-/// use collisioner::colliders::Collides;
-/// use collisioner::common::Vector3;
+/// use collisioner::colliders::primitive::AlignedBoxCollider;
+/// use collisioner::colliders::common::Collides;
+/// use collisioner::math::Vector3;
 ///
 /// let box1 = AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
 /// let box2 = AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(2.0, 2.0, 2.0));
@@ -142,7 +141,7 @@ impl Collides<OrientedBoxCollider> for AlignedBoxCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::asserts::assert_vector;
+    use crate::utils::asserts::assert_vector;
     use pretty_assertions::assert_eq;
 
     #[test]

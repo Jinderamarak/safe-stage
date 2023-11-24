@@ -2,9 +2,7 @@
 //! Library for collision detection and path planning
 
 pub mod colliders;
-pub mod collisions;
-pub mod common;
-mod utils;
+pub mod math;
 
 #[cfg(test)]
-mod tests;
+mod utils;

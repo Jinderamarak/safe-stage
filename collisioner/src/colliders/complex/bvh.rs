@@ -1,5 +1,6 @@
-use crate::colliders::{Bounded, Collider, Collides, Rotation};
-use crate::common::{Axis, Quaternion, Vector3};
+use crate::colliders::common::{Bounded, Collides, Rotation};
+use crate::colliders::primitive::Collider;
+use crate::math::{Axis, Quaternion, Vector3};
 use itertools::Itertools;
 
 /// # Bounding Volume Hierarchy
@@ -168,7 +169,7 @@ impl Rotation for BvhTree {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::asserts::assert_vector;
+    use crate::utils::asserts::assert_vector;
     use pretty_assertions::assert_eq;
 
     fn cbox(x: f64, y: f64, z: f64, w: f64, h: f64, d: f64) -> Collider {

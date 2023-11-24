@@ -1,15 +1,16 @@
-use crate::colliders::{
-    AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, PointCollider, Projectable,
-    Rotation, SphereCollider,
+use crate::colliders::common::{Bounded, Collides, Projectable, Rotation};
+use crate::colliders::primitive::{
+    AlignedBoxCollider, OrientedBoxCollider, PointCollider, SphereCollider,
 };
-use crate::common::{Quaternion, Vector3};
+use crate::math::{Quaternion, Vector3};
 
 /// # Generic Collider
 /// Enum representing all possible collider primitives.
 /// ## Example
 /// ```
-/// use collisioner::common::Vector3;
-/// use collisioner::colliders::{Collider, PointCollider, AlignedBoxCollider, Collides};
+/// use collisioner::math::Vector3;
+/// use collisioner::colliders::primitive::{Collider, PointCollider, AlignedBoxCollider};
+/// use collisioner::colliders::common::Collides;
 ///
 /// let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 /// let collider_point = Collider::from(point);

@@ -1,4 +1,4 @@
-use crate::common::{Quaternion, Vector3};
+use crate::math::{Quaternion, Vector3};
 use assert_float_eq::*;
 
 pub fn assert_vector(expected: Vector3, actual: Vector3) {

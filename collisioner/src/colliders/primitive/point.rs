@@ -1,17 +1,15 @@
-use crate::colliders::{
-    AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, Projectable, Rotation,
-    SphereCollider,
-};
-use crate::common::{Quaternion, Vector3};
+use crate::colliders::common::{Bounded, Collides, Projectable, Rotation};
+use crate::colliders::primitive::{AlignedBoxCollider, OrientedBoxCollider, SphereCollider};
+use crate::math::{Quaternion, Vector3};
 
 /// # Point Collider
 /// Basic primitive for representing single point.
 ///
 /// ## Example
 /// ```
-/// use collisioner::colliders::PointCollider;
-/// use collisioner::colliders::Collides;
-/// use collisioner::common::Vector3;
+/// use collisioner::colliders::primitive::PointCollider;
+/// use collisioner::colliders::common::Collides;
+/// use collisioner::math::Vector3;
 ///
 /// let point1 = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 /// let point2 = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
@@ -96,7 +94,7 @@ impl Collides<OrientedBoxCollider> for PointCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::asserts::assert_vector;
+    use crate::utils::asserts::assert_vector;
     use pretty_assertions::assert_eq;
 
     #[test]

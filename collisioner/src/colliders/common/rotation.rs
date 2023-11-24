@@ -1,4 +1,4 @@
-use crate::common::{Quaternion, Vector3};
+use crate::math::{Quaternion, Vector3};
 
 /// Rotation of specific object
 pub trait Rotation<T = Self> {

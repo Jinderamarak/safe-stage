@@ -1,4 +1,4 @@
-use crate::common::Vector3;
+use crate::math::Vector3;
 use std::ops::Mul;
 
 /// # Quaternion
@@ -7,8 +7,8 @@ use std::ops::Mul;
 /// ## Example
 /// ```
 /// use assert_float_eq::*;
-/// use collisioner::common::Quaternion;
-/// use collisioner::common::Vector3;
+/// use collisioner::math::Quaternion;
+/// use collisioner::math::Vector3;
 ///
 /// let euler = Vector3::new(30_f64.to_radians(), 45_f64.to_radians(), 90_f64.to_radians());
 /// let quaternion = Quaternion::from_euler(euler);

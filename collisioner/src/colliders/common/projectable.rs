@@ -1,4 +1,4 @@
-use crate::common::Vector3;
+use crate::math::Vector3;
 
 /// Object projection onto single axis
 pub trait Projectable {

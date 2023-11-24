@@ -1,7 +1,6 @@
-use crate::colliders::{
-    AlignedBoxCollider, Bounded, Collides, PointCollider, Projectable, Rotation, SphereCollider,
-};
-use crate::common::{Quaternion, Vector3};
+use crate::colliders::common::{Bounded, Collides, Projectable, Rotation};
+use crate::colliders::primitive::{AlignedBoxCollider, PointCollider, SphereCollider};
+use crate::math::{Quaternion, Vector3};
 use itertools::Itertools;
 
 /// # Oriented Bounding Box Collider
@@ -9,9 +8,8 @@ use itertools::Itertools;
 ///
 /// ## Example
 /// ```
-/// use assert_float_eq::*;
-/// use collisioner::colliders::OrientedBoxCollider;
-/// use collisioner::common::{Quaternion, Vector3};
+/// use collisioner::colliders::primitive::OrientedBoxCollider;
+/// use collisioner::math::{Quaternion, Vector3};
 ///
 /// let position = Vector3::new(0.0, 0.0, 0.0);
 /// let size = Vector3::new(2.0, 2.0, 2.0);
@@ -237,7 +235,7 @@ impl Collides<AlignedBoxCollider> for OrientedBoxCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::asserts::*;
+    use crate::utils::asserts::*;
 
     #[test]
     fn pivot_rotation() {

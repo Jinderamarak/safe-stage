@@ -1,17 +1,15 @@
-use crate::colliders::{
-    AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, PointCollider, Projectable,
-    Rotation,
-};
-use crate::common::{Quaternion, Vector3};
+use crate::colliders::common::{Bounded, Collides, Projectable, Rotation};
+use crate::colliders::primitive::{AlignedBoxCollider, OrientedBoxCollider, PointCollider};
+use crate::math::{Quaternion, Vector3};
 
 /// # Sphere Collider
 /// Primitive for representing sphere.
 ///
 /// ## Example
 /// ```
-/// use collisioner::colliders::SphereCollider;
-/// use collisioner::colliders::Collides;
-/// use collisioner::common::Vector3;
+/// use collisioner::colliders::primitive::SphereCollider;
+/// use collisioner::colliders::common::Collides;
+/// use collisioner::math::Vector3;
 ///
 /// let sphere1 = SphereCollider::new(Vector3::new(0.0, 0.0, 0.0), 1.0);
 /// let sphere2 = SphereCollider::new(Vector3::new(1.0, 1.0, 1.0), 1.0);
@@ -94,7 +92,7 @@ impl Collides<OrientedBoxCollider> for SphereCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::asserts::*;
+    use crate::utils::asserts::*;
 
     #[test]
     fn bounds_regular() {

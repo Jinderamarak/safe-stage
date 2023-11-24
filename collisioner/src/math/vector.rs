@@ -1,4 +1,4 @@
-use crate::common::{Axis, Quaternion};
+use crate::math::{Axis, Quaternion};
 use std::ops::{Add, Div, Mul, Sub};
 
 /// # Vector 3
@@ -6,7 +6,7 @@ use std::ops::{Add, Div, Mul, Sub};
 ///
 /// ## Example
 /// ```
-/// use collisioner::common::Vector3;
+/// use collisioner::math::Vector3;
 ///
 /// let v1 = Vector3::new(1.0, 2.0, 3.0);
 /// let v2 = Vector3::new(4.0, 5.0, 6.0);
