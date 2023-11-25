@@ -4,7 +4,7 @@ use crate::math::{Quaternion, Vector3};
 use itertools::Itertools;
 
 /// # Axis Aligned Box Collider
-/// Basic primitive for collision detection of boxes.
+/// Collision primitive for box that is aligned with the x,y,z axes.
 ///
 /// ## Example
 /// ```
@@ -23,7 +23,7 @@ pub struct AlignedBoxCollider {
 }
 
 impl AlignedBoxCollider {
-    pub fn new(position: Vector3, size: Vector3) -> Self {
+    /// Creates a new `AlignedBoxCollider` with the given `center` and `size`.
     pub fn new(center: Vector3, size: Vector3) -> Self {
         Self {
             center,
@@ -31,10 +31,12 @@ impl AlignedBoxCollider {
         }
     }
 
+    /// Returns the center of the box.
     pub fn center(&self) -> Vector3 {
         self.center
     }
 
+    /// Returns the size of the box.
     pub fn size(&self) -> Vector3 {
         self.size
     }

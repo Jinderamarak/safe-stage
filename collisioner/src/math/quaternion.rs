@@ -2,7 +2,7 @@ use crate::math::Vector3;
 use std::ops::Mul;
 
 /// # Quaternion
-/// Struct representing a quaternion.
+/// Quaternion implementation useful for rotations in 3D space.
 ///
 /// ## Example
 /// ```
@@ -27,26 +27,32 @@ pub struct Quaternion {
 }
 
 impl Quaternion {
+    /// Creates a new quaternion from raw values.
     pub fn raw(x: f64, y: f64, z: f64, w: f64) -> Self {
         Self { x, y, z, w }
     }
 
+    /// Creates a new normalized quaternion from raw values.
     pub fn normalized(x: f64, y: f64, z: f64, w: f64) -> Self {
         Self::raw(x, y, z, w).normalize()
     }
 
+    /// Returns the quaternion's `x` component.
     pub fn x(&self) -> f64 {
         self.x
     }
 
+    /// Returns the quaternion's `y` component.
     pub fn y(&self) -> f64 {
         self.y
     }
 
+    /// Returns the quaternion's `z` component.
     pub fn z(&self) -> f64 {
         self.z
     }
 
+    /// Returns the quaternion's `w` component.
     pub fn w(&self) -> f64 {
         self.w
     }
@@ -70,6 +76,7 @@ impl Quaternion {
         Self::normalized(x, y, z, w)
     }
 
+    /// Converts a quaternion to euler angles according to the right hand thumb rule.
     pub fn to_euler(self) -> Vector3 {
         let t0 = 2.0 * (self.w * self.x + self.y * self.z);
         let t1 = 1.0 - 2.0 * (self.x * self.x + self.y * self.y);
@@ -92,14 +99,17 @@ impl Quaternion {
         Vector3::new(x, y, z)
     }
 
+    /// Returns the conjugate of the quaternion.
     pub fn conjugate(self) -> Self {
         Self::raw(-self.x, -self.y, -self.z, self.w)
     }
 
+    /// Returns the length of the quaternion.
     pub fn len(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w
     }
 
+    /// Returns the normalized quaternion.
     pub fn normalize(&self) -> Self {
         let len = self.len();
         if len == 0.0 {

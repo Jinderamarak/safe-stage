@@ -3,7 +3,7 @@ use crate::colliders::primitive::{AlignedBoxCollider, OrientedBoxCollider, Point
 use crate::math::{Quaternion, Vector3};
 
 /// # Sphere Collider
-/// Primitive for representing sphere.
+/// Collision primitive for representing a sphere.
 ///
 /// ## Example
 /// ```
@@ -23,14 +23,17 @@ pub struct SphereCollider {
 }
 
 impl SphereCollider {
+    /// Creates a new `SphereCollider` with `center` and `radius`.
     pub fn new(center: Vector3, radius: f64) -> Self {
         Self { center, radius }
     }
 
+    /// Returns the center of the sphere.
     pub fn center(&self) -> Vector3 {
         self.center
     }
 
+    /// Returns the radius of the sphere.
     pub fn radius(&self) -> f64 {
         self.radius
     }

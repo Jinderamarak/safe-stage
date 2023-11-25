@@ -4,7 +4,7 @@ use crate::math::{Quaternion, Vector3};
 use itertools::Itertools;
 
 /// # Oriented Bounding Box Collider
-/// Advanced primitive for collision detection of boxes with rotation.
+/// Collision primitive for box which has a rotation.
 ///
 /// ## Example
 /// ```
@@ -28,6 +28,7 @@ pub struct OrientedBoxCollider {
 }
 
 impl OrientedBoxCollider {
+    /// Creates a new `OrientedBoxCollider` with given `center`, `size` and `rotation`.
     pub fn new(center: Vector3, size: Vector3, rotation: Quaternion) -> Self {
         Self {
             center,
@@ -36,14 +37,17 @@ impl OrientedBoxCollider {
         }
     }
 
+    /// Returns the center of the collider.
     pub fn center(&self) -> Vector3 {
         self.center
     }
 
+    /// Returns the size of the collider.
     pub fn size(&self) -> Vector3 {
         self.size
     }
 
+    /// Returns the rotation of the collider.
     pub fn rotation(&self) -> Quaternion {
         self.rotation
     }

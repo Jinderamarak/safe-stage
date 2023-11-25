@@ -1,4 +1,5 @@
 //! # Common functionality
+//! Common traits for functionality that is shared between colliders.
 
 mod bounded;
 mod collides;

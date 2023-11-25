@@ -1,5 +1,5 @@
-//! # Common Items
-//! Common types, functions, utilities used by the crate.
+//! # Math library
+//! Small collection of basic math types and functions.
 
 mod axis;
 mod quaternion;

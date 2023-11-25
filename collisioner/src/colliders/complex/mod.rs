@@ -1,5 +1,5 @@
-//! # Advanced Collisions
-//! Data structures and algorithms used for more advanced collision detection
+//! # Complex collision structures
+//! Composite data structures for accelerating collision detection.
 
 mod bvh;
 

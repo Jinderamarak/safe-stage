@@ -3,7 +3,7 @@ use crate::colliders::primitive::{AlignedBoxCollider, OrientedBoxCollider, Spher
 use crate::math::{Quaternion, Vector3};
 
 /// # Point Collider
-/// Basic primitive for representing single point.
+/// Collision primitive for representing single point.
 ///
 /// ## Example
 /// ```
@@ -25,10 +25,12 @@ pub struct PointCollider {
 }
 
 impl PointCollider {
+    /// Creates a new `PointCollider` with `position`.
     pub fn new(position: Vector3) -> Self {
         Self { position }
     }
 
+    /// Returns the position of the point.
     pub fn position(&self) -> Vector3 {
         self.position
     }

@@ -4,7 +4,8 @@ use crate::math::{Axis, Quaternion, Vector3};
 use itertools::Itertools;
 
 /// # Bounding Volume Hierarchy
-/// A tree structure that allows for efficient collision detection.
+/// A tree structure composed of primitive colliders
+/// for accelerating collisions between complex objects.
 #[derive(Debug, PartialEq)]
 pub enum BvhTree {
     Branch(Collider, Option<Box<BvhTree>>, Option<Box<BvhTree>>),

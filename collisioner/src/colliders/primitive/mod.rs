@@ -1,4 +1,4 @@
-//! # Basic Colliders
+//! # Primitive colliders
 //! Module containing all the primitives for collisions.
 //! Prefer using `Collider` over the primitives.
 //!
