@@ -18,17 +18,17 @@ use crate::math::{Quaternion, Vector3};
 /// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct SphereCollider {
-    position: Vector3,
+    center: Vector3,
     radius: f64,
 }
 
 impl SphereCollider {
-    pub fn new(position: Vector3, radius: f64) -> Self {
-        Self { position, radius }
+    pub fn new(center: Vector3, radius: f64) -> Self {
+        Self { center, radius }
     }
 
-    pub fn position(&self) -> Vector3 {
-        self.position
+    pub fn center(&self) -> Vector3 {
+        self.center
     }
 
     pub fn radius(&self) -> f64 {
@@ -38,17 +38,17 @@ impl SphereCollider {
 
 impl Bounded for SphereCollider {
     fn min(&self) -> Vector3 {
-        self.position - Vector3::new(self.radius, self.radius, self.radius)
+        self.center - Vector3::new(self.radius, self.radius, self.radius)
     }
 
     fn max(&self) -> Vector3 {
-        self.position + Vector3::new(self.radius, self.radius, self.radius)
+        self.center + Vector3::new(self.radius, self.radius, self.radius)
     }
 }
 
 impl Projectable for SphereCollider {
     fn project(&self, axis: Vector3) -> (f64, f64) {
-        let projection = self.position().dot(axis);
+        let projection = self.center().dot(axis);
         (projection - self.radius(), projection + self.radius())
     }
 }
@@ -59,20 +59,20 @@ impl Rotation for SphereCollider {
     }
 
     fn rotate_around(&self, rotation: Quaternion, pivot: Vector3) -> Self {
-        Self::new(self.position.rotate_around(rotation, pivot), self.radius)
+        Self::new(self.center.rotate_around(rotation, pivot), self.radius)
     }
 }
 
 impl Collides<Self> for SphereCollider {
     fn collides_with(&self, other: &Self) -> bool {
-        let distance = (self.position - other.position).len();
+        let distance = (self.center - other.center).len();
         distance <= self.radius() + other.radius()
     }
 }
 
 impl Collides<PointCollider> for SphereCollider {
     fn collides_with(&self, other: &PointCollider) -> bool {
-        let distance = (self.position - other.position()).len();
+        let distance = (self.center - other.position()).len();
         distance <= self.radius()
     }
 }
@@ -121,7 +121,7 @@ mod tests {
         ));
         let rotated = sphere.rotate(rotation);
 
-        assert_eq!(sphere.position(), rotated.position());
+        assert_eq!(sphere.center(), rotated.center());
     }
 
     #[test]
@@ -135,7 +135,7 @@ mod tests {
         ));
         let rotated = sphere.rotate_around(rotation, pivot);
 
-        assert_vector(Vector3::new(2.0, 0.0, 0.0), rotated.position());
+        assert_vector(Vector3::new(2.0, 0.0, 0.0), rotated.center());
     }
 
     #[test]
