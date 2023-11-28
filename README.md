@@ -5,7 +5,11 @@ System for safe navigation for stage inside electron microscope chamber using 3D
 
 ### `collisioner`
 - `rust`
-- core project handling safe navigation
+- crate handling 3D collisions
+
+### `mather`
+- `rust`
+- crate for math operations and structures
 
 ### `service-app`
 - `rust`, `tauri`, `typescript`, `react`
