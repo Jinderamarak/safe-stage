@@ -1,67 +1,72 @@
 include:
   - pipeline/templates.yml
 
-collisioner:lint:
+.logic-template:
   extends: .rust-template
+  variables:
+    LOGIC_PROJECTS: -p collisioner -p mather
+
+logic:lint:
+  extends: .logic-template
   stage: lint
   needs:
     - job: cache:cargo
       optional: true
   script:
     - rustup component add rustfmt
-    - cargo fmt -p collisioner -- --check
+    - cargo fmt ${LOGIC_PROJECTS} -- --check
     - rustup component add clippy
-    - cargo clippy -p collisioner -- -D warnings
+    - cargo clippy ${LOGIC_PROJECTS} -- -D warnings
 
-collisioner:build:
-  extends: .rust-template
+logic:build:
+  extends: .logic-template
   stage: build
   needs:
-    - collisioner:lint
+    - logic:lint
     - job: cache:cargo
       optional: true
   script:
-    - cargo build -p collisioner --locked
+    - cargo build ${LOGIC_PROJECTS} --locked
 
-collisioner:test:
-  extends: .rust-template
+logic:test:
+  extends: .logic-template
   stage: test
   needs:
-    - collisioner:lint
-    - collisioner:build
+    - logic:lint
+    - logic:build
     - job: cache:cargo
       optional: true
   before_script:
     - mkdir -p ${CARGO_HOME}/bin
     - curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME}/bin
   script:
-    - cargo nextest run --config-file .nextest.toml -p collisioner --locked
+    - cargo nextest run --config-file .nextest.toml ${LOGIC_PROJECTS} --locked
   artifacts:
     when: always
     reports:
       junit:
         - target/nextest/default/junit-report.xml
 
-collisioner:test-docs:
-  extends: .rust-template
+logic:test-docs:
+  extends: .logic-template
   stage: test
   needs:
-    - collisioner:lint
-    - collisioner:build
+    - logic:lint
+    - logic:build
     - job: cache:cargo
       optional: true
   script:
-    - cargo test -p collisioner --doc --locked
+    - cargo test ${LOGIC_PROJECTS} --doc --locked
 
 # Optional build on nightly channel
-collisioner:build:nightly:
+logic:build:nightly:
   stage: build
   image:
     name: rustlang/rust:nightly
     pull_policy: always
   needs:
-    - collisioner:lint
-    - collisioner:build
+    - logic:lint
+    - logic:build
   script:
-    - cargo build -p collisioner
+    - cargo build ${LOGIC_PROJECTS}
   allow_failure: true
