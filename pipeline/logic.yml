@@ -60,6 +60,7 @@ logic:test:docs:
 
 # Optional build on nightly channel
 logic:build:nightly:
+  extends: .logic-template
   stage: build
   image:
     name: rustlang/rust:nightly
