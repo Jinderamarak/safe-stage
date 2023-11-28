@@ -1,14 +1,14 @@
-use crate::colliders::common::{Bounded, Collides, Projectable, Rotation};
-use crate::colliders::primitive::{AlignedBoxCollider, OrientedBoxCollider, PointCollider};
+use crate::common::{Bounded, Collides, Projectable, Rotation};
 use crate::math::{Quaternion, Vector3};
+use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, PointCollider};
 
 /// # Sphere Collider
 /// Collision primitive for representing a sphere.
 ///
 /// ## Example
 /// ```
-/// use collisioner::colliders::primitive::SphereCollider;
-/// use collisioner::colliders::common::Collides;
+/// use collisioner::primitive::SphereCollider;
+/// use collisioner::common::Collides;
 /// use collisioner::math::Vector3;
 ///
 /// let sphere1 = SphereCollider::new(Vector3::new(0.0, 0.0, 0.0), 1.0);
@@ -95,14 +95,14 @@ impl Collides<OrientedBoxCollider> for SphereCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::asserts::*;
+    use mather::asserts::*;
 
     #[test]
     fn bounds_regular() {
         let sphere = SphereCollider::new(Vector3::new(0.0, 0.0, 0.0), 1.0);
 
-        assert_vector(Vector3::new(-1.0, -1.0, -1.0), sphere.min());
-        assert_vector(Vector3::new(1.0, 1.0, 1.0), sphere.max());
+        assert_vectors(Vector3::new(-1.0, -1.0, -1.0), sphere.min());
+        assert_vectors(Vector3::new(1.0, 1.0, 1.0), sphere.max());
     }
 
     #[test]
@@ -138,7 +138,7 @@ mod tests {
         ));
         let rotated = sphere.rotate_around(rotation, pivot);
 
-        assert_vector(Vector3::new(2.0, 0.0, 0.0), rotated.center());
+        assert_vectors(Vector3::new(2.0, 0.0, 0.0), rotated.center());
     }
 
     #[test]

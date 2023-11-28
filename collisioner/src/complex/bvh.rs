@@ -1,6 +1,6 @@
-use crate::colliders::common::{Bounded, Collides, Rotation};
-use crate::colliders::primitive::Collider;
+use crate::common::{Bounded, Collides, Rotation};
 use crate::math::{Axis, Quaternion, Vector3};
+use crate::primitive::Collider;
 use itertools::Itertools;
 
 /// # Bounding Volume Hierarchy
@@ -170,7 +170,7 @@ impl Rotation for BvhTree {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::asserts::assert_vector;
+    use mather::asserts::assert_vectors;
     use pretty_assertions::assert_eq;
 
     fn cbox(x: f64, y: f64, z: f64, w: f64, h: f64, d: f64) -> Collider {
@@ -383,8 +383,8 @@ mod tests {
             90.0_f64.to_radians(),
         )));
 
-        assert_vector(Vector3::new(0.0, -1.0, 0.0), rotated.min());
-        assert_vector(Vector3::new(2.0, 3.0, 2.0), rotated.max());
+        assert_vectors(Vector3::new(0.0, -1.0, 0.0), rotated.min());
+        assert_vectors(Vector3::new(2.0, 3.0, 2.0), rotated.max());
     }
 
     #[test]
@@ -400,15 +400,15 @@ mod tests {
             90.0_f64.to_radians(),
         )));
 
-        assert_vector(Vector3::new(-1.0, -1.0, -1.0), rotated.min());
-        assert_vector(Vector3::new(1.0, 1.0, 1.0), rotated.max());
+        assert_vectors(Vector3::new(-1.0, -1.0, -1.0), rotated.min());
+        assert_vectors(Vector3::new(1.0, 1.0, 1.0), rotated.max());
 
         match rotated {
             BvhTree::Branch(_, Some(left), Some(right)) => {
-                assert_vector(Vector3::new(-1.0, 1.0, 1.0), left.min());
-                assert_vector(Vector3::new(-1.0, 1.0, 1.0), left.max());
-                assert_vector(Vector3::new(1.0, -1.0, -1.0), right.min());
-                assert_vector(Vector3::new(1.0, -1.0, -1.0), right.max());
+                assert_vectors(Vector3::new(-1.0, 1.0, 1.0), left.min());
+                assert_vectors(Vector3::new(-1.0, 1.0, 1.0), left.max());
+                assert_vectors(Vector3::new(1.0, -1.0, -1.0), right.min());
+                assert_vectors(Vector3::new(1.0, -1.0, -1.0), right.max());
             }
             _ => assert!(false),
         }
@@ -422,7 +422,7 @@ mod tests {
             Vector3::new(0.0, 0.0, 0.0),
         );
 
-        assert_vector(Vector3::new(-1.0, 1.0, 1.0), rotated.min());
+        assert_vectors(Vector3::new(-1.0, 1.0, 1.0), rotated.min());
     }
 
     #[test]
@@ -437,15 +437,15 @@ mod tests {
             Vector3::new(1.0, 1.0, 1.0),
         );
 
-        assert_vector(Vector3::new(1.0, -1.0, -1.0), rotated.min());
-        assert_vector(Vector3::new(3.0, 1.0, 1.0), rotated.max());
+        assert_vectors(Vector3::new(1.0, -1.0, -1.0), rotated.min());
+        assert_vectors(Vector3::new(3.0, 1.0, 1.0), rotated.max());
 
         match rotated {
             BvhTree::Branch(_, Some(left), Some(right)) => {
-                assert_vector(Vector3::new(1.0, 1.0, 1.0), left.min());
-                assert_vector(Vector3::new(1.0, 1.0, 1.0), left.max());
-                assert_vector(Vector3::new(3.0, -1.0, -1.0), right.min());
-                assert_vector(Vector3::new(3.0, -1.0, -1.0), right.max());
+                assert_vectors(Vector3::new(1.0, 1.0, 1.0), left.min());
+                assert_vectors(Vector3::new(1.0, 1.0, 1.0), left.max());
+                assert_vectors(Vector3::new(3.0, -1.0, -1.0), right.min());
+                assert_vectors(Vector3::new(3.0, -1.0, -1.0), right.max());
             }
             _ => assert!(false),
         }

@@ -1,8 +1,8 @@
 //! # Collisioner
 //! Library for collision detection and path planning
 
-pub mod colliders;
-pub mod math;
+pub mod common;
+pub mod complex;
+pub mod primitive;
 
-#[cfg(test)]
-mod utils;
+pub use mather as math;

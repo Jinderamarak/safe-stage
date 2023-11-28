@@ -1,6 +1,7 @@
 //! # Math library
-//! Small collection of basic math types and functions.
+//! Small collection of basic mather types and functions.
 
+pub mod asserts;
 mod axis;
 mod quaternion;
 mod vector;

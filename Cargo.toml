@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "collisioner",
+    "mather",
     "service-app/src-tauri"
 ]
 

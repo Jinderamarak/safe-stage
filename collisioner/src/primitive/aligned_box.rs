@@ -1,6 +1,6 @@
-use crate::colliders::common::{Bounded, Collides, Projectable, Rotation};
-use crate::colliders::primitive::{OrientedBoxCollider, PointCollider, SphereCollider};
+use crate::common::{Bounded, Collides, Projectable, Rotation};
 use crate::math::{Quaternion, Vector3};
+use crate::primitive::{OrientedBoxCollider, PointCollider, SphereCollider};
 use itertools::Itertools;
 
 /// # Axis Aligned Box Collider
@@ -8,8 +8,8 @@ use itertools::Itertools;
 ///
 /// ## Example
 /// ```
-/// use collisioner::colliders::primitive::AlignedBoxCollider;
-/// use collisioner::colliders::common::Collides;
+/// use collisioner::primitive::AlignedBoxCollider;
+/// use collisioner::common::Collides;
 /// use collisioner::math::Vector3;
 ///
 /// let box1 = AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
@@ -144,7 +144,7 @@ impl Collides<OrientedBoxCollider> for AlignedBoxCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::asserts::assert_vector;
+    use mather::asserts::assert_vectors;
     use pretty_assertions::assert_eq;
 
     #[test]
@@ -152,8 +152,8 @@ mod tests {
         let aabb =
             AlignedBoxCollider::new(Vector3::new(1.0, 2.0, 4.0), Vector3::new(3.0, 2.0, 1.0));
 
-        assert_vector(Vector3::new(-0.5, 1.0, 3.5), aabb.min());
-        assert_vector(Vector3::new(2.5, 3.0, 4.5), aabb.max());
+        assert_vectors(Vector3::new(-0.5, 1.0, 3.5), aabb.min());
+        assert_vectors(Vector3::new(2.5, 3.0, 4.5), aabb.max());
     }
 
     #[test]
@@ -174,9 +174,9 @@ mod tests {
 
         let rotated = aabb.rotate(rotation);
 
-        assert_vector(Vector3::new(1.0, 1.0, 1.0), rotated.center());
-        assert_vector(Vector3::new(-1.0, 0.0, 0.0), rotated.min());
-        assert_vector(Vector3::new(3.0, 2.0, 2.0), rotated.max());
+        assert_vectors(Vector3::new(1.0, 1.0, 1.0), rotated.center());
+        assert_vectors(Vector3::new(-1.0, 0.0, 0.0), rotated.min());
+        assert_vectors(Vector3::new(3.0, 2.0, 2.0), rotated.max());
     }
 
     #[test]
@@ -187,9 +187,9 @@ mod tests {
 
         let rotated = aabb.rotate_around(rotation, Vector3::new(1.0, 1.0, 1.0));
 
-        assert_vector(Vector3::new(1.0, 2.0, 0.0), rotated.center());
-        assert_vector(Vector3::new(-1.0, 1.0, -1.0), rotated.min());
-        assert_vector(Vector3::new(3.0, 3.0, 1.0), rotated.max());
+        assert_vectors(Vector3::new(1.0, 2.0, 0.0), rotated.center());
+        assert_vectors(Vector3::new(-1.0, 1.0, -1.0), rotated.min());
+        assert_vectors(Vector3::new(3.0, 3.0, 1.0), rotated.max());
     }
 
     #[test]
