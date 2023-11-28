@@ -10,7 +10,7 @@ logic:lint:
   extends: .logic-template
   stage: lint
   needs:
-    - job: cache:cargo
+    - job: cargo:cache
       optional: true
   script:
     - rustup component add rustfmt
@@ -23,7 +23,7 @@ logic:build:
   stage: build
   needs:
     - logic:lint
-    - job: cache:cargo
+    - job: cargo:cache
       optional: true
   script:
     - cargo build ${LOGIC_PROJECTS} --locked
@@ -34,7 +34,7 @@ logic:test:
   needs:
     - logic:lint
     - logic:build
-    - job: cache:cargo
+    - job: cargo:cache
       optional: true
   before_script:
     - mkdir -p ${CARGO_HOME}/bin
@@ -47,13 +47,13 @@ logic:test:
       junit:
         - target/nextest/default/junit-report.xml
 
-logic:test-docs:
+logic:test:docs:
   extends: .logic-template
   stage: test
   needs:
     - logic:lint
     - logic:build
-    - job: cache:cargo
+    - job: cargo:cache
       optional: true
   script:
     - cargo test ${LOGIC_PROJECTS} --doc --locked
