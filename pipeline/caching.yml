@@ -1,7 +1,7 @@
 include:
   - pipeline/templates.yml
 
-cache:cargo:
+cargo:cache:
   extends: .rust-template
   stage: cache
   rules:
@@ -12,7 +12,7 @@ cache:cargo:
   script:
     - cargo fetch --locked
 
-cache:pnpm:
+pnpm:cache:
   extends: .node-template
   stage: cache
   rules:

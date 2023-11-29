@@ -1,17 +1,15 @@
-use crate::colliders::{
-    AlignedBoxCollider, Bounded, Collides, PointCollider, Projectable, Rotation, SphereCollider,
-};
-use crate::common::{Quaternion, Vector3};
+use crate::common::{Bounded, Collides, Projectable, Rotation};
+use crate::math::{Quaternion, Vector3};
+use crate::primitive::{AlignedBoxCollider, PointCollider, SphereCollider};
 use itertools::Itertools;
 
 /// # Oriented Bounding Box Collider
-/// Advanced primitive for collision detection of boxes with rotation.
+/// Collision primitive for box which has a rotation.
 ///
 /// ## Example
 /// ```
-/// use assert_float_eq::*;
-/// use collisioner::colliders::OrientedBoxCollider;
-/// use collisioner::common::{Quaternion, Vector3};
+/// use collisioner::primitive::OrientedBoxCollider;
+/// use collisioner::math::{Quaternion, Vector3};
 ///
 /// let position = Vector3::new(0.0, 0.0, 0.0);
 /// let size = Vector3::new(2.0, 2.0, 2.0);
@@ -19,41 +17,45 @@ use itertools::Itertools;
 ///
 /// let obb = OrientedBoxCollider::new(position, size, Quaternion::from_euler(rotation));
 ///
-/// assert_eq!(Vector3::new(0.0, 0.0, 0.0), obb.position());
+/// assert_eq!(Vector3::new(0.0, 0.0, 0.0), obb.center());
 /// assert_eq!(Vector3::new(2.0, 2.0, 2.0), obb.size());
 /// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrientedBoxCollider {
-    position: Vector3,
+    center: Vector3,
     size: Vector3,
     rotation: Quaternion,
 }
 
 impl OrientedBoxCollider {
-    pub fn new(position: Vector3, size: Vector3, rotation: Quaternion) -> Self {
+    /// Creates a new `OrientedBoxCollider` with given `center`, `size` and `rotation`.
+    pub fn new(center: Vector3, size: Vector3, rotation: Quaternion) -> Self {
         Self {
-            position,
+            center,
             size: Vector3::new(size.x().abs(), size.y().abs(), size.z().abs()),
             rotation,
         }
     }
 
-    pub fn position(&self) -> Vector3 {
-        self.position
+    /// Returns the center of the collider.
+    pub fn center(&self) -> Vector3 {
+        self.center
     }
 
+    /// Returns the size of the collider.
     pub fn size(&self) -> Vector3 {
         self.size
     }
 
+    /// Returns the rotation of the collider.
     pub fn rotation(&self) -> Quaternion {
         self.rotation
     }
 
     fn corners(&self) -> [Vector3; 8] {
         let half_size = self.size() / 2.0;
-        let negative_pos = self.position - half_size;
-        let positive_pos = self.position + half_size;
+        let negative_pos = self.center - half_size;
+        let positive_pos = self.center + half_size;
 
         let corners = [
             Vector3::new(negative_pos.x(), negative_pos.y(), negative_pos.z()),
@@ -68,7 +70,7 @@ impl OrientedBoxCollider {
 
         corners
             .into_iter()
-            .map(|c| c.rotate_around(self.rotation, self.position))
+            .map(|c| c.rotate_around(self.rotation, self.center))
             .collect_vec()
             .try_into()
             .unwrap()
@@ -124,11 +126,11 @@ impl Projectable for OrientedBoxCollider {
 
 impl Rotation for OrientedBoxCollider {
     fn rotate(&self, rotation: Quaternion) -> Self {
-        self.rotate_around(rotation, self.position)
+        self.rotate_around(rotation, self.center)
     }
 
     fn rotate_around(&self, rotation: Quaternion, pivot: Vector3) -> Self {
-        let new_position = self.position.rotate_around(rotation, pivot);
+        let new_position = self.center.rotate_around(rotation, pivot);
         let new_rotation = self.rotation * rotation;
 
         Self::new(new_position, self.size, new_rotation)
@@ -138,7 +140,7 @@ impl Rotation for OrientedBoxCollider {
 impl From<&AlignedBoxCollider> for OrientedBoxCollider {
     fn from(value: &AlignedBoxCollider) -> Self {
         OrientedBoxCollider::new(
-            value.position(),
+            value.center(),
             value.size(),
             Quaternion::normalized(0.0, 0.0, 0.0, 1.0),
         )
@@ -177,8 +179,8 @@ impl Collides<Self> for OrientedBoxCollider {
 impl Collides<PointCollider> for OrientedBoxCollider {
     fn collides_with(&self, other: &PointCollider) -> bool {
         let halfs = self.size / 2.0;
-        let min = self.position - halfs;
-        let max = self.position + halfs;
+        let min = self.center - halfs;
+        let max = self.center + halfs;
 
         let inverse_point = other.position().rotate(self.rotation.conjugate());
 
@@ -189,14 +191,14 @@ impl Collides<PointCollider> for OrientedBoxCollider {
 impl Collides<SphereCollider> for OrientedBoxCollider {
     fn collides_with(&self, other: &SphereCollider) -> bool {
         let halfs = self.size / 2.0;
-        let min = self.position - halfs;
-        let max = self.position + halfs;
+        let min = self.center - halfs;
+        let max = self.center + halfs;
 
-        let inverse_center = other.position().rotate(self.rotation.conjugate());
+        let inverse_center = other.center().rotate(self.rotation.conjugate());
         let clamped = inverse_center.clamp(&min, &max);
 
         let closest = clamped.rotate(self.rotation);
-        let distance = (closest - other.position()).len();
+        let distance = (closest - other.center()).len();
 
         distance <= other.radius()
     }
@@ -237,7 +239,7 @@ impl Collides<AlignedBoxCollider> for OrientedBoxCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::asserts::*;
+    use mather::asserts::*;
 
     #[test]
     fn pivot_rotation() {
@@ -260,14 +262,14 @@ mod tests {
             Vector3::new(0.0, 0.0, 0.0),
         );
 
-        let position = Vector3::new(0.0, 5.0, 0.0);
+        let center = Vector3::new(0.0, 5.0, 0.0);
         let rotation = Quaternion::from_euler(Vector3::new(
             0.0_f64.to_radians(),
             0.0_f64.to_radians(),
             135.0_f64.to_radians(),
         ));
 
-        assert_vector(position, rotated.position());
+        assert_vectors(center, rotated.center());
         assert_quaternion(rotation, rotated.rotation());
     }
 

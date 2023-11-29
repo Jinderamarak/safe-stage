@@ -1,17 +1,16 @@
-use crate::colliders::{
-    Bounded, Collides, OrientedBoxCollider, PointCollider, Projectable, Rotation, SphereCollider,
-};
-use crate::common::{Quaternion, Vector3};
+use crate::common::{Bounded, Collides, Projectable, Rotation};
+use crate::math::{Quaternion, Vector3};
+use crate::primitive::{OrientedBoxCollider, PointCollider, SphereCollider};
 use itertools::Itertools;
 
 /// # Axis Aligned Box Collider
-/// Basic primitive for collision detection of boxes.
+/// Collision primitive for box that is aligned with the x,y,z axes.
 ///
 /// ## Example
 /// ```
-/// use collisioner::colliders::AlignedBoxCollider;
-/// use collisioner::colliders::Collides;
-/// use collisioner::common::Vector3;
+/// use collisioner::primitive::AlignedBoxCollider;
+/// use collisioner::common::Collides;
+/// use collisioner::math::Vector3;
 ///
 /// let box1 = AlignedBoxCollider::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
 /// let box2 = AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(2.0, 2.0, 2.0));
@@ -19,30 +18,33 @@ use itertools::Itertools;
 /// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct AlignedBoxCollider {
-    position: Vector3,
+    center: Vector3,
     size: Vector3,
 }
 
 impl AlignedBoxCollider {
-    pub fn new(position: Vector3, size: Vector3) -> Self {
+    /// Creates a new `AlignedBoxCollider` with the given `center` and `size`.
+    pub fn new(center: Vector3, size: Vector3) -> Self {
         Self {
-            position,
+            center,
             size: Vector3::new(size.x().abs(), size.y().abs(), size.z().abs()),
         }
     }
 
-    pub fn position(&self) -> Vector3 {
-        self.position
+    /// Returns the center of the box.
+    pub fn center(&self) -> Vector3 {
+        self.center
     }
 
+    /// Returns the size of the box.
     pub fn size(&self) -> Vector3 {
         self.size
     }
 
     fn corners(&self) -> [Vector3; 8] {
         let half_size = self.size() / 2.0;
-        let negative_pos = self.position - half_size;
-        let positive_pos = self.position + half_size;
+        let negative_pos = self.center - half_size;
+        let positive_pos = self.center + half_size;
 
         [
             Vector3::new(negative_pos.x(), negative_pos.y(), negative_pos.z()),
@@ -59,11 +61,11 @@ impl AlignedBoxCollider {
 
 impl Bounded for AlignedBoxCollider {
     fn min(&self) -> Vector3 {
-        self.position - self.size / 2.0
+        self.center - self.size / 2.0
     }
 
     fn max(&self) -> Vector3 {
-        self.position + self.size / 2.0
+        self.center + self.size / 2.0
     }
 }
 
@@ -123,7 +125,7 @@ impl Collides<SphereCollider> for AlignedBoxCollider {
     fn collides_with(&self, other: &SphereCollider) -> bool {
         let min = self.min();
         let max = self.max();
-        let center = other.position();
+        let center = other.center();
 
         let distance_squared = (min.x().max(center.x()).min(max.x()) - center.x()).powi(2)
             + (min.y().max(center.y()).min(max.y()) - center.y()).powi(2)
@@ -142,7 +144,7 @@ impl Collides<OrientedBoxCollider> for AlignedBoxCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::asserts::assert_vector;
+    use mather::asserts::assert_vectors;
     use pretty_assertions::assert_eq;
 
     #[test]
@@ -150,8 +152,8 @@ mod tests {
         let aabb =
             AlignedBoxCollider::new(Vector3::new(1.0, 2.0, 4.0), Vector3::new(3.0, 2.0, 1.0));
 
-        assert_vector(Vector3::new(-0.5, 1.0, 3.5), aabb.min());
-        assert_vector(Vector3::new(2.5, 3.0, 4.5), aabb.max());
+        assert_vectors(Vector3::new(-0.5, 1.0, 3.5), aabb.min());
+        assert_vectors(Vector3::new(2.5, 3.0, 4.5), aabb.max());
     }
 
     #[test]
@@ -172,9 +174,9 @@ mod tests {
 
         let rotated = aabb.rotate(rotation);
 
-        assert_vector(Vector3::new(1.0, 1.0, 1.0), rotated.position());
-        assert_vector(Vector3::new(-1.0, 0.0, 0.0), rotated.min());
-        assert_vector(Vector3::new(3.0, 2.0, 2.0), rotated.max());
+        assert_vectors(Vector3::new(1.0, 1.0, 1.0), rotated.center());
+        assert_vectors(Vector3::new(-1.0, 0.0, 0.0), rotated.min());
+        assert_vectors(Vector3::new(3.0, 2.0, 2.0), rotated.max());
     }
 
     #[test]
@@ -185,9 +187,9 @@ mod tests {
 
         let rotated = aabb.rotate_around(rotation, Vector3::new(1.0, 1.0, 1.0));
 
-        assert_vector(Vector3::new(1.0, 2.0, 0.0), rotated.position());
-        assert_vector(Vector3::new(-1.0, 1.0, -1.0), rotated.min());
-        assert_vector(Vector3::new(3.0, 3.0, 1.0), rotated.max());
+        assert_vectors(Vector3::new(1.0, 2.0, 0.0), rotated.center());
+        assert_vectors(Vector3::new(-1.0, 1.0, -1.0), rotated.min());
+        assert_vectors(Vector3::new(3.0, 3.0, 1.0), rotated.max());
     }
 
     #[test]

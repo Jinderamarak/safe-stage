@@ -4,7 +4,6 @@ workflow:
 
 stages:
   - cache
-  - setup
   - lint
   - build
   - test
@@ -12,6 +11,6 @@ stages:
 include:
   - pipeline/templates.yml
   - pipeline/caching.yml
-  - pipeline/collisioner.yml
+  - pipeline/logic.yml
   - pipeline/service-backend.yml
   - pipeline/service-frontend.yml

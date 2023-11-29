@@ -1,12 +1,13 @@
-use crate::common::{Axis, Quaternion};
+use crate::Axis;
+use crate::Quaternion;
 use std::ops::{Add, Div, Mul, Sub};
 
-/// # Vector 3
+/// # Vector 3D
 /// Struct representing a 3D vector / 3D point.
 ///
 /// ## Example
 /// ```
-/// use collisioner::common::Vector3;
+/// use mather::Vector3;
 ///
 /// let v1 = Vector3::new(1.0, 2.0, 3.0);
 /// let v2 = Vector3::new(4.0, 5.0, 6.0);
@@ -26,22 +27,27 @@ pub struct Vector3 {
 }
 
 impl Vector3 {
+    /// Creates a new vector from raw values.
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
     }
 
+    /// Returns the vector's `x` component.
     pub fn x(&self) -> f64 {
         self.x
     }
 
+    /// Returns the vector's `y` component.
     pub fn y(&self) -> f64 {
         self.y
     }
 
+    /// Returns the vector's `z` component.
     pub fn z(&self) -> f64 {
         self.z
     }
 
+    /// Returns the vector's component according to the given axis.
     pub fn get(&self, axis: Axis) -> f64 {
         match axis {
             Axis::X => self.x,
@@ -50,19 +56,23 @@ impl Vector3 {
         }
     }
 
+    /// Returns a rotated vector according to the given rotation.
     pub fn rotate(&self, rotation: Quaternion) -> Self {
         let rotated = rotation * self.into() * rotation.conjugate();
         rotated.into()
     }
 
+    /// Returns a rotated vector around the given pivot according to the given rotation.
     pub fn rotate_around(&self, rotation: Quaternion, pivot: Vector3) -> Self {
         (*self - pivot).rotate(rotation) + pivot
     }
 
+    /// Returns the dot product of the vector and the `other` vector.
     pub fn dot(&self, other: Vector3) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
+    /// Returns the cross product of the vector and the `other` vector.
     pub fn cross(&self, other: Vector3) -> Vector3 {
         Vector3::new(
             self.y * other.z - self.z * other.y,
@@ -71,10 +81,12 @@ impl Vector3 {
         )
     }
 
+    /// Returns the length of the vector.
     pub fn len(&self) -> f64 {
         self.dot(*self).sqrt()
     }
 
+    /// Returns the normalized vector.
     pub fn normalize(&self) -> Self {
         let len = self.len();
         if len > 0.0 {
@@ -84,6 +96,7 @@ impl Vector3 {
         }
     }
 
+    /// Returns the vector with each component clamped to the given min and max values.
     pub fn clamp(&self, min: &Vector3, max: &Vector3) -> Vector3 {
         Vector3::new(
             self.x.clamp(min.x, max.x),

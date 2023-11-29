@@ -341,6 +341,7 @@ version = "0.1.0"
 dependencies = [
  "assert_float_eq",
  "itertools",
+ "mather",
  "pretty_assertions",
  "thiserror",
 ]
@@ -1547,6 +1548,14 @@ name = "matches"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2532096657941c2fea9c289d370a250971c689d4f143798ff67113ec042024a5"
+
+[[package]]
+name = "mather"
+version = "0.1.0"
+dependencies = [
+ "assert_float_eq",
+ "pretty_assertions",
+]
 
 [[package]]
 name = "memchr"

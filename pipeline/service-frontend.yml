@@ -5,7 +5,7 @@ service-frontend:lint:
   extends: .node-template
   stage: lint
   needs:
-    - job: cache:pnpm
+    - job: pnpm:cache
       optional: true
   script:
     - pnpm run lint
@@ -15,7 +15,7 @@ service-frontend:build:
   stage: build
   needs:
     - service-frontend:lint
-    - job: cache:pnpm
+    - job: pnpm:cache
       optional: true
   script:
     - pnpm run build

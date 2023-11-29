@@ -5,7 +5,7 @@ service-backend:lint:
   extends: .rust-template
   stage: lint
   needs:
-    - job: cache:cargo
+    - job: cargo:cache
       optional: true
   script:
     - rustup component add rustfmt

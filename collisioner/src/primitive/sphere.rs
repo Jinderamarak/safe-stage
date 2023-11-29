@@ -1,17 +1,15 @@
-use crate::colliders::{
-    AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, PointCollider, Projectable,
-    Rotation,
-};
-use crate::common::{Quaternion, Vector3};
+use crate::common::{Bounded, Collides, Projectable, Rotation};
+use crate::math::{Quaternion, Vector3};
+use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, PointCollider};
 
 /// # Sphere Collider
-/// Primitive for representing sphere.
+/// Collision primitive for representing a sphere.
 ///
 /// ## Example
 /// ```
-/// use collisioner::colliders::SphereCollider;
-/// use collisioner::colliders::Collides;
-/// use collisioner::common::Vector3;
+/// use collisioner::primitive::SphereCollider;
+/// use collisioner::common::Collides;
+/// use collisioner::math::Vector3;
 ///
 /// let sphere1 = SphereCollider::new(Vector3::new(0.0, 0.0, 0.0), 1.0);
 /// let sphere2 = SphereCollider::new(Vector3::new(1.0, 1.0, 1.0), 1.0);
@@ -20,19 +18,22 @@ use crate::common::{Quaternion, Vector3};
 /// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct SphereCollider {
-    position: Vector3,
+    center: Vector3,
     radius: f64,
 }
 
 impl SphereCollider {
-    pub fn new(position: Vector3, radius: f64) -> Self {
-        Self { position, radius }
+    /// Creates a new `SphereCollider` with `center` and `radius`.
+    pub fn new(center: Vector3, radius: f64) -> Self {
+        Self { center, radius }
     }
 
-    pub fn position(&self) -> Vector3 {
-        self.position
+    /// Returns the center of the sphere.
+    pub fn center(&self) -> Vector3 {
+        self.center
     }
 
+    /// Returns the radius of the sphere.
     pub fn radius(&self) -> f64 {
         self.radius
     }
@@ -40,17 +41,17 @@ impl SphereCollider {
 
 impl Bounded for SphereCollider {
     fn min(&self) -> Vector3 {
-        self.position - Vector3::new(self.radius, self.radius, self.radius)
+        self.center - Vector3::new(self.radius, self.radius, self.radius)
     }
 
     fn max(&self) -> Vector3 {
-        self.position + Vector3::new(self.radius, self.radius, self.radius)
+        self.center + Vector3::new(self.radius, self.radius, self.radius)
     }
 }
 
 impl Projectable for SphereCollider {
     fn project(&self, axis: Vector3) -> (f64, f64) {
-        let projection = self.position().dot(axis);
+        let projection = self.center().dot(axis);
         (projection - self.radius(), projection + self.radius())
     }
 }
@@ -61,20 +62,20 @@ impl Rotation for SphereCollider {
     }
 
     fn rotate_around(&self, rotation: Quaternion, pivot: Vector3) -> Self {
-        Self::new(self.position.rotate_around(rotation, pivot), self.radius)
+        Self::new(self.center.rotate_around(rotation, pivot), self.radius)
     }
 }
 
 impl Collides<Self> for SphereCollider {
     fn collides_with(&self, other: &Self) -> bool {
-        let distance = (self.position - other.position).len();
+        let distance = (self.center - other.center).len();
         distance <= self.radius() + other.radius()
     }
 }
 
 impl Collides<PointCollider> for SphereCollider {
     fn collides_with(&self, other: &PointCollider) -> bool {
-        let distance = (self.position - other.position()).len();
+        let distance = (self.center - other.position()).len();
         distance <= self.radius()
     }
 }
@@ -94,14 +95,14 @@ impl Collides<OrientedBoxCollider> for SphereCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::asserts::*;
+    use mather::asserts::*;
 
     #[test]
     fn bounds_regular() {
         let sphere = SphereCollider::new(Vector3::new(0.0, 0.0, 0.0), 1.0);
 
-        assert_vector(Vector3::new(-1.0, -1.0, -1.0), sphere.min());
-        assert_vector(Vector3::new(1.0, 1.0, 1.0), sphere.max());
+        assert_vectors(Vector3::new(-1.0, -1.0, -1.0), sphere.min());
+        assert_vectors(Vector3::new(1.0, 1.0, 1.0), sphere.max());
     }
 
     #[test]
@@ -123,7 +124,7 @@ mod tests {
         ));
         let rotated = sphere.rotate(rotation);
 
-        assert_eq!(sphere.position(), rotated.position());
+        assert_eq!(sphere.center(), rotated.center());
     }
 
     #[test]
@@ -137,7 +138,7 @@ mod tests {
         ));
         let rotated = sphere.rotate_around(rotation, pivot);
 
-        assert_vector(Vector3::new(2.0, 0.0, 0.0), rotated.position());
+        assert_vectors(Vector3::new(2.0, 0.0, 0.0), rotated.center());
     }
 
     #[test]

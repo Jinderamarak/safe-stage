@@ -1,15 +1,15 @@
-use crate::colliders::{
-    AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, PointCollider, Projectable,
-    Rotation, SphereCollider,
-};
-use crate::common::{Quaternion, Vector3};
+use crate::common::{Bounded, Collides, Projectable, Rotation};
+use crate::math::{Quaternion, Vector3};
+use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, PointCollider, SphereCollider};
 
 /// # Generic Collider
 /// Enum representing all possible collider primitives.
+///
 /// ## Example
 /// ```
-/// use collisioner::common::Vector3;
-/// use collisioner::colliders::{Collider, PointCollider, AlignedBoxCollider, Collides};
+/// use collisioner::math::Vector3;
+/// use collisioner::primitive::{Collider, PointCollider, AlignedBoxCollider};
+/// use collisioner::common::Collides;
 ///
 /// let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 /// let collider_point = Collider::from(point);
@@ -27,14 +27,17 @@ pub enum Collider {
 }
 
 impl Collider {
+    /// Creates a new `PointCollider` at `(x, y, z)`.
     pub fn point(x: f64, y: f64, z: f64) -> Self {
         Self::Point(PointCollider::new(Vector3::new(x, y, z)))
     }
 
+    /// Creates a new `SphereCollider` at `(x, y, z)` with radius `r`.
     pub fn sphere(x: f64, y: f64, z: f64, r: f64) -> Self {
         Self::Sphere(SphereCollider::new(Vector3::new(x, y, z), r))
     }
 
+    /// Creates a new `AlignedBoxCollider` at `(x, y, z)` with size `(sx, sy, sz)`.
     pub fn aligned_box(x: f64, y: f64, z: f64, sx: f64, sy: f64, sz: f64) -> Self {
         Self::AlignedBox(AlignedBoxCollider::new(
             Vector3::new(x, y, z),
@@ -42,6 +45,8 @@ impl Collider {
         ))
     }
 
+    /// Creates a new `OrientedBoxCollider` at `(x, y, z)` with size `(sx, sy, sz)`
+    /// and rotation of euler angles `(rx, ry, rz)`.
     #[allow(clippy::too_many_arguments)]
     pub fn oriented_box(
         x: f64,

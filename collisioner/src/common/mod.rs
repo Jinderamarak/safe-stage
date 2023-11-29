@@ -1,10 +1,12 @@
-//! # Common Items
-//! Common types, functions, utilities used by the crate.
+//! # Common functionality
+//! Common traits for functionality that is shared between colliders.
 
-mod axis;
-mod quaternion;
-mod vector;
+mod bounded;
+mod collides;
+mod projectable;
+mod rotation;
 
-pub use axis::Axis;
-pub use quaternion::Quaternion;
-pub use vector::Vector3;
+pub use bounded::Bounded;
+pub use collides::Collides;
+pub use projectable::Projectable;
+pub use rotation::Rotation;

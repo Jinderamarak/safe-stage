@@ -1,17 +1,15 @@
-use crate::colliders::{
-    AlignedBoxCollider, Bounded, Collides, OrientedBoxCollider, Projectable, Rotation,
-    SphereCollider,
-};
-use crate::common::{Quaternion, Vector3};
+use crate::common::{Bounded, Collides, Projectable, Rotation};
+use crate::math::{Quaternion, Vector3};
+use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, SphereCollider};
 
 /// # Point Collider
-/// Basic primitive for representing single point.
+/// Collision primitive for representing single point.
 ///
 /// ## Example
 /// ```
-/// use collisioner::colliders::PointCollider;
-/// use collisioner::colliders::Collides;
-/// use collisioner::common::Vector3;
+/// use collisioner::primitive::PointCollider;
+/// use collisioner::common::Collides;
+/// use collisioner::math::Vector3;
 ///
 /// let point1 = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 /// let point2 = PointCollider::new(Vector3::new(1.0, 1.0, 1.0));
@@ -27,10 +25,12 @@ pub struct PointCollider {
 }
 
 impl PointCollider {
+    /// Creates a new `PointCollider` with `position`.
     pub fn new(position: Vector3) -> Self {
         Self { position }
     }
 
+    /// Returns the position of the point.
     pub fn position(&self) -> Vector3 {
         self.position
     }
@@ -96,7 +96,7 @@ impl Collides<OrientedBoxCollider> for PointCollider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::asserts::assert_vector;
+    use mather::asserts::assert_vectors;
     use pretty_assertions::assert_eq;
 
     #[test]
@@ -131,7 +131,7 @@ mod tests {
         ));
         let rotated = point.rotate_around(rotation, pivot);
 
-        assert_vector(Vector3::new(2.0, 0.0, 0.0), rotated.position());
+        assert_vectors(Vector3::new(2.0, 0.0, 0.0), rotated.position());
     }
 
     #[test]
