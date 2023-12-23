@@ -1,6 +1,7 @@
 use crate::common::{Bounded, Collides, Projectable, Rotation};
 use crate::math::{Quaternion, Vector3};
 use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, PointCollider, SphereCollider};
+use serde::{Deserialize, Serialize};
 
 /// # Generic Collider
 /// Enum representing all possible collider primitives.
@@ -18,7 +19,7 @@ use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, PointCollider, S
 ///
 /// assert!(collider_point.collides_with(&collider_box));
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Collider {
     Point(PointCollider),
     Sphere(SphereCollider),

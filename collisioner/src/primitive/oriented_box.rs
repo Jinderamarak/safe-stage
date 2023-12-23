@@ -2,6 +2,7 @@ use crate::common::{Bounded, Collides, Projectable, Rotation};
 use crate::math::{Quaternion, Vector3};
 use crate::primitive::{AlignedBoxCollider, PointCollider, SphereCollider};
 use itertools::Itertools;
+use serde::{Deserialize, Serialize};
 
 /// # Oriented Bounding Box Collider
 /// Collision primitive for box which has a rotation.
@@ -20,7 +21,7 @@ use itertools::Itertools;
 /// assert_eq!(Vector3::new(0.0, 0.0, 0.0), obb.center());
 /// assert_eq!(Vector3::new(2.0, 2.0, 2.0), obb.size());
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct OrientedBoxCollider {
     center: Vector3,
     size: Vector3,

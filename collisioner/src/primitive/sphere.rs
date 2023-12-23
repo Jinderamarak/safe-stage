@@ -1,6 +1,7 @@
 use crate::common::{Bounded, Collides, Projectable, Rotation};
 use crate::math::{Quaternion, Vector3};
 use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, PointCollider};
+use serde::{Deserialize, Serialize};
 
 /// # Sphere Collider
 /// Collision primitive for representing a sphere.
@@ -16,7 +17,7 @@ use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, PointCollider};
 ///
 /// assert!(sphere1.collides_with(&sphere2));
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SphereCollider {
     center: Vector3,
     radius: f64,

@@ -1,5 +1,6 @@
 use crate::Axis;
 use crate::Quaternion;
+use serde::{Deserialize, Serialize};
 use std::ops::{Add, Div, Mul, Sub};
 
 /// # Vector 3D
@@ -19,7 +20,7 @@ use std::ops::{Add, Div, Mul, Sub};
 /// assert_eq!(v1_v2.x(), 5.0);
 /// assert_eq!(v2_v3.x(), 2.0);
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub struct Vector3 {
     x: f64,
     y: f64,

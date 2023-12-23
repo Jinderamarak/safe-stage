@@ -1,4 +1,5 @@
 use crate::Vector3;
+use serde::{Deserialize, Serialize};
 use std::ops::Mul;
 
 /// # Quaternion
@@ -18,7 +19,7 @@ use std::ops::Mul;
 /// assert_float_absolute_eq!(quaternion.z(), 0.5609, 0.0001);
 /// assert_float_absolute_eq!(quaternion.w(), 0.7010, 0.0001);
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Quaternion {
     x: f64,
     y: f64,

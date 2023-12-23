@@ -1,6 +1,7 @@
 use crate::common::{Bounded, Collides, Projectable, Rotation};
 use crate::math::{Quaternion, Vector3};
 use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, SphereCollider};
+use serde::{Deserialize, Serialize};
 
 /// # Point Collider
 /// Collision primitive for representing single point.
@@ -19,7 +20,7 @@ use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, SphereCollider};
 /// assert!(point2.collides_with(&point3));
 /// assert!(!point1.collides_with(&point3));
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PointCollider {
     position: Vector3,
 }
