@@ -2,11 +2,12 @@ use crate::common::{Bounded, Collides, Rotation};
 use crate::math::{Axis, Quaternion, Vector3};
 use crate::primitive::Collider;
 use itertools::Itertools;
+use serde::{Deserialize, Serialize};
 
 /// # Bounding Volume Hierarchy
 /// A tree structure composed of primitive colliders
 /// for accelerating collisions between complex objects.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub enum BvhTree {
     Branch(Collider, Option<Box<BvhTree>>, Option<Box<BvhTree>>),
     Leaf(Collider),

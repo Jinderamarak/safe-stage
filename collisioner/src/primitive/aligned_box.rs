@@ -2,6 +2,7 @@ use crate::common::{Bounded, Collides, Projectable, Rotation};
 use crate::math::{Quaternion, Vector3};
 use crate::primitive::{OrientedBoxCollider, PointCollider, SphereCollider};
 use itertools::Itertools;
+use serde::{Deserialize, Serialize};
 
 /// # Axis Aligned Box Collider
 /// Collision primitive for box that is aligned with the x,y,z axes.
@@ -16,7 +17,7 @@ use itertools::Itertools;
 /// let box2 = AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(2.0, 2.0, 2.0));
 /// assert!(box1.collides_with(&box2));
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct AlignedBoxCollider {
     center: Vector3,
     size: Vector3,
