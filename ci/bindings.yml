@@ -1,0 +1,53 @@
+include:
+  - ci/templates.yml
+
+.rust-template-cache: &rust-template-cache
+  key:
+    files:
+      - safe-stage/Cargo.lock
+  paths:
+    - $CARGO_HOME/
+  policy: pull
+
+.bindings-cache: &bindings-cache
+  key:
+    files:
+      - safe-stage/src
+      - safe-stage/bindings
+  paths:
+    - safe-stage/bindings/generated/
+  policy: pull
+
+bindings:generate:
+  extends: .rust-template
+  stage: build
+  image:
+    name: rustlang/rust:nightly
+  cache:
+    - <<: *rust-template-cache
+    - <<: *bindings-cache
+      policy: pull-push
+  needs:
+    - safe-stage:lint
+    - job: cargo:cache
+      optional: true
+  before_script:
+    - cd safe-stage
+  script:
+    - cargo run -p bindings
+
+bindings:build:csharp:
+  extends: .dotnet-template
+  stage: build
+  cache:
+    - <<: *rust-template-cache
+    - <<: *bindings-cache
+  needs:
+    - bindings:generate
+  before_script:
+    # No need for actual library, just file for copying
+    - mkdir -p safe-stage/target/release
+    - touch safe-stage/target/release/safe_stage.dll
+    - cd bindings/BindingsCs
+  script:
+    - dotnet build

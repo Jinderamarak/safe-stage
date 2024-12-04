@@ -1,0 +1,14 @@
+.rust-template:
+  image: rust:1.83.0
+  variables:
+    CARGO_HOME: $CI_PROJECT_DIR/.cargo
+  cache:
+    key:
+      files:
+        - safe-stage/Cargo.lock
+    paths:
+      - $CARGO_HOME/
+    policy: pull
+
+.dotnet-template:
+  image: mcr.microsoft.com/dotnet/sdk:8.0

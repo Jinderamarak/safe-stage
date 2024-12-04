@@ -1,0 +1,14 @@
+include:
+  - ci/templates.yml
+
+cargo:cache:
+  extends: .rust-template
+  stage: cache
+  rules:
+    - changes:
+        - safe-stage/Cargo.lock
+  cache:
+    policy: pull-push
+  script:
+    - cd safe-stage
+    - cargo fetch --locked

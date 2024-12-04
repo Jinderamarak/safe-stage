@@ -1,6 +1,0 @@
-[hooks]
-pre-commit = "cargo fmt"
-pre-push = "cargo clippy -- -D warnings"
-
-[logging]
-verbose = true

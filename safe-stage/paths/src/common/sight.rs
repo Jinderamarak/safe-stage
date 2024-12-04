@@ -1,0 +1,78 @@
+use collisions::common::Collides;
+use collisions::complex::group::ColliderGroup;
+use collisions::PrimaryCollider;
+use maths::NaNExtension;
+use models::{movable::Movable, position::sixaxis::SixAxis};
+use rayon::prelude::*;
+
+/// Check if there is a line of sight between two coordinates
+/// by using linear interpolation with fixed step.
+#[deprecated]
+pub fn line_of_sight<M, I>(
+    from: &SixAxis,
+    to: &SixAxis,
+    movable: &M,
+    immovable: &I,
+    move_step: f64,
+    rotate_step: f64,
+) -> bool
+where
+    M: Movable<SixAxis>,
+    I: Collides<ColliderGroup<PrimaryCollider>>,
+{
+    let diff_pos = (to.pos - from.pos).abs();
+    let diff_rot = from.shortest_rotation(to);
+
+    let move_steps = diff_pos.x().max(diff_pos.y()).max(diff_pos.z()) / move_step;
+    let rotate_steps = diff_rot.x().max(diff_rot.y()).max(diff_rot.z()) / rotate_step;
+
+    let steps = move_steps.max(rotate_steps).max(1.0) as usize;
+    for i in 0..=steps {
+        let t = (i as f64 / steps as f64).map_nan(0.0);
+        #[allow(deprecated)]
+        let c = from.lerp(to, t, t);
+        if immovable.collides_with(&movable.move_to(&c)) {
+            return false;
+        }
+    }
+
+    true
+}
+
+pub fn line_of_sight_step<M, I>(
+    from: &SixAxis,
+    to: &SixAxis,
+    movable: &M,
+    immovable: &I,
+    step: &SixAxis,
+) -> bool
+where
+    M: Movable<SixAxis>,
+    I: Collides<ColliderGroup<PrimaryCollider>>,
+{
+    let max_steps = from.stepping(to, step);
+    (0..=max_steps).all(|i| {
+        let t = (i as f64 / max_steps as f64).map_nan(0.0);
+        let state = from.lerp_t(to, t);
+        !immovable.collides_with(&movable.move_to(&state))
+    })
+}
+
+pub fn line_of_sight_step_par<M, I>(
+    from: &SixAxis,
+    to: &SixAxis,
+    movable: &M,
+    immovable: &I,
+    step: &SixAxis,
+) -> bool
+where
+    M: Movable<SixAxis> + Sync,
+    I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
+{
+    let max_steps = from.stepping(to, step);
+    (0..=max_steps).into_par_iter().all(|i| {
+        let t = (i as f64 / max_steps as f64).map_nan(0.0);
+        let state = from.lerp_t(to, t);
+        !immovable.collides_with(&movable.move_to(&state))
+    })
+}

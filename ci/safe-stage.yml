@@ -1,0 +1,146 @@
+include:
+  - ci/templates.yml
+
+.safe-stage-template:
+  extends: .rust-template
+  variables:
+    SERDE_FEATURE: --all -F serde
+    LINEAR_FEATURE: -p collisions --no-default-features -F rayon-bvh-linear -F bvh-linear
+    FFI_FEATURE: -F ffi
+
+safe-stage:lint:
+  extends: .safe-stage-template
+  stage: lint
+  needs:
+    - job: cargo:cache
+      optional: true
+  before_script:
+    - cd safe-stage
+    - rustup component add rustfmt
+    - cargo fmt --version
+    - rustup component add clippy
+    - cargo clippy --version
+  script:
+    - cargo fmt --all --check
+    - cargo clippy --locked --all -- -D warnings
+    - cargo clippy --locked ${SERDE_FEATURE} -- -D warnings
+    - cargo clippy --locked ${LINEAR_FEATURE} -- -D warnings
+    - cargo clippy --locked ${FFI_FEATURE} -- -D warnings
+
+safe-stage:build:
+  extends: .safe-stage-template
+  stage: build
+  needs:
+    - safe-stage:lint
+    - job: cargo:cache
+      optional: true
+  before_script:
+    - cd safe-stage
+  script:
+    - cargo build --locked --all
+    - cargo build --locked ${SERDE_FEATURE}
+    - cargo build --locked ${LINEAR_FEATURE}
+    - cargo build --locked ${FFI_FEATURE}
+
+safe-stage:build:release:
+  extends: .safe-stage-template
+  stage: build
+  needs:
+    - safe-stage:lint
+    - job: cargo:cache
+      optional: true
+  before_script:
+    - cd safe-stage
+  script:
+    - cargo build --locked --release --all
+    - cargo build --locked --release ${SERDE_FEATURE}
+    - cargo build --locked --release ${LINEAR_FEATURE}
+    - cargo build --locked --release ${FFI_FEATURE}
+
+safe-stage:test:
+  extends: .safe-stage-template
+  stage: test
+  needs:
+    - safe-stage:lint
+    - safe-stage:build
+    - job: cargo:cache
+      optional: true
+  before_script:
+    - cd safe-stage
+    - mkdir -p ${CARGO_HOME}/bin
+    - curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME}/bin
+    - cargo nextest --version
+  script:
+    - cargo nextest run --locked --config-file .nextest.toml -P ci-default --all
+    - cargo nextest run --locked --config-file .nextest.toml -P ci-features-serde ${SERDE_FEATURE}
+    - cargo nextest run --locked --config-file .nextest.toml -P ci-features-linear ${LINEAR_FEATURE}
+    - cargo nextest run --locked --config-file .nextest.toml -P ci-features-ffi ${FFI_FEATURE}
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - safe-stage/target/nextest/ci-default/junit-report.xml
+        - safe-stage/target/nextest/ci-features-serde/junit-report.xml
+        - safe-stage/target/nextest/ci-features-linear/junit-report.xml
+        - safe-stage/target/nextest/ci-features-ffi/junit-report.xml
+
+safe-stage:test:docs:
+  extends: .safe-stage-template
+  stage: test
+  needs:
+    - safe-stage:lint
+    - safe-stage:build
+    - job: cargo:cache
+      optional: true
+  before_script:
+    - cd safe-stage
+  script:
+    - cargo test --locked --doc --all
+    - cargo test --locked --doc ${SERDE_FEATURE}
+    - cargo test --locked --doc ${LINEAR_FEATURE}
+    - cargo test --locked --doc ${FFI_FEATURE}
+
+safe-stage:test:miri:
+  extends: .safe-stage-template
+  stage: test
+  image:
+    name: rustlang/rust:nightly
+    pull_policy: always
+  needs:
+    - safe-stage:lint
+    - safe-stage:build
+    - job: cargo:cache
+      optional: true
+  before_script:
+    - cd safe-stage
+    - mkdir -p ${CARGO_HOME}/bin
+    - curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME}/bin
+    - cargo nextest --version
+    - rustup component add miri
+    - cargo miri --version
+  script:
+    - cargo miri nextest run --locked --config-file .nextest.toml ${API_FFI_VARIANT}
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - safe-stage/target/nextest/default-miri/junit-report.xml
+
+# Optional build on nightly channel
+safe-stage:build:nightly:
+  extends: .safe-stage-template
+  stage: build
+  image:
+    name: rustlang/rust:nightly
+    pull_policy: always
+  needs:
+    - safe-stage:lint
+    - safe-stage:build
+  before_script:
+    - cd safe-stage
+  script:
+    - cargo build --all
+    - cargo build ${SERDE_FEATURE}
+    - cargo build ${LINEAR_FEATURE}
+    - cargo build ${FFI_FEATURE}
+  allow_failure: true
