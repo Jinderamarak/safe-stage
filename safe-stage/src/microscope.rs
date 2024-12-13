@@ -72,21 +72,18 @@ impl Microscope {
     }
 
     #[no_mangle]
-    pub extern "C" fn microscope_clear_sample(&mut self) -> StateUpdateError {
-        to_result(self.safe_clear_sample())
+    pub extern "C" fn microscope_clear_sample(&mut self) {
+        self.safe_clear_sample()
     }
 
     #[no_mangle]
-    pub extern "C" fn microscope_update_holder(
-        &mut self,
-        holder: &HolderConfig,
-    ) -> StateUpdateError {
-        to_result(self.safe_update_holder(holder))
+    pub extern "C" fn microscope_update_holder(&mut self, holder: &HolderConfig) {
+        self.safe_update_holder(holder)
     }
 
     #[no_mangle]
-    pub extern "C" fn microscope_remove_holder(&mut self) -> StateUpdateError {
-        to_result(self.safe_remove_holder())
+    pub extern "C" fn microscope_remove_holder(&mut self) {
+        self.safe_remove_holder()
     }
 
     /// # Safety
@@ -99,17 +96,14 @@ impl Microscope {
         size_y: usize,
         real_x: f64,
         real_y: f64,
-    ) -> StateUpdateError {
+    ) {
         let height_map = slice_from_raw_parts(height_map, size_x * size_y);
-        to_result(self.safe_update_sample_height_map(&*height_map, size_x, size_y, real_x, real_y))
+        self.safe_update_sample_height_map(&*height_map, size_x, size_y, real_x, real_y)
     }
 
     #[no_mangle]
-    pub extern "C" fn microscope_update_stage_state(
-        &mut self,
-        state: &CSixAxis,
-    ) -> StateUpdateError {
-        to_result(self.safe_update_stage_state(state))
+    pub extern "C" fn microscope_update_stage_state(&mut self, state: &CSixAxis) {
+        self.safe_update_stage_state(state)
     }
 
     #[no_mangle]
@@ -119,6 +113,11 @@ impl Microscope {
         state: &CLinearState,
     ) -> StateUpdateError {
         to_result(self.safe_update_retract_state(id, state))
+    }
+
+    #[no_mangle]
+    pub extern "C" fn microscope_update_resolvers(&mut self) -> StateUpdateError {
+        to_result(self.safe_update_resolvers())
     }
 
     #[no_mangle]
@@ -136,8 +135,18 @@ impl Microscope {
     }
 
     #[no_mangle]
-    pub extern "C" fn microscope_present_static(&self) -> TriangleBuffer {
-        self.safe_present_static()
+    pub extern "C" fn microscope_present_static_full(&self) -> TriangleBuffer {
+        self.safe_present_static_full()
+    }
+
+    #[no_mangle]
+    pub extern "C" fn microscope_present_static_less_obstructive(&self) -> TriangleBuffer {
+        self.safe_present_static_less_obstructive()
+    }
+
+    #[no_mangle]
+    pub extern "C" fn microscope_present_static_non_obstructive(&self) -> TriangleBuffer {
+        self.safe_present_static_non_obstructive()
     }
 
     #[no_mangle]
@@ -146,8 +155,22 @@ impl Microscope {
     }
 
     #[no_mangle]
+    pub extern "C" fn microscope_present_stage_at(&self, state: &CSixAxis) -> TriangleBuffer {
+        self.safe_present_stage_at(state)
+    }
+
+    #[no_mangle]
     pub extern "C" fn microscope_present_retract(&self, id: Id) -> TriangleBuffer {
         self.safe_present_retract(id)
+    }
+
+    #[no_mangle]
+    pub extern "C" fn microscope_present_retract_at(
+        &self,
+        id: Id,
+        state: &CLinearState,
+    ) -> TriangleBuffer {
+        self.safe_present_retract_at(id, state)
     }
 
     #[no_mangle]
@@ -162,16 +185,16 @@ impl Microscope {
         Self::build(config)
     }
 
-    pub fn clear_sample(&mut self) -> Result<(), StateUpdateError> {
-        self.safe_clear_sample()
+    pub fn clear_sample(&mut self) {
+        self.safe_clear_sample();
     }
 
-    pub fn update_holder(&mut self, holder: &HolderConfig) -> Result<(), StateUpdateError> {
-        self.safe_update_holder(holder)
+    pub fn update_holder(&mut self, holder: &HolderConfig) {
+        self.safe_update_holder(holder);
     }
 
-    pub fn remove_holder(&mut self) -> Result<(), StateUpdateError> {
-        self.safe_remove_holder()
+    pub fn remove_holder(&mut self) {
+        self.safe_remove_holder();
     }
 
     pub fn update_sample_height_map(
@@ -181,12 +204,12 @@ impl Microscope {
         size_y: usize,
         real_x: f64,
         real_y: f64,
-    ) -> Result<(), StateUpdateError> {
-        self.safe_update_sample_height_map(height_map, size_x, size_y, real_x, real_y)
+    ) {
+        self.safe_update_sample_height_map(height_map, size_x, size_y, real_x, real_y);
     }
 
-    pub fn update_stage_state(&mut self, state: &CSixAxis) -> Result<(), StateUpdateError> {
-        self.safe_update_stage_state(state)
+    pub fn update_stage_state(&mut self, state: &CSixAxis) {
+        self.safe_update_stage_state(state);
     }
 
     pub fn update_retract_state(
@@ -197,6 +220,10 @@ impl Microscope {
         self.safe_update_retract_state(id, state)
     }
 
+    pub fn update_resolvers(&mut self) -> Result<(), StateUpdateError> {
+        self.safe_update_resolvers()
+    }
+
     pub fn find_stage_path(&self, state: &CSixAxis) -> CPathResultSixAxis {
         self.safe_find_stage_path(state)
     }
@@ -205,16 +232,32 @@ impl Microscope {
         self.safe_find_retract_path(id, state)
     }
 
-    pub fn present_static(&self) -> TriangleBuffer {
-        self.safe_present_static()
+    pub fn present_static_full(&self) -> TriangleBuffer {
+        self.safe_present_static_full()
+    }
+
+    pub fn present_static_less_obstructive(&self) -> TriangleBuffer {
+        self.safe_present_static_less_obstructive()
+    }
+
+    pub fn present_static_non_obstructive(&self) -> TriangleBuffer {
+        self.safe_present_static_non_obstructive()
     }
 
     pub fn present_stage(&self) -> TriangleBuffer {
         self.safe_present_stage()
     }
 
+    pub fn present_stage_at(&self, state: &CSixAxis) -> TriangleBuffer {
+        self.safe_present_stage_at(state)
+    }
+
     pub fn present_retract(&self, id: Id) -> TriangleBuffer {
         self.safe_present_retract(id)
+    }
+
+    pub fn present_retract_at(&self, id: Id, state: &CLinearState) -> TriangleBuffer {
+        self.safe_present_retract_at(id, state)
     }
 }
 
@@ -255,30 +298,19 @@ impl Microscope {
         self.retracts.inner().get(&id).is_some()
     }
 
-    fn safe_clear_sample(&mut self) -> Result<(), StateUpdateError> {
+    fn safe_clear_sample(&mut self) {
         if let Some(h) = self.stage.get_mut().active_holder_mut() {
             h.swap_sample(None)
         }
-
-        self.update_all_retract_resolvers()?;
-        self.update_stage_resolver_state(&self.stage_state.clone())?;
-        Ok(())
     }
 
-    fn safe_update_holder(&mut self, holder: &HolderConfig) -> Result<(), StateUpdateError> {
+    fn safe_update_holder(&mut self, holder: &HolderConfig) {
         let holder = holder.build();
         self.stage.get_mut().swap_holder(Some(holder));
-
-        self.update_all_retract_resolvers()?;
-        self.update_stage_resolver_state(&self.stage_state.clone())?;
-        Ok(())
     }
 
-    fn safe_remove_holder(&mut self) -> Result<(), StateUpdateError> {
+    fn safe_remove_holder(&mut self) {
         self.stage.get_mut().swap_holder(None);
-        self.update_all_retract_resolvers()?;
-        self.update_stage_resolver_state(&self.stage_state.clone())?;
-        Ok(())
     }
 
     fn safe_update_sample_height_map(
@@ -288,17 +320,17 @@ impl Microscope {
         size_y: usize,
         real_x: f64,
         real_y: f64,
-    ) -> Result<(), StateUpdateError> {
+    ) {
         let real_size = Vector2::new(real_x, real_y);
         let model = height_map_to_sample_model(height_map, size_x, size_y, &real_size, 0.0);
-        let sample = PrimaryCollider::build(&model);
+        let sample = if model.is_empty() {
+            None
+        } else {
+            Some(PrimaryCollider::build(&model))
+        };
         if let Some(h) = self.stage.get_mut().active_holder_mut() {
-            h.swap_sample(Some(sample))
+            h.swap_sample(sample)
         }
-
-        self.update_all_retract_resolvers()?;
-        self.update_stage_resolver_state(&self.stage_state.clone())?;
-        Ok(())
     }
 
     fn movable_stage(&self) -> DynamicMovable<SixAxis> {
@@ -313,12 +345,19 @@ impl Microscope {
             .map(|(r, _, _)| DynamicMovable(r.get_ref().as_arc()))
     }
 
-    fn always_immovable(&self) -> ColliderGroup<PrimaryCollider> {
-        let mut immovable = self.chamber.get_ref().full();
+    fn add_equipment(
+        &self,
+        mut group: ColliderGroup<PrimaryCollider>,
+    ) -> ColliderGroup<PrimaryCollider> {
         for equipment in self.equipment.inner() {
-            immovable.extend(equipment.get_ref().collider())
+            group.extend(equipment.get_ref().collider())
         }
-        immovable
+        group
+    }
+
+    fn always_immovable(&self) -> ColliderGroup<PrimaryCollider> {
+        let immovable = self.chamber.get_ref().full();
+        self.add_equipment(immovable)
     }
 
     fn immovable_without_stage(&self) -> DynamicImmovable {
@@ -366,27 +405,8 @@ impl Microscope {
         Ok(())
     }
 
-    fn update_all_retract_resolvers(&mut self) -> Result<(), StateUpdateError> {
-        let to_update = self
-            .retracts
-            .inner()
-            .iter()
-            .map(|(id, (_, _, s))| (*id, *s))
-            .collect::<Vec<_>>();
-        for (id, s) in to_update {
-            self.update_retract_resolver_state(id, &s)?;
-        }
-
-        Ok(())
-    }
-
-    fn safe_update_stage_state(&mut self, state: &CSixAxis) -> Result<(), StateUpdateError> {
-        self.update_stage_resolver_state(state)?;
+    fn safe_update_stage_state(&mut self, state: &CSixAxis) {
         self.stage_state = *state;
-
-        self.update_all_retract_resolvers()?;
-
-        Ok(())
     }
 
     fn safe_update_retract_state(
@@ -398,20 +418,22 @@ impl Microscope {
             return Err(StateUpdateError::InvalidId);
         }
 
-        self.update_retract_resolver_state(id, state)?;
         self.retracts.inner_mut().get_mut(&id).unwrap().2 = *state;
+        Ok(())
+    }
 
-        let to_update = self
+    fn safe_update_resolvers(&mut self) -> Result<(), StateUpdateError> {
+        self.update_stage_resolver_state(&self.stage_state.clone())?;
+
+        let retracts_id_state = self
             .retracts
             .inner()
             .iter()
-            .filter(|(i, _)| **i != id)
             .map(|(id, (_, _, s))| (*id, *s))
             .collect::<Vec<_>>();
-        for (id, s) in to_update {
-            self.update_retract_resolver_state(id, &s)?;
+        for (id, state) in retracts_id_state {
+            self.update_retract_resolver_state(id, &state)?;
         }
-        self.update_stage_resolver_state(&self.stage_state.clone())?;
 
         Ok(())
     }
@@ -442,9 +464,19 @@ impl Microscope {
         CPathResultLinearState::from(result)
     }
 
-    fn safe_present_static(&self) -> TriangleBuffer {
-        let immovable = self.always_immovable();
-        collider_to_triangle_buffer(immovable)
+    fn safe_present_static_full(&self) -> TriangleBuffer {
+        let chamber = self.chamber.get_ref().full();
+        collider_to_triangle_buffer(self.add_equipment(chamber))
+    }
+
+    fn safe_present_static_less_obstructive(&self) -> TriangleBuffer {
+        let chamber = self.chamber.get_ref().less_obstructive();
+        collider_to_triangle_buffer(self.add_equipment(chamber))
+    }
+
+    fn safe_present_static_non_obstructive(&self) -> TriangleBuffer {
+        let chamber = self.chamber.get_ref().non_obstructive();
+        collider_to_triangle_buffer(self.add_equipment(chamber))
     }
 
     fn safe_present_stage(&self) -> TriangleBuffer {
@@ -455,8 +487,19 @@ impl Microscope {
         collider_to_triangle_buffer(stage)
     }
 
+    fn safe_present_stage_at(&self, state: &CSixAxis) -> TriangleBuffer {
+        let stage = self.stage.get_ref().move_to(&SixAxis::from(state));
+        collider_to_triangle_buffer(stage)
+    }
+
     fn safe_present_retract(&self, id: Id) -> TriangleBuffer {
         let (retract, _, state) = &self.retracts.inner()[&id];
+        let retracted = retract.get_ref().move_to(&LinearState::from(state));
+        collider_to_triangle_buffer(retracted)
+    }
+
+    fn safe_present_retract_at(&self, id: Id, state: &CLinearState) -> TriangleBuffer {
+        let (retract, _, _) = &self.retracts.inner()[&id];
         let retracted = retract.get_ref().move_to(&LinearState::from(state));
         collider_to_triangle_buffer(retracted)
     }

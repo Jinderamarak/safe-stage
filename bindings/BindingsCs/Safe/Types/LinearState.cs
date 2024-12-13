@@ -10,9 +10,7 @@ public struct LinearState
         set
         {
             if (value < 0 || value > 1)
-            {
                 throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 1.");
-            }
             Inner.t = value;
         }
     }
@@ -21,22 +19,28 @@ public struct LinearState
     {
         Inner = inner;
     }
-    
+
     public LinearState(double t = 0)
     {
-        if (t < 0 || t > 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(t), "Value must be between 0 and 1.");
-        }
+        if (t < 0 || t > 1) throw new ArgumentOutOfRangeException(nameof(t), "Value must be between 0 and 1.");
         Inner = new Unsafe.CLinearState
         {
             t = t
         };
     }
 
-    public static LinearState Full() => new LinearState(1.0);
-    public static LinearState None() => new LinearState(0.0);
+    public static LinearState Full()
+    {
+        return new LinearState(1.0);
+    }
+
+    public static LinearState None()
+    {
+        return new LinearState(0.0);
+    }
 
     public override string? ToString()
-        => $"{{[ T: {T} ]}}";
+    {
+        return $"{{[ T: {T} ]}}";
+    }
 }

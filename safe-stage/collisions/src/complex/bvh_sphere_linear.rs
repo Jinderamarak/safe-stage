@@ -6,9 +6,6 @@ use crate::primitive::{SphereCollider, TriangleCollider};
 use maths::{Quaternion, Vector3};
 use std::fmt::Debug;
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 #[cfg(feature = "rayon-bvh-linear")]
 use rayon::prelude::*;
 
@@ -18,7 +15,7 @@ use rayon::prelude::*;
 /// Uses binary tree in linear memory for storing nodes.
 ///
 /// Currently slower than [BvhSphereRecursive].
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone)]
 pub struct BvhSphereLinear(pub(crate) LinearTree<SphereCollider, TriangleCollider>);
 

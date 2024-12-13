@@ -1,9 +1,6 @@
 use crate::Vector3;
 use std::ops::Mul;
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 /// # Quaternion
 /// Quaternion implementation useful for rotations in 3D space.
 ///
@@ -21,7 +18,7 @@ use serde::{Deserialize, Serialize};
 /// assert_float_absolute_eq!(quaternion.y(), 0.4304, 0.0001);
 /// assert_float_absolute_eq!(quaternion.z(), 0.5609, 0.0001);
 /// ```
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Quaternion {
     w: f64,

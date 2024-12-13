@@ -21,8 +21,6 @@ include:
 bindings:generate:
   extends: .rust-template
   stage: build
-  image:
-    name: rustlang/rust:nightly
   cache:
     - <<: *rust-template-cache
     - <<: *bindings-cache
@@ -33,6 +31,7 @@ bindings:generate:
       optional: true
   before_script:
     - cd safe-stage
+    - cargo install cargo-expand
   script:
     - cargo run -p bindings
 

@@ -53,21 +53,33 @@ fn main() -> Result<(), String> {
 /// Expand the Rust crate to evaluate the macros.
 fn rust_expanded_crate(output: impl AsRef<Path>) -> Result<(), String> {
     let expand = Command::new("cargo")
-        .arg("rustc")
+        .arg("expand")
         .arg("--profile=check")
         .arg("--features")
         .arg("ffi")
-        .arg("--")
-        .arg("-Zunpretty=expanded")
-        .output()
-        .expect("Failed to run `cargo rustc`");
+        .output();
 
+    let expand = match expand {
+        Ok(output) if output.status.success() => output,
+        _ => {
+            println!("`cargo expand` failed, trying nightly `cargo rustc`");
+            Command::new("cargo")
+                .arg("rustc")
+                .arg("--profile=check")
+                .arg("--features")
+                .arg("ffi")
+                .arg("--")
+                .arg("-Zunpretty=expanded")
+                .output()
+                .expect("Failed to run `cargo rustc`")
+        }
+    };
     if !expand.status.success() {
         eprintln!(
-            "Library build failed:\n{}",
+            "Library expand failed:\n{}",
             String::from_utf8_lossy(&expand.stderr)
         );
-        return Err("Library build failed".to_string());
+        return Err("Library expand failed".to_string());
     }
 
     let src = output.as_ref().join("src");

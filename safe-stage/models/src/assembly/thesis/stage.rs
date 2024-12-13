@@ -3,7 +3,7 @@ use crate::movable::Movable;
 use crate::parts::holder::Holder;
 use crate::parts::stage::Stage;
 use crate::position::sixaxis::SixAxis;
-use collisions::common::Transformation;
+use collisions::common::{Rotation, Transformation};
 use collisions::complex::group::ColliderGroup;
 use collisions::{collider_group, PrimaryCollider};
 use maths::{Quaternion, Vector3};
@@ -13,8 +13,9 @@ const BASE: &[u8] = include_bytes!("./models/Base.stl");
 const TILTER: &[u8] = include_bytes!("./models/Tilter.stl");
 
 const ROTATION_PIVOT: Vector3 = Vector3::new(0.0, 0.0, 12.5e-3);
-static STAGE_ROTATION: LazyLock<Quaternion> =
+static BASE_MODEL_ROTATION: LazyLock<Quaternion> =
     LazyLock::new(|| Quaternion::from_euler(&Vector3::new(0.0, 0.0, 90_f64.to_radians())));
+
 // Add small offset to make 0/0/0 not collide with the chamber
 const STAGE_POSITION: Vector3 = Vector3::new(0.0, 0.0, -62.5e-3 + 1e-12);
 
@@ -53,8 +54,10 @@ impl Stage for ThesisStage {
 
 impl Default for ThesisStage {
     fn default() -> Self {
-        let base = PrimaryCollider::build(&load_stl_from_bytes(BASE).unwrap());
-        let tilter = PrimaryCollider::build(&load_stl_from_bytes(TILTER).unwrap());
+        let base = PrimaryCollider::build(&load_stl_from_bytes(BASE).unwrap())
+            .rotate_around(&BASE_MODEL_ROTATION, &Vector3::ZERO);
+        let tilter = PrimaryCollider::build(&load_stl_from_bytes(TILTER).unwrap())
+            .rotate_around(&BASE_MODEL_ROTATION, &Vector3::ZERO);
         ThesisStage {
             base,
             tilter,
@@ -71,10 +74,8 @@ impl Movable<SixAxis> for ThesisStage {
 
         let base = self
             .base
-            .transform(&STAGE_ROTATION, &Vector3::ZERO, &offset);
-        let tilter = self
-            .tilter
-            .transform(&(tilt * *STAGE_ROTATION), &ROTATION_PIVOT, &offset);
+            .transform(&Quaternion::IDENTITY, &Vector3::ZERO, &offset);
+        let tilter = self.tilter.transform(&(tilt), &ROTATION_PIVOT, &offset);
 
         if let Some(holder) = self.holder.as_ref() {
             let holder = ColliderGroup(
@@ -82,13 +83,7 @@ impl Movable<SixAxis> for ThesisStage {
                     .collider()
                     .0
                     .into_iter()
-                    .map(|i| {
-                        i.transform(
-                            &(tilt * rotation * *STAGE_ROTATION),
-                            &ROTATION_PIVOT,
-                            &offset,
-                        )
-                    })
+                    .map(|i| i.transform(&(tilt * rotation), &ROTATION_PIVOT, &offset))
                     .collect(),
             );
 

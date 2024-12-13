@@ -14,8 +14,11 @@ pub fn height_map_to_sample_model(
     assert_eq!(height_map.len(), size_x * size_y);
     assert!(base_height.is_finite());
 
-    let offset = Vector2::new(-real_size.x() / 2.0, -real_size.y() / 2.0);
-    let scale = Vector2::new(real_size.x() / size_x as f64, real_size.y() / size_y as f64);
+    let offset = -real_size / 2.0;
+    let scale = Vector2::new(
+        real_size.x() / (size_x - 1) as f64,
+        real_size.y() / (size_y - 1) as f64,
+    );
 
     let mut triangles = Vec::new();
     for x in 0..size_x - 1 {
@@ -57,7 +60,7 @@ pub fn height_map_to_sample_model(
                     &scale,
                 );
 
-                triangles.push(TriangleCollider::new(a, b, c));
+                triangles.push(TriangleCollider::new(a, c, b));
             }
         }
     }
@@ -80,8 +83,8 @@ fn flat_to_actual_point(
     offset: &Vector2,
     scale: &Vector2,
 ) -> Vector3 {
-    let x = x as f64 * scale.x() + flat.x() * scale.x() + offset.x();
-    let y = y as f64 * scale.y() + flat.y() * scale.y() + offset.y();
+    let x = (x as f64 + flat.x()) * scale.x() + offset.x();
+    let y = (y as f64 + flat.y()) * scale.y() + offset.y();
     let z = height;
     Vector3::new(x, y, z)
 }

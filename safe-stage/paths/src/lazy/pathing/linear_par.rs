@@ -72,8 +72,9 @@ impl PathStrategy<LinearState> for LinearParallelStrategy<LinearState> {
             return PathResult::InvalidStart(*from);
         }
 
-        let steps = ((to.as_relative() - from.as_relative()).abs()
-            / self.step_size.as_relative().ceil()) as usize;
+        let steps = ((to.as_relative() - from.as_relative()).abs() / self.step_size.as_relative())
+            .ceil() as usize;
+
         let first = (1..=steps).into_par_iter().find_first(|i| {
             let t = (*i as f64 / steps as f64).map_nan(0.0);
             let state = from.lerp(to, t);

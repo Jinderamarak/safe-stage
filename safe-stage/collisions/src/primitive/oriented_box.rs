@@ -4,9 +4,6 @@ use crate::primitive::{AlignedBoxCollider, PointCollider, SphereCollider};
 use itertools::Itertools;
 use maths::{Quaternion, Vector3};
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 /// # Oriented Bounding Box Collider
 /// Collision primitive for box which has a rotation.
 ///
@@ -24,7 +21,7 @@ use serde::{Deserialize, Serialize};
 /// assert_eq!(Vector3::new(0.0, 0.0, 0.0), obb.center());
 /// assert_eq!(Vector3::new(2.0, 2.0, 2.0), obb.size());
 /// ```
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrientedBoxCollider {
     center: Vector3,

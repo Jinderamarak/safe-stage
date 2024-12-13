@@ -4,9 +4,6 @@ use crate::primitive::builder::WithBuilder;
 use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, PointCollider, SphereCollider};
 use maths::{Quaternion, Vector3};
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 /// # Generic Collider
 /// Enum representing all possible collider primitives.
 ///
@@ -31,7 +28,7 @@ use serde::{Deserialize, Serialize};
 /// assert!(!collider_point.collides_with(&collider_sphere));
 /// assert!(collider_box.collides_with(&collider_sphere));
 /// ```
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub enum Collider {
     Point(PointCollider),

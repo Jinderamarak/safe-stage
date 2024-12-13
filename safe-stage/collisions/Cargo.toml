@@ -21,6 +21,10 @@ bvh-linear = []
 # Prefers `BvhSphereRecursive` for `BvhSphere`
 bvh-recursive = []
 
+[[bench]]
+name = "primitive_collision"
+harness = false
+
 [dependencies]
 maths = { workspace = true }
 itertools = { workspace = true }

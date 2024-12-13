@@ -3,9 +3,6 @@ use crate::common::{Bounded, Collides, Projectable, Rotation, Transformation, Tr
 use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, SphereCollider};
 use maths::{Quaternion, Vector3};
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 /// # Point Collider
 /// Collision primitive for representing single point.
 ///
@@ -23,7 +20,7 @@ use serde::{Deserialize, Serialize};
 /// assert!(point2.collides_with(&point3));
 /// assert!(!point1.collides_with(&point3));
 /// ```
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub struct PointCollider {
     position: Vector3,

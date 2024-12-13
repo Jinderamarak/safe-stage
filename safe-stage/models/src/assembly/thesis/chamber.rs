@@ -23,18 +23,18 @@ pub struct ThesisChamber {
 impl Chamber for ThesisChamber {
     fn full(&self) -> ColliderGroup<PrimaryCollider> {
         collider_group!(
-            self.walls.clone(),
             self.pole_piece.clone(),
+            self.walls.clone(),
             self.door.clone()
         )
     }
 
-    fn without_walls(&self) -> ColliderGroup<PrimaryCollider> {
-        collider_group!(self.pole_piece.clone(), self.door.clone())
+    fn less_obstructive(&self) -> ColliderGroup<PrimaryCollider> {
+        collider_group!(self.pole_piece.clone(), self.walls.clone())
     }
 
-    fn only_walls(&self) -> ColliderGroup<PrimaryCollider> {
-        collider_group!(self.walls.clone())
+    fn non_obstructive(&self) -> ColliderGroup<PrimaryCollider> {
+        collider_group!(self.pole_piece.clone())
     }
 }
 

@@ -4,9 +4,6 @@ use crate::primitive::{OrientedBoxCollider, PointCollider, SphereCollider};
 use itertools::Itertools;
 use maths::{Quaternion, Vector3};
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 /// # Axis Aligned Box Collider
 /// Collision primitive for box that is aligned with the x,y,z axes.
 ///
@@ -20,7 +17,7 @@ use serde::{Deserialize, Serialize};
 /// let box2 = AlignedBoxCollider::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(2.0, 2.0, 2.0));
 /// assert!(box1.collides_with(&box2));
 /// ```
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub struct AlignedBoxCollider {
     center: Vector3,
@@ -37,15 +34,18 @@ impl AlignedBoxCollider {
     }
 
     /// Returns the center of the box.
-    pub fn center(&self) -> Vector3 {
+    #[inline]
+    pub const fn center(&self) -> Vector3 {
         self.center
     }
 
     /// Returns the size of the box.
-    pub fn size(&self) -> Vector3 {
+    #[inline]
+    pub const fn size(&self) -> Vector3 {
         self.size
     }
 
+    #[inline]
     fn corners(&self) -> [Vector3; 8] {
         let half_size = self.size() / 2.0;
         let negative_pos = self.center - half_size;

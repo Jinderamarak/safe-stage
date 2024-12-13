@@ -17,3 +17,4 @@ include:
   - ci/caching.yml
   - ci/repo.yml
   - ci/safe-stage.yml
+  - ci/service-app.yml

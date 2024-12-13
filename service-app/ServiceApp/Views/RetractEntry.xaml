@@ -1,0 +1,42 @@
+<utility:ReactiveUserControl x:Class="ServiceApp.Views.RetractEntry"
+                             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                             xmlns:utility="clr-namespace:ServiceApp.Utility"
+                             mc:Ignorable="d"
+                             d:DesignHeight="300" d:DesignWidth="300">
+    <GroupBox Header="{Binding Retract}" Margin="0 10 0 0" Padding="5">
+        <StackPanel Orientation="Vertical">
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Id: " Margin="5" />
+                <TextBlock Text="{Binding Id}" Margin="5" />
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical">
+                <ItemsControl ItemsSource="{Binding Retract.Fields}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ContentControl Content="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <ComboBox Margin="2 10 2 2"
+                      SelectedItem="{Binding Resolver}"
+                      ItemsSource="{Binding RetractResolversVariants}" />
+            <StackPanel Orientation="Vertical">
+                <ItemsControl ItemsSource="{Binding Resolver.Fields}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ContentControl Content="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+            <Button Content="Remove" Click="OnRemoveEntry" Margin="2 10 2 2" />
+        </StackPanel>
+    </GroupBox>
+</utility:ReactiveUserControl>
