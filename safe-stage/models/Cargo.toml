@@ -23,7 +23,6 @@ harness = false
 [dependencies]
 collisions = { workspace = true }
 maths = { workspace = true }
-rand = { workspace = true }
 serde = { workspace = true, features = ["derive"], optional = true }
 tinystl = { workspace = true }
 

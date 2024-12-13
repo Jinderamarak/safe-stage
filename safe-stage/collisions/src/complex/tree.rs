@@ -1,11 +1,8 @@
 use std::collections::VecDeque;
 use std::fmt::Debug;
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 /// Regular recursive binary tree using [Box] for nodes.
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub enum RecursiveTree<K, V> {
     Branch(K, Box<RecursiveTree<K, V>>, Box<RecursiveTree<K, V>>),
@@ -33,14 +30,14 @@ pub enum LinearTreeNode<'a, V> {
     Value(&'a V),
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone)]
 pub struct LinearNode<K, V>(pub K, pub Option<V>);
 
 /// Implementation of binary tree with nodes in single vector.
 /// Traversing is slower than [RecursiveTree] but operations
 /// can be applied by iterating over the inner vector.
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone)]
 pub struct LinearTree<K, V>(Vec<Option<LinearNode<K, V>>>);
 

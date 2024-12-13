@@ -81,10 +81,10 @@ mod tests {
         fn full(&self) -> ColliderGroup<PrimaryCollider> {
             unreachable!()
         }
-        fn without_walls(&self) -> ColliderGroup<BvhSphereRecursive> {
+        fn less_obstructive(&self) -> ColliderGroup<PrimaryCollider> {
             unreachable!()
         }
-        fn only_walls(&self) -> ColliderGroup<BvhSphereRecursive> {
+        fn non_obstructive(&self) -> ColliderGroup<PrimaryCollider> {
             unreachable!()
         }
     }

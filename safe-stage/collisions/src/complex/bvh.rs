@@ -4,13 +4,10 @@ use crate::primitive::Collider;
 use itertools::Itertools;
 use maths::{Axis, Quaternion, Vector3};
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 /// # Bounding Volume Hierarchy
 /// A tree structure composed of primitive colliders
 /// for accelerating collisions between complex objects.
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub enum BvhTree {
     Branch(Collider, Option<Box<BvhTree>>, Option<Box<BvhTree>>),

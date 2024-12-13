@@ -482,7 +482,6 @@ dependencies = [
  "collisions",
  "criterion",
  "maths",
- "rand",
  "serde",
  "tinystl",
 ]

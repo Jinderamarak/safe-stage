@@ -3,9 +3,6 @@ use crate::common::{Bounded, Collides, Projectable, Rotation, Transformation, Tr
 use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, PointCollider};
 use maths::{Quaternion, Vector3};
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 /// # Sphere Collider
 /// Collision primitive for representing a sphere.
 ///
@@ -20,7 +17,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// assert!(sphere1.collides_with(&sphere2));
 /// ```
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub struct SphereCollider {
     center: Vector3,
@@ -35,13 +32,13 @@ impl SphereCollider {
 
     /// Returns the center of the sphere.
     #[inline]
-    pub fn center(&self) -> Vector3 {
+    pub const fn center(&self) -> Vector3 {
         self.center
     }
 
     /// Returns the radius of the sphere.
     #[inline]
-    pub fn radius(&self) -> f64 {
+    pub const fn radius(&self) -> f64 {
         self.radius
     }
 }
@@ -88,8 +85,9 @@ impl Transformation for SphereCollider {
 
 impl Collides<Self> for SphereCollider {
     fn collides_with(&self, other: &Self) -> bool {
-        let distance = (self.center - other.center).len();
-        distance <= self.radius() + other.radius()
+        let distance2 = (self.center - other.center).len2();
+        let max = self.radius() + other.radius();
+        distance2 <= max * max
     }
 }
 

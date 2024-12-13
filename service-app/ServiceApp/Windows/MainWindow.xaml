@@ -1,0 +1,168 @@
+﻿<utility:ReactiveWindow x:Class="ServiceApp.Windows.MainWindow"
+                        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                        xmlns:utility="clr-namespace:ServiceApp.Utility"
+                        xmlns:fields="clr-namespace:ServiceApp.Views.Fields"
+                        xmlns:converters="clr-namespace:ServiceApp.Converters"
+                        mc:Ignorable="d"
+                        Title="Safe Stage - Service Application" Height="810" Width="1000">
+    <Window.Resources>
+        <converters:NegativeBoolConverter x:Key="Negative" />
+        <converters:NotNullToBoolConverter x:Key="NotNull" />
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical" Margin="5">
+
+                <GroupBox Header="Configuration" Margin="5 10 5 5" Padding="5">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding ConfigurationTitle}" Margin="2" />
+                        <Button Content="Configure" Click="OnConfigureMicroscope" Margin="2" />
+
+                        <TextBlock Text="{Binding HolderTitle}" Margin="2 5 2 2" />
+                        <Button Content="Change Holder" Click="OnChangeHolder" Margin="2"
+                                IsEnabled="{Binding HasConfiguration}" />
+
+                        <Button Content="Change Sample" Click="OnChangeSampleHeight" Margin="2"
+                                IsEnabled="{Binding HasConfiguration}" />
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Preview" Margin="5 10 5 5" Padding="5"
+                          IsEnabled="{Binding IsUpdating, Converter={StaticResource Negative}}">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="Obstruction Level" Margin="2" />
+                        <Slider Minimum="0" Maximum="2" IsSnapToTickEnabled="True" TickFrequency="1" Margin="2"
+                                ValueChanged="OnObstructionLevelChanged"
+                                Value="{Binding ObstructionLevel}" />
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Stage" Margin="5 10 5 5" Padding="5"
+                          IsEnabled="{Binding IsUpdating, Converter={StaticResource Negative}}">
+                    <StackPanel Orientation="Vertical">
+                        <fields:SixAxisField Label="Current" x:Name="StageCurrent" />
+                        <Button Content="Update State" Click="StageUpdateCurrent" Margin="2" Padding="10 2" />
+
+                        <Grid Margin="5 15 5 5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0" Padding="10 5" Content="˄" Click="OnCopyTargetToCurrent" />
+                            <Button Grid.Column="2" Padding="10 5" Content="˅" Click="OnCopyCurrentToTarget" />
+                        </Grid>
+
+                        <fields:SixAxisField Label="Target" x:Name="StageTarget" />
+                        <Button Content="Find Path" Click="StageFindPath" Margin="2" Padding="10 2" />
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Retracts" Margin="5 10 5 5" Padding="5"
+                          IsEnabled="{Binding IsUpdating, Converter={StaticResource Negative}}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="2 5 2 2"
+                                  ItemsSource="{Binding Retracts}"
+                                  SelectedItem="{Binding SelectedRetract}" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="Update Current State:"
+                                   Margin="2 10 2 2" />
+                        <Button Grid.Row="2" Grid.Column="0" Margin="2" Padding="10 2"
+                                Content="Inserted" Click="OnRetractStateInserted"
+                                IsEnabled="{Binding SelectedRetract, Converter={StaticResource NotNull}}" />
+                        <Button Grid.Row="2" Grid.Column="1" Margin="2" Padding="10 2"
+                                Content="Retracted" Click="OnRetractStateRetracted"
+                                IsEnabled="{Binding SelectedRetract, Converter={StaticResource NotNull}}" />
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="Find Path To:"
+                                   Margin="2 10 2 2" />
+                        <Button Grid.Row="4" Grid.Column="0" Margin="2" Padding="10 2"
+                                Content="Inserted" Click="OnRetractFindInserted"
+                                IsEnabled="{Binding SelectedRetract, Converter={StaticResource NotNull}}" />
+                        <Button Grid.Row="4" Grid.Column="1" Margin="2" Padding="10 2"
+                                Content="Retracted" Click="OnRetractFindRetracted"
+                                IsEnabled="{Binding SelectedRetract, Converter={StaticResource NotNull}}" />
+                    </Grid>
+                </GroupBox>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border
+            Grid.Row="0"
+            Grid.Column="1"
+            Background="White"
+            MouseMove="OnViewportMouseMove"
+            MouseWheel="OnViewportMouseWheel">
+            <Viewport3D
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                x:Name="Viewport">
+                <Viewport3D.Camera>
+                    <PerspectiveCamera
+                        FieldOfView="30"
+                        NearPlaneDistance="0.1"
+                        FarPlaneDistance="10"
+                        UpDirection="0,0,1"
+                        Position="1,1,1"
+                        LookDirection="-1,-1,-1"
+                        x:Name="Camera" />
+                </Viewport3D.Camera>
+                <Viewport3D.Children>
+                    <ModelVisual3D>
+                        <ModelVisual3D.Content>
+                            <Model3DGroup>
+                                <Model3DGroup.Children>
+                                    <DirectionalLight x:Name="DirectLight" Color="#FFFFFFFF" Direction="-1,-1,-1" />
+                                    <Model3DGroup>
+                                        <GeometryModel3D Geometry="{Binding StageGeometry}"
+                                                         Material="{x:Static utility:Materials.Stage}"
+                                                         BackMaterial="{x:Static utility:Materials.StageBack}" />
+                                        <GeometryModel3D Geometry="{Binding StaticGeometry}"
+                                                         Material="{x:Static utility:Materials.Static}" />
+                                    </Model3DGroup>
+                                    <Model3DGroup x:Name="RetractModelGroup" />
+                                    <Model3DGroup x:Name="PathModelGroup" />
+                                </Model3DGroup.Children>
+                            </Model3DGroup>
+                        </ModelVisual3D.Content>
+                    </ModelVisual3D>
+                </Viewport3D.Children>
+            </Viewport3D>
+        </Border>
+
+        <DockPanel Grid.Row="1" Grid.Column="1" IsEnabled="{Binding HasPath}">
+            <TextBlock DockPanel.Dock="Left" Margin="5" Text="Path Interpolation: " />
+            <Slider Margin="5" x:Name="PathInterpolationSlider"
+                    TickFrequency="1" Minimum="0" Maximum="{Binding StageInterpolationMax}" />
+        </DockPanel>
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding StatusText}" Padding="5" />
+    </Grid>
+</utility:ReactiveWindow>

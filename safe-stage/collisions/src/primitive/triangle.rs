@@ -3,13 +3,10 @@ use crate::common::{Collides, Rotation, Transformation, Translation};
 use crate::primitive::algo::guigue_2003;
 use maths::{Quaternion, Vector3};
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 //  Common vertex buffer adds too much complexity for not a lot of gain,
 //  and it introduces indirect memory access
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone)]
 pub struct TriangleCollider {
     a: Vector3,

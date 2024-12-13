@@ -1,0 +1,20 @@
+service-app:build:
+  stage: build
+  tags:
+    - windows
+  needs:
+    - bindings:generate
+    - bindings:build:csharp
+  before_script:
+    - rustup default stable
+    - cargo install cargo-expand
+  script:
+    - cd safe-stage
+    - cargo run -p bindings
+    - cargo build --release -F ffi
+    - cd ../service-app
+    - dotnet publish
+  artifacts:
+    name: ServiceAppPublish
+    paths:
+      - service-app/ServiceApp/bin/Release/net8.0-windows/publish/

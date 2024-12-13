@@ -4,10 +4,7 @@ use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Sub};
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct SixAxis {
     pub pos: Vector3,

@@ -6,9 +6,6 @@ use itertools::Itertools;
 use maths::{Axis, Quaternion, Vector3};
 use std::sync::Arc;
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 type Node = RecursiveTree<SphereCollider, TriangleCollider>;
 
 /// # Recursive Spherical Volume Hierarchy of Triangles
@@ -17,7 +14,7 @@ type Node = RecursiveTree<SphereCollider, TriangleCollider>;
 /// Uses recursive binary tree for storing nodes.
 ///
 /// Currently faster than `BvhSphereLinear`.
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug)]
 pub struct BvhSphereRecursive(pub(crate) Arc<Node>);
 

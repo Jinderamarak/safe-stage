@@ -1,8 +1,5 @@
 use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub};
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 /// # Vector 2D
 /// Struct representing a 2D vector / 2D point.
 ///
@@ -20,7 +17,7 @@ use serde::{Deserialize, Serialize};
 /// assert_eq!(v1_v2.x(), 5.0);
 /// assert_eq!(v2_v3.x(), 2.0);
 /// ```
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Vector2 {
     x: f64,

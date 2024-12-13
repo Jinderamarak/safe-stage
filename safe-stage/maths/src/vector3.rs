@@ -2,9 +2,6 @@ use crate::Axis;
 use crate::Quaternion;
 use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub};
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 /// # Vector 3D
 /// Struct representing a 3D vector / 3D point.
 ///
@@ -22,7 +19,7 @@ use serde::{Deserialize, Serialize};
 /// assert_eq!(v1_v2.x(), 5.0);
 /// assert_eq!(v2_v3.x(), 2.0);
 /// ```
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Vector3 {
     x: f64,
