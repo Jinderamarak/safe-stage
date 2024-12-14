@@ -52,23 +52,6 @@ impl ColliderGroup<BvhSphere> {
             .expect("ColliderGroup cannot be empty")
     }
 
-    pub fn triangle_buffer<T, M>(&self, mapper: M) -> Vec<T>
-    where
-        T: Send,
-        M: (Fn(Vector3) -> T) + Send + Sync,
-    {
-        #[cfg(feature = "rayon-group")]
-        let data_iter = self.0.par_iter();
-
-        #[cfg(not(feature = "rayon-group"))]
-        let data_iter = self.0.iter();
-
-        data_iter
-            .flat_map(|t| t.triangle_buffer())
-            .map(mapper)
-            .collect()
-    }
-
     pub fn triangle_buffer_per_item<T, M>(&self, mapper: M) -> Vec<Vec<T>>
     where
         T: Send,
@@ -218,7 +201,11 @@ mod tests {
                 Vector3::new(1.0, 2.0, 3.0),
             ],
         ];
-        let actual = collider.triangle_buffer(|x| x);
+        let actual = collider
+            .triangle_buffer_per_item(|x| x)
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>();
 
         for series in expected {
             let [a, b, c] = series;

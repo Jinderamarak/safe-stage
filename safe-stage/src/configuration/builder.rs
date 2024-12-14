@@ -22,6 +22,7 @@ impl Default for ConfigurationBuilder {
 }
 
 impl ConfigurationBuilder {
+    /// Create a new configuration builder.
     pub fn new() -> Self {
         Self {
             chamber: None,
@@ -32,22 +33,26 @@ impl ConfigurationBuilder {
         }
     }
 
+    /// Set the chamber configuration.
     pub fn with_chamber(mut self, chamber: ChamberConfig) -> Self {
         self.chamber = Some(chamber);
         self
     }
 
+    /// Set the stage configuration.
     pub fn with_stage(mut self, stage: StageConfig, resolver: ResolverStageConfig) -> Self {
         self.stage = Some(stage);
         self.stage_resolver = Some(resolver);
         self
     }
 
+    /// Add an equipment configuration.
     pub fn with_equipment(mut self, equipment: EquipmentConfig) -> Self {
         self.equipment.push(equipment);
         self
     }
 
+    /// Add a retract configuration.
     pub fn with_retract(
         mut self,
         id: Id,
@@ -58,6 +63,7 @@ impl ConfigurationBuilder {
         self
     }
 
+    /// Build the configuration.
     pub fn build(self) -> Result<Configuration, ConfigBuilderResult> {
         let chamber = if let Some(chamber) = self.chamber {
             chamber

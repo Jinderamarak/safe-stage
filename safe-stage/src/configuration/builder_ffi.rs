@@ -64,6 +64,10 @@ impl ConfigurationBuilder {
         &mut *ptr
     }
 
+    /// Create a new instance of configuration builder.
+    ///
+    /// # Safety
+    /// The caller must ensure that the returned builder is dropped after use.
     #[no_mangle]
     pub extern "C" fn builder_new() -> Self {
         let equipment: Box<EquipmentsType> = Box::default();
@@ -77,8 +81,11 @@ impl ConfigurationBuilder {
         }
     }
 
+    /// Set the chamber configuration.
+    ///
     /// # Safety
-    /// Remains safe as long as the contents are modified only through the builder methods.
+    /// Takes ownership of the chamber configuration.
+    /// The returned builder must be dropped after use.
     #[no_mangle]
     pub unsafe extern "C" fn builder_with_chamber(mut self, chamber: ChamberConfig) -> Self {
         if !self.chamber.is_null() {
@@ -88,8 +95,11 @@ impl ConfigurationBuilder {
         self
     }
 
+    /// Set the stage configuration.
+    ///
     /// # Safety
-    /// Remains safe as long as the contents are modified only through the builder methods.
+    /// Takes ownership of the chamber configuration.
+    /// The returned builder must be dropped after use.
     #[no_mangle]
     pub unsafe extern "C" fn builder_with_stage(
         mut self,
@@ -107,16 +117,22 @@ impl ConfigurationBuilder {
         self
     }
 
+    /// Add an equipment configuration.
+    ///
     /// # Safety
-    /// Remains safe as long as the contents are modified only through the builder methods.
+    /// Takes ownership of the chamber configuration.
+    /// The returned builder must be dropped after use.
     #[no_mangle]
     pub unsafe extern "C" fn builder_with_equipment(mut self, equipment: EquipmentConfig) -> Self {
         self.equipment().push(equipment);
         self
     }
 
+    /// Add a retract configuration.
+    ///
     /// # Safety
-    /// Remains safe as long as the contents are modified only through the builder methods.
+    /// Takes ownership of the chamber configuration.
+    /// The returned builder must be dropped after use.
     #[no_mangle]
     pub unsafe extern "C" fn builder_with_retract(
         mut self,
@@ -128,9 +144,12 @@ impl ConfigurationBuilder {
         self
     }
 
+    /// Build the configuration.
+    ///
     /// # Safety
-    /// Expects the builder was modified only through the builder methods.
-    /// The contents of pointer `config` are overwritten without dropping its original value.
+    /// - Expects the builder was modified only through the builder methods.
+    /// - The contents of pointer `config` are overwritten without dropping its original value.
+    /// - Takes ownership of the builder and drops it.
     #[no_mangle]
     pub unsafe extern "C" fn builder_build(
         mut self,
@@ -159,6 +178,8 @@ impl ConfigurationBuilder {
         ConfigBuilderResult::Success
     }
 
+    /// # Safety
+    /// Takes ownership of the configuration and drops it.
     #[no_mangle]
     pub extern "C" fn builder_drop(self) {
         //  dropped after leaving scope

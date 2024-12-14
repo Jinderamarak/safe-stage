@@ -4,19 +4,16 @@ use crate::configuration::holder::HolderConfig;
 use crate::configuration::Configuration;
 use crate::ffi::opaque_ffi_for_type;
 use crate::id::Id;
-use collisions::PrimaryCollider;
-use maths::Vector2;
-use models::sample::height_map::height_map_to_sample_model;
-use std::collections::HashMap;
-
 use crate::presentation::{collider_to_triangle_buffer_per_item, TriangleBufferVec};
 use crate::types::{CLinearState, CPathResultLinearState, CPathResultSixAxis, CSixAxis};
 use collisions::complex::group::ColliderGroup;
+use collisions::PrimaryCollider;
+use maths::Vector2;
 use models::position::linear::LinearState;
 use models::position::sixaxis::SixAxis;
+use models::sample::height_map::height_map_to_sample_model;
 use paths::resolver::{DynamicImmovable, DynamicMovable, StateUpdateError as ResolverUpdateError};
-#[cfg(feature = "ffi")]
-use std::ptr::slice_from_raw_parts;
+use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;
 
@@ -47,7 +44,7 @@ impl From<ResolverUpdateError> for StateUpdateError {
 }
 
 #[cfg(feature = "ffi")]
-fn to_result(result: Result<(), StateUpdateError>) -> StateUpdateError {
+fn result_to_error_enum(result: Result<(), StateUpdateError>) -> StateUpdateError {
     match result {
         Ok(_) => StateUpdateError::Ok,
         Err(e) => e,
@@ -66,28 +63,44 @@ pub struct Microscope {
 
 #[cfg(feature = "ffi")]
 impl Microscope {
+    /// Build microscope from configuration.
     #[no_mangle]
     pub extern "C" fn microscope_from_config(config: &Configuration) -> Self {
         Self::build(config)
     }
 
+    /// Clear the sample from the active holder.
+    ///
+    /// # Safety
+    /// Expects exclusive mutable reference to the microscope.
     #[no_mangle]
     pub extern "C" fn microscope_clear_sample(&mut self) {
         self.safe_clear_sample()
     }
 
+    /// Update the active stage holder.
+    ///
+    /// # Safety
+    /// Expects exclusive mutable reference to the microscope.
     #[no_mangle]
     pub extern "C" fn microscope_update_holder(&mut self, holder: &HolderConfig) {
         self.safe_update_holder(holder)
     }
 
+    /// Remove the active stage holder.
+    ///
+    /// # Safety
+    /// Expects exclusive mutable reference to the microscope.
     #[no_mangle]
     pub extern "C" fn microscope_remove_holder(&mut self) {
         self.safe_remove_holder()
     }
 
+    /// Update the sample height map.
+    ///
     /// # Safety
-    /// The `height_map` must be a pointer to an array of `f64` values with a length of `size_x * size_y`.
+    /// - Expect exclusive mutable reference to the microscope.
+    /// - The `height_map` must be a pointer to an array of `f64` values with a length of `size_x * size_y`.
     #[no_mangle]
     pub unsafe extern "C" fn microscope_update_sample_height_map(
         &mut self,
@@ -97,34 +110,48 @@ impl Microscope {
         real_x: f64,
         real_y: f64,
     ) {
-        let height_map = slice_from_raw_parts(height_map, size_x * size_y);
+        let height_map = std::ptr::slice_from_raw_parts(height_map, size_x * size_y);
         self.safe_update_sample_height_map(&*height_map, size_x, size_y, real_x, real_y)
     }
 
+    /// Update the stage state.
+    ///
+    /// # Safety
+    /// Expects exclusive mutable reference to the microscope.
     #[no_mangle]
     pub extern "C" fn microscope_update_stage_state(&mut self, state: &CSixAxis) {
         self.safe_update_stage_state(state)
     }
 
+    /// Update the retract state.
+    ///
+    /// # Safety
+    /// Expects exclusive mutable reference to the microscope.
     #[no_mangle]
     pub extern "C" fn microscope_update_retract_state(
         &mut self,
         id: Id,
         state: &CLinearState,
     ) -> StateUpdateError {
-        to_result(self.safe_update_retract_state(id, state))
+        result_to_error_enum(self.safe_update_retract_state(id, state))
     }
 
+    /// Update the resolvers for stage and all retracts.
+    ///
+    /// # Safety
+    /// Expects exclusive mutable reference to the microscope.
     #[no_mangle]
     pub extern "C" fn microscope_update_resolvers(&mut self) -> StateUpdateError {
-        to_result(self.safe_update_resolvers())
+        result_to_error_enum(self.safe_update_resolvers())
     }
 
+    /// Find a path for the stage from the latest state to the given one.
     #[no_mangle]
     pub extern "C" fn microscope_find_stage_path(&self, state: &CSixAxis) -> CPathResultSixAxis {
         self.safe_find_stage_path(state)
     }
 
+    /// Find a path for the retract from the latest state to the given one.
     #[no_mangle]
     pub extern "C" fn microscope_find_retract_path(
         &self,
@@ -134,36 +161,43 @@ impl Microscope {
         self.safe_find_retract_path(id, state)
     }
 
+    /// Present the full view of static parts.
     #[no_mangle]
     pub extern "C" fn microscope_present_static_full(&self) -> TriangleBufferVec {
         self.safe_present_static_full()
     }
 
+    /// Present the less obstructive view of static parts.
     #[no_mangle]
     pub extern "C" fn microscope_present_static_less_obstructive(&self) -> TriangleBufferVec {
         self.safe_present_static_less_obstructive()
     }
 
+    /// Present the non-obstructive view of static parts.
     #[no_mangle]
     pub extern "C" fn microscope_present_static_non_obstructive(&self) -> TriangleBufferVec {
         self.safe_present_static_non_obstructive()
     }
 
+    /// Present the stage at the current state.
     #[no_mangle]
     pub extern "C" fn microscope_present_stage(&self) -> TriangleBufferVec {
         self.safe_present_stage()
     }
 
+    /// Present the stage at the given state.
     #[no_mangle]
     pub extern "C" fn microscope_present_stage_at(&self, state: &CSixAxis) -> TriangleBufferVec {
         self.safe_present_stage_at(state)
     }
 
+    /// Present the retract at the current state.
     #[no_mangle]
     pub extern "C" fn microscope_present_retract(&self, id: Id) -> TriangleBufferVec {
         self.safe_present_retract(id)
     }
 
+    /// Present the retract at the given state.
     #[no_mangle]
     pub extern "C" fn microscope_present_retract_at(
         &self,
@@ -173,6 +207,8 @@ impl Microscope {
         self.safe_present_retract_at(id, state)
     }
 
+    /// # Safety
+    /// Takes ownership of the microscope and drops it.
     #[no_mangle]
     pub extern "C" fn microscope_drop(self) {
         //  dropped after leaving scope
@@ -181,22 +217,27 @@ impl Microscope {
 
 #[cfg(not(feature = "ffi"))]
 impl Microscope {
+    /// Build microscope from configuration.
     pub fn from_config(config: &Configuration) -> Self {
         Self::build(config)
     }
 
+    /// Clear the sample from the active holder.
     pub fn clear_sample(&mut self) {
         self.safe_clear_sample();
     }
 
+    /// Update the active stage holder.
     pub fn update_holder(&mut self, holder: &HolderConfig) {
         self.safe_update_holder(holder);
     }
 
+    /// Remove the active stage holder.
     pub fn remove_holder(&mut self) {
         self.safe_remove_holder();
     }
 
+    /// Update the sample height map.
     pub fn update_sample_height_map(
         &mut self,
         height_map: &[f64],
@@ -208,10 +249,12 @@ impl Microscope {
         self.safe_update_sample_height_map(height_map, size_x, size_y, real_x, real_y);
     }
 
+    /// Update the stage state.
     pub fn update_stage_state(&mut self, state: &CSixAxis) {
         self.safe_update_stage_state(state);
     }
 
+    /// Update the retract state.
     pub fn update_retract_state(
         &mut self,
         id: Id,
@@ -220,42 +263,52 @@ impl Microscope {
         self.safe_update_retract_state(id, state)
     }
 
+    /// Update the resolvers for stage and all retracts.
     pub fn update_resolvers(&mut self) -> Result<(), StateUpdateError> {
         self.safe_update_resolvers()
     }
 
+    /// Find a path for the stage from the latest state to the given one.
     pub fn find_stage_path(&self, state: &CSixAxis) -> CPathResultSixAxis {
         self.safe_find_stage_path(state)
     }
 
+    /// Find a path for the retract from latest state to the given one.
     pub fn find_retract_path(&self, id: Id, state: &CLinearState) -> CPathResultLinearState {
         self.safe_find_retract_path(id, state)
     }
 
+    /// Present the full view of static parts.
     pub fn present_static_full(&self) -> TriangleBufferVec {
         self.safe_present_static_full()
     }
 
+    /// Present the less obstructive view of static parts.
     pub fn present_static_less_obstructive(&self) -> TriangleBufferVec {
         self.safe_present_static_less_obstructive()
     }
 
+    /// Present the non-obstructive view of static parts.
     pub fn present_static_non_obstructive(&self) -> TriangleBufferVec {
         self.safe_present_static_non_obstructive()
     }
 
+    /// Present the stage at the current state.
     pub fn present_stage(&self) -> TriangleBufferVec {
         self.safe_present_stage()
     }
 
+    /// Present the stage at the given state.
     pub fn present_stage_at(&self, state: &CSixAxis) -> TriangleBufferVec {
         self.safe_present_stage_at(state)
     }
 
+    /// Present the retract at the current state.
     pub fn present_retract(&self, id: Id) -> TriangleBufferVec {
         self.safe_present_retract(id)
     }
 
+    /// Present the retract at the given state.
     pub fn present_retract_at(&self, id: Id, state: &CLinearState) -> TriangleBufferVec {
         self.safe_present_retract_at(id, state)
     }

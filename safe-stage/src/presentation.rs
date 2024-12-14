@@ -11,11 +11,6 @@ ffi_vec_for_type!(
     TriangleBuffer
 );
 
-fn collider_to_triangle_buffer(collider: ColliderGroup<PrimaryCollider>) -> TriangleBuffer {
-    let triangles = collider.triangle_buffer(|v| CVector3::from(&v));
-    TriangleBuffer::from_vec(triangles)
-}
-
 pub fn collider_to_triangle_buffer_per_item(
     group: ColliderGroup<PrimaryCollider>,
 ) -> TriangleBufferVec {

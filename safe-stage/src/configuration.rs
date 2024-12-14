@@ -75,6 +75,8 @@ impl Configuration {
         self.retracts.inner()
     }
 
+    /// # Safety
+    /// Takes ownership of the configuration and drops it.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn configuration_drop(self) {
