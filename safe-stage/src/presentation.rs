@@ -1,64 +1,31 @@
+use crate::ffi::ffi_vec_for_type;
 use crate::types::CVector3;
 use collisions::complex::group::ColliderGroup;
 use collisions::PrimaryCollider;
 
-#[cfg(feature = "ffi")]
-#[repr(C)]
-pub struct TriangleBuffer {
-    data: *const CVector3,
-    len: usize,
-}
+ffi_vec_for_type!(pub, TriangleBuffer, trianglebuffer_drop, CVector3);
+ffi_vec_for_type!(
+    pub,
+    TriangleBufferVec,
+    trianglebuffervec_drop,
+    TriangleBuffer
+);
 
-#[cfg(feature = "ffi")]
-impl TriangleBuffer {
-    pub fn from_vec(data: Vec<CVector3>) -> Self {
-        let boxed = data.into_boxed_slice();
-        let len = boxed.len();
-        let ptr = Box::into_raw(boxed) as *const CVector3;
-        TriangleBuffer { data: ptr, len }
-    }
-
-    pub fn data(&self) -> &[CVector3] {
-        unsafe { std::slice::from_raw_parts(self.data, self.len) }
-    }
-
-    #[no_mangle]
-    pub extern "C" fn trianglebuffer_drop(self) {
-        // Dropped after going out of scope
-    }
-}
-
-#[cfg(feature = "ffi")]
-impl Drop for TriangleBuffer {
-    fn drop(&mut self) {
-        unsafe {
-            let _slice = Box::from_raw(std::slice::from_raw_parts_mut(
-                self.data as *mut CVector3,
-                self.len,
-            ));
-        }
-    }
-}
-
-#[cfg(not(feature = "ffi"))]
-pub struct TriangleBuffer {
-    data: Vec<CVector3>,
-}
-
-#[cfg(not(feature = "ffi"))]
-impl TriangleBuffer {
-    pub fn from_vec(data: Vec<CVector3>) -> Self {
-        TriangleBuffer { data }
-    }
-
-    pub fn data(&self) -> &[CVector3] {
-        &self.data
-    }
-}
-
-pub fn collider_to_triangle_buffer(collider: ColliderGroup<PrimaryCollider>) -> TriangleBuffer {
+fn collider_to_triangle_buffer(collider: ColliderGroup<PrimaryCollider>) -> TriangleBuffer {
     let triangles = collider.triangle_buffer(|v| CVector3::from(&v));
     TriangleBuffer::from_vec(triangles)
+}
+
+pub fn collider_to_triangle_buffer_per_item(
+    group: ColliderGroup<PrimaryCollider>,
+) -> TriangleBufferVec {
+    let vec = group
+        .triangle_buffer_per_item(|v| CVector3::from(&v))
+        .into_iter()
+        .map(TriangleBuffer::from_vec)
+        .collect::<Vec<TriangleBuffer>>();
+
+    TriangleBufferVec::from_vec(vec)
 }
 
 #[cfg(test)]

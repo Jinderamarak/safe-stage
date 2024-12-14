@@ -154,7 +154,7 @@ public class Microscope : IDisposable
         }
     }
 
-    public TriangleBuffer PresentStaticFull()
+    public List<TriangleBuffer> PresentStaticFull()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         using var guard = _lock.LockRef();
@@ -162,12 +162,12 @@ public class Microscope : IDisposable
         {
             fixed (Unsafe.Microscope* microscope = &_microscope)
             {
-                return new TriangleBuffer(Unsafe.NativeMethods.microscope_present_static_full(microscope));
+                return TriangleBuffer.FromNativeVec(Unsafe.NativeMethods.microscope_present_static_full(microscope));
             }
         }
     }
 
-    public TriangleBuffer PresentStaticLessObstructive()
+    public List<TriangleBuffer> PresentStaticLessObstructive()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         using var guard = _lock.LockRef();
@@ -175,13 +175,13 @@ public class Microscope : IDisposable
         {
             fixed (Unsafe.Microscope* microscope = &_microscope)
             {
-                return new TriangleBuffer(
+                return TriangleBuffer.FromNativeVec(
                     Unsafe.NativeMethods.microscope_present_static_less_obstructive(microscope));
             }
         }
     }
 
-    public TriangleBuffer PresentStaticNonObstructive()
+    public List<TriangleBuffer> PresentStaticNonObstructive()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         using var guard = _lock.LockRef();
@@ -189,13 +189,13 @@ public class Microscope : IDisposable
         {
             fixed (Unsafe.Microscope* microscope = &_microscope)
             {
-                return new TriangleBuffer(
+                return TriangleBuffer.FromNativeVec(
                     Unsafe.NativeMethods.microscope_present_static_non_obstructive(microscope));
             }
         }
     }
 
-    public TriangleBuffer PresentStage()
+    public List<TriangleBuffer> PresentStage()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         using var guard = _lock.LockRef();
@@ -203,12 +203,12 @@ public class Microscope : IDisposable
         {
             fixed (Unsafe.Microscope* microscope = &_microscope)
             {
-                return new TriangleBuffer(Unsafe.NativeMethods.microscope_present_stage(microscope));
+                return TriangleBuffer.FromNativeVec(Unsafe.NativeMethods.microscope_present_stage(microscope));
             }
         }
     }
 
-    public TriangleBuffer PresentStageAt(SixAxis state)
+    public List<TriangleBuffer> PresentStageAt(SixAxis state)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         using var guard = _lock.LockRef();
@@ -216,12 +216,13 @@ public class Microscope : IDisposable
         {
             fixed (Unsafe.Microscope* microscope = &_microscope)
             {
-                return new TriangleBuffer(Unsafe.NativeMethods.microscope_present_stage_at(microscope, &state.Inner));
+                return TriangleBuffer.FromNativeVec(
+                    Unsafe.NativeMethods.microscope_present_stage_at(microscope, &state.Inner));
             }
         }
     }
 
-    public TriangleBuffer PresentRetract(Id id)
+    public List<TriangleBuffer> PresentRetract(Id id)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         using var guard = _lock.LockRef();
@@ -229,12 +230,13 @@ public class Microscope : IDisposable
         {
             fixed (Unsafe.Microscope* microscope = &_microscope)
             {
-                return new TriangleBuffer(Unsafe.NativeMethods.microscope_present_retract(microscope, id.Inner));
+                return TriangleBuffer.FromNativeVec(
+                    Unsafe.NativeMethods.microscope_present_retract(microscope, id.Inner));
             }
         }
     }
 
-    public TriangleBuffer PresentRetractAt(Id id, LinearState state)
+    public List<TriangleBuffer> PresentRetractAt(Id id, LinearState state)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         using var guard = _lock.LockRef();
@@ -242,7 +244,7 @@ public class Microscope : IDisposable
         {
             fixed (Unsafe.Microscope* microscope = &_microscope)
             {
-                return new TriangleBuffer(
+                return TriangleBuffer.FromNativeVec(
                     Unsafe.NativeMethods.microscope_present_retract_at(microscope, id.Inner, &state.Inner));
             }
         }

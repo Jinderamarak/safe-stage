@@ -9,6 +9,17 @@ public class TriangleBuffer
         Buffer = buffer;
     }
 
+    internal static List<TriangleBuffer> FromNativeVec(Unsafe.TriangleBufferVec vec)
+    {
+        var list = new List<TriangleBuffer>();
+        unsafe
+        {
+            for (uint i = 0; i < vec.len; i++) list.Add(new TriangleBuffer(vec.data[i]));
+        }
+
+        return list;
+    }
+
     internal TriangleBuffer(Unsafe.TriangleBuffer nativeBuffer)
     {
         Buffer = new Vector3[nativeBuffer.len];

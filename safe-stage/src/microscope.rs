@@ -9,7 +9,7 @@ use maths::Vector2;
 use models::sample::height_map::height_map_to_sample_model;
 use std::collections::HashMap;
 
-use crate::presentation::{collider_to_triangle_buffer, TriangleBuffer};
+use crate::presentation::{collider_to_triangle_buffer_per_item, TriangleBufferVec};
 use crate::types::{CLinearState, CPathResultLinearState, CPathResultSixAxis, CSixAxis};
 use collisions::complex::group::ColliderGroup;
 use models::position::linear::LinearState;
@@ -135,32 +135,32 @@ impl Microscope {
     }
 
     #[no_mangle]
-    pub extern "C" fn microscope_present_static_full(&self) -> TriangleBuffer {
+    pub extern "C" fn microscope_present_static_full(&self) -> TriangleBufferVec {
         self.safe_present_static_full()
     }
 
     #[no_mangle]
-    pub extern "C" fn microscope_present_static_less_obstructive(&self) -> TriangleBuffer {
+    pub extern "C" fn microscope_present_static_less_obstructive(&self) -> TriangleBufferVec {
         self.safe_present_static_less_obstructive()
     }
 
     #[no_mangle]
-    pub extern "C" fn microscope_present_static_non_obstructive(&self) -> TriangleBuffer {
+    pub extern "C" fn microscope_present_static_non_obstructive(&self) -> TriangleBufferVec {
         self.safe_present_static_non_obstructive()
     }
 
     #[no_mangle]
-    pub extern "C" fn microscope_present_stage(&self) -> TriangleBuffer {
+    pub extern "C" fn microscope_present_stage(&self) -> TriangleBufferVec {
         self.safe_present_stage()
     }
 
     #[no_mangle]
-    pub extern "C" fn microscope_present_stage_at(&self, state: &CSixAxis) -> TriangleBuffer {
+    pub extern "C" fn microscope_present_stage_at(&self, state: &CSixAxis) -> TriangleBufferVec {
         self.safe_present_stage_at(state)
     }
 
     #[no_mangle]
-    pub extern "C" fn microscope_present_retract(&self, id: Id) -> TriangleBuffer {
+    pub extern "C" fn microscope_present_retract(&self, id: Id) -> TriangleBufferVec {
         self.safe_present_retract(id)
     }
 
@@ -169,7 +169,7 @@ impl Microscope {
         &self,
         id: Id,
         state: &CLinearState,
-    ) -> TriangleBuffer {
+    ) -> TriangleBufferVec {
         self.safe_present_retract_at(id, state)
     }
 
@@ -232,31 +232,31 @@ impl Microscope {
         self.safe_find_retract_path(id, state)
     }
 
-    pub fn present_static_full(&self) -> TriangleBuffer {
+    pub fn present_static_full(&self) -> TriangleBufferVec {
         self.safe_present_static_full()
     }
 
-    pub fn present_static_less_obstructive(&self) -> TriangleBuffer {
+    pub fn present_static_less_obstructive(&self) -> TriangleBufferVec {
         self.safe_present_static_less_obstructive()
     }
 
-    pub fn present_static_non_obstructive(&self) -> TriangleBuffer {
+    pub fn present_static_non_obstructive(&self) -> TriangleBufferVec {
         self.safe_present_static_non_obstructive()
     }
 
-    pub fn present_stage(&self) -> TriangleBuffer {
+    pub fn present_stage(&self) -> TriangleBufferVec {
         self.safe_present_stage()
     }
 
-    pub fn present_stage_at(&self, state: &CSixAxis) -> TriangleBuffer {
+    pub fn present_stage_at(&self, state: &CSixAxis) -> TriangleBufferVec {
         self.safe_present_stage_at(state)
     }
 
-    pub fn present_retract(&self, id: Id) -> TriangleBuffer {
+    pub fn present_retract(&self, id: Id) -> TriangleBufferVec {
         self.safe_present_retract(id)
     }
 
-    pub fn present_retract_at(&self, id: Id, state: &CLinearState) -> TriangleBuffer {
+    pub fn present_retract_at(&self, id: Id, state: &CLinearState) -> TriangleBufferVec {
         self.safe_present_retract_at(id, state)
     }
 }
@@ -464,44 +464,44 @@ impl Microscope {
         CPathResultLinearState::from(result)
     }
 
-    fn safe_present_static_full(&self) -> TriangleBuffer {
+    fn safe_present_static_full(&self) -> TriangleBufferVec {
         let chamber = self.chamber.get_ref().full();
-        collider_to_triangle_buffer(self.add_equipment(chamber))
+        collider_to_triangle_buffer_per_item(self.add_equipment(chamber))
     }
 
-    fn safe_present_static_less_obstructive(&self) -> TriangleBuffer {
+    fn safe_present_static_less_obstructive(&self) -> TriangleBufferVec {
         let chamber = self.chamber.get_ref().less_obstructive();
-        collider_to_triangle_buffer(self.add_equipment(chamber))
+        collider_to_triangle_buffer_per_item(self.add_equipment(chamber))
     }
 
-    fn safe_present_static_non_obstructive(&self) -> TriangleBuffer {
+    fn safe_present_static_non_obstructive(&self) -> TriangleBufferVec {
         let chamber = self.chamber.get_ref().non_obstructive();
-        collider_to_triangle_buffer(self.add_equipment(chamber))
+        collider_to_triangle_buffer_per_item(self.add_equipment(chamber))
     }
 
-    fn safe_present_stage(&self) -> TriangleBuffer {
+    fn safe_present_stage(&self) -> TriangleBufferVec {
         let stage = self
             .stage
             .get_ref()
             .move_to(&SixAxis::from(&self.stage_state));
-        collider_to_triangle_buffer(stage)
+        collider_to_triangle_buffer_per_item(stage)
     }
 
-    fn safe_present_stage_at(&self, state: &CSixAxis) -> TriangleBuffer {
+    fn safe_present_stage_at(&self, state: &CSixAxis) -> TriangleBufferVec {
         let stage = self.stage.get_ref().move_to(&SixAxis::from(state));
-        collider_to_triangle_buffer(stage)
+        collider_to_triangle_buffer_per_item(stage)
     }
 
-    fn safe_present_retract(&self, id: Id) -> TriangleBuffer {
+    fn safe_present_retract(&self, id: Id) -> TriangleBufferVec {
         let (retract, _, state) = &self.retracts.inner()[&id];
         let retracted = retract.get_ref().move_to(&LinearState::from(state));
-        collider_to_triangle_buffer(retracted)
+        collider_to_triangle_buffer_per_item(retracted)
     }
 
-    fn safe_present_retract_at(&self, id: Id, state: &CLinearState) -> TriangleBuffer {
+    fn safe_present_retract_at(&self, id: Id, state: &CLinearState) -> TriangleBufferVec {
         let (retract, _, _) = &self.retracts.inner()[&id];
         let retracted = retract.get_ref().move_to(&LinearState::from(state));
-        collider_to_triangle_buffer(retracted)
+        collider_to_triangle_buffer_per_item(retracted)
     }
 }
 

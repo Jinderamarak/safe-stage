@@ -68,6 +68,22 @@ impl ColliderGroup<BvhSphere> {
             .map(mapper)
             .collect()
     }
+
+    pub fn triangle_buffer_per_item<T, M>(&self, mapper: M) -> Vec<Vec<T>>
+    where
+        T: Send,
+        M: (Fn(Vector3) -> T) + Send + Sync,
+    {
+        #[cfg(feature = "rayon-group")]
+        let data_iter = self.0.par_iter();
+
+        #[cfg(not(feature = "rayon-group"))]
+        let data_iter = self.0.iter();
+
+        data_iter
+            .map(|t| t.triangle_buffer().into_iter().map(|x| mapper(x)).collect())
+            .collect()
+    }
 }
 
 #[cfg(feature = "rayon-group")]
