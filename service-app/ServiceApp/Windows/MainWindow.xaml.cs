@@ -437,7 +437,7 @@ public partial class MainWindow : ReactiveWindow, IDisposable
                     OnPropertyChanged(nameof(HasPath));
                     OnPropertyChanged(nameof(StageInterpolationMax));
 
-                    StatusText = $"Path found in {time}ms. {_lastStagePath?.ToStatusMessage()}";
+                    StatusText = $"Path found in {time} ms. {_lastStagePath?.ToStatusMessage()}";
                     _lastStagePath?.ShowMessageBox();
 
                     PathModelGroup.Children.Clear();
@@ -520,7 +520,7 @@ public partial class MainWindow : ReactiveWindow, IDisposable
                     OnPropertyChanged(nameof(HasPath));
                     OnPropertyChanged(nameof(StageInterpolationMax));
 
-                    StatusText = $"Path found in {time}ms. {_lastRetractPath?.ToStatusMessage()}";
+                    StatusText = $"Path found in {time} ms. {_lastRetractPath?.ToStatusMessage()}";
                     _lastRetractPath?.ShowMessageBox();
 
                     PathModelGroup.Children.Clear();
