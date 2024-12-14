@@ -64,7 +64,7 @@ impl ColliderGroup<BvhSphere> {
         let data_iter = self.0.iter();
 
         data_iter
-            .map(|t| t.triangle_buffer().into_iter().map(|x| mapper(x)).collect())
+            .map(|t| t.triangle_buffer().into_iter().map(&mapper).collect())
             .collect()
     }
 }
