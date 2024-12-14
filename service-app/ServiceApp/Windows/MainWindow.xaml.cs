@@ -534,16 +534,16 @@ public partial class MainWindow : ReactiveWindow, IDisposable
     private void OnPathInterpolationChanged(double interpolation)
     {
         var task = new TaskChain();
-        if (_interestedInStage)
+        if (_interestedInStage && _lastStagePath is not null)
         {
-            var state = Maths.PathInterpolation(_lastStagePath!, interpolation);
+            var state = Maths.PathInterpolation(_lastStagePath, interpolation);
             task.Chain(UpdateStageGeometry(state));
             if (_lastRetractId.HasValue) task.Chain(UpdateRetractGeometry(_lastRetractId.Value));
         }
-        else
+        else if (_lastRetractPath is not null && _lastRetractId.HasValue)
         {
-            var state = Maths.PathInterpolation(_lastRetractPath!, interpolation);
-            task.Chain(UpdateRetractGeometry(_lastRetractId!.Value, state));
+            var state = Maths.PathInterpolation(_lastRetractPath, interpolation);
+            task.Chain(UpdateRetractGeometry(_lastRetractId.Value, state));
             task.Chain(UpdateStageGeometry());
         }
 
