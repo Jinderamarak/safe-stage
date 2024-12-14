@@ -3,8 +3,8 @@ using System.Windows;
 using System.Windows.Controls;
 using BindingsCs.Safe.Configurations;
 using BindingsCs.Safe.Types;
-using ServiceApp.Models;
-using ServiceApp.Models.Presets;
+using ServiceApp.Config;
+using ServiceApp.Config.Presets;
 using ServiceApp.Utility;
 using ServiceApp.Views;
 

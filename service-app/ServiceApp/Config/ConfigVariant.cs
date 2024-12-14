@@ -1,8 +1,8 @@
 using System.Reflection;
 using BindingsCs.Safe.Types;
-using ServiceApp.Views.Fields;
+using ServiceApp.Config.Fields;
 
-namespace ServiceApp.Models;
+namespace ServiceApp.Config;
 
 /// <summary>
 /// Represents a variant of a configuration (usually static method) as configurable object with fields.

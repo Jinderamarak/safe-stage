@@ -1,11 +1,10 @@
 using System.Windows.Controls;
-using BindingsCs.Safe.Types;
-using ServiceApp.Models;
+using ServiceApp.Config;
 using ServiceApp.Utility;
 
-namespace ServiceApp.Views.Fields;
+namespace ServiceApp.Config.Fields;
 
-public partial class LinearStateField : ReactiveUserControl, IField
+public partial class DoubleField : ReactiveUserControl, IField
 {
     public UserControl Control => this;
 
@@ -17,18 +16,14 @@ public partial class LinearStateField : ReactiveUserControl, IField
 
     public double Value
     {
-        get => _fieldValue.T;
-        set
-        {
-            _fieldValue.T = Math.Clamp(value, 0, 1);
-            OnPropertyChanged();
-        }
+        get => _value;
+        set => SetField(ref _value, value);
     }
 
     private string? _label;
-    private LinearState _fieldValue;
+    private double _value;
 
-    public LinearStateField()
+    public DoubleField()
     {
         DataContext = this;
         InitializeComponent();
@@ -36,18 +31,17 @@ public partial class LinearStateField : ReactiveUserControl, IField
 
     public object GetValue()
     {
-        return _fieldValue;
+        return Value;
     }
 
     public void SetValue(object value)
     {
-        _fieldValue = (LinearState)value;
-        OnPropertyChanged(nameof(Value));
+        Value = (double)value;
     }
 
     public object Clone()
     {
-        return new LinearStateField
+        return new DoubleField
         {
             Label = Label,
             Value = Value

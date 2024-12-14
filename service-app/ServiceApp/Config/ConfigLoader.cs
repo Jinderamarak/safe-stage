@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace ServiceApp.Models;
+namespace ServiceApp.Config;
 
 public static class ConfigLoader
 {

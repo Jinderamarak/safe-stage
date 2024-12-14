@@ -13,21 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Page Update="Views\Fields\SixAxisField.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>Wpf</XamlRuntime>
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="Views\Fields\DoubleField.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>Wpf</XamlRuntime>
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="Views\Fields\LinearStateField.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>Wpf</XamlRuntime>
-            <SubType>Designer</SubType>
-        </Page>
         <Page Update="Views\EquipmentEntry.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
@@ -37,6 +22,18 @@
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Config\Fields\DoubleField.xaml">
+          <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="Config\Fields\LinearStateField.xaml">
+          <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="Config\Fields\SixAxisField.xaml">
+          <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="Config\Fields\VectorField.xaml">
+          <Generator>MSBuild:Compile</Generator>
         </Page>
     </ItemGroup>
 

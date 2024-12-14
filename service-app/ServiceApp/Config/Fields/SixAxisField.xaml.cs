@@ -1,9 +1,9 @@
 using System.Windows.Controls;
 using BindingsCs.Safe.Types;
-using ServiceApp.Models;
+using ServiceApp.Config;
 using ServiceApp.Utility;
 
-namespace ServiceApp.Views.Fields;
+namespace ServiceApp.Config.Fields;
 
 public partial class SixAxisField : ReactiveUserControl, IField
 {

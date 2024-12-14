@@ -2,7 +2,7 @@ using BindingsCs.Safe;
 using BindingsCs.Safe.Configurations;
 using ServiceApp.Views;
 
-namespace ServiceApp.Models;
+namespace ServiceApp.Config;
 
 public static class ConfigBuilder
 {

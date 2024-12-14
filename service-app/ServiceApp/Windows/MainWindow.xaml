@@ -4,7 +4,7 @@
                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                         xmlns:utility="clr-namespace:ServiceApp.Utility"
-                        xmlns:fields="clr-namespace:ServiceApp.Views.Fields"
+                        xmlns:fields="clr-namespace:ServiceApp.Config.Fields"
                         xmlns:converters="clr-namespace:ServiceApp.Converters"
                         mc:Ignorable="d"
                         Title="Safe Stage - Service Application" Height="810" Width="1000">
