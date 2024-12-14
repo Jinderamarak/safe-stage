@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace ServiceApp.Models;
 
-public class ConfigLoader
+public static class ConfigLoader
 {
     public static IEnumerable<ConfigVariant> LoadConfigurations(Type source)
     {

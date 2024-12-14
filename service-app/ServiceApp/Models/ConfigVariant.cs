@@ -4,6 +4,9 @@ using ServiceApp.Views.Fields;
 
 namespace ServiceApp.Models;
 
+/// <summary>
+/// Represents a variant of a configuration (usually static method) as configurable object with fields.
+/// </summary>
 public class ConfigVariant
 {
     public string Name => _methodInfo.Name;
@@ -101,6 +104,6 @@ public class ConfigVariant
 
     public override string ToString()
     {
-        return $"{_classType.Name}.{_methodInfo.Name}";
+        return Name;
     }
 }
