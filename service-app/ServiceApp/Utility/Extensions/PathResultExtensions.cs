@@ -55,9 +55,9 @@ public static class PathResultExtensions
             (PathResultState.UnreachableEnd, false, _) or (PathResultState.UnreachableEnd, true, null) =>
                 "Unreachable end state, no action available.",
             (PathResultState.UnreachableEnd, true, true) =>
-                $"Unreachable end state, can be partially inserted to {path.Nodes.Last().ToFormattedString()}.",
+                $"Unreachable end state, can be moved to {path.Nodes.Last().ToFormattedString()}.",
             (PathResultState.UnreachableEnd, true, false) =>
-                $"Unreachable end state, can be partially retracted to {path.Nodes.Last().ToFormattedString(false)}.",
+                $"Unreachable end state, can be moved to {path.Nodes.Last().ToFormattedString(false)}.",
             _ => throw new ArgumentOutOfRangeException()
         };
     }
