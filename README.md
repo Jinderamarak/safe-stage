@@ -1,24 +1,58 @@
-# Electron microscope stage navigation system
+# Safe Stage - Electron microscope safe navigation
 
-System for safe navigation for stage inside electron microscope chamber using 3D model collisions.
+System for safe navigation of a stage and retractable devices inside a chamber of a scanning electron microscope.
 
-# MSRV (Minimum Supported Rust Version)
+This project was created as a part of a bachelor's thesis at the Faculty of Informatics, Masaryk University Brno.
 
-- `1.83.0` - due to stabilization of floats in `const` context
 
 ## Project parts
 
-### `collisions`
+### [`safe-stage`](safe-stage/README.md)
 
-- `rust`
-- crate handling 3D collisions
+The safety system itself is written in Rust.
 
-### `maths`
+### [`bindings`](bindings/README.md)
 
-- `rust`
-- crate for math operations and structures
+Bindings for the `safe-stage` Rust library. Currently, safe bindings only for C#, but header files can be generated for C and C++.
 
-### `service-app`
+### [`service-app`](bindings/README.md)
 
-- `rust`, `tauri`, `typescript`, `react`
-- testing app for 3D visualizations
+Desktop service application written in C#, WPF. Connects to `safe-stage` using the safe bindings.
+
+
+## Requirements
+
+### Running
+
+Only Windows and .NET runtime are needed to run a compiled binary of the service application.
+
+### Building
+
+- installed Rust with version 1.83 or newer
+- installed .NET SDK 8 or newer
+- installed `cargo-expand` or selected nightly chain (run `cargo install cargo-expand` to install) - required for generating bindings
+- (optionally) setup `miri` with nightly toolchain to test undefined behavior
+- (optionally) setup `nextest` to run unit tests with reports
+
+### MSRV (Minimum Supported Rust Version)
+
+- `1.83.0` - due to stabilization of floats in `const` context
+
+
+## Building
+
+1. Enter the `safe-stage` directory
+2. Compile the library with ffi feature and in release mode with `cargo build --release --features ffi`
+3. Generate unsafe bindings with `cargo run -p bindings`
+4. Go back to main directory and enter the `service-app` directory
+    - Use `dotnet run --project ServiceApp` to directly run it
+    - Use `dotnet publish` to create release build
+
+When lost, try looking at the CI/CD pipeline and how it is done there.
+
+
+## Represesentative SEM
+
+Exported STL files can be found here: `safe-stage/models/src/assembly/thesis/models`
+
+Or can be viewed online in Onshape: https://cad.onshape.com/documents/694e38e8d979f14ad35f8ff9/w/1727b025a7bb93644c4c09d6/e/62cb081996d848e3b3a7ae06
