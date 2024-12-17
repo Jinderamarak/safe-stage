@@ -52,7 +52,7 @@ Only Windows and .NET runtime are needed to run a compiled binary of the service
 When lost, try looking at the CI/CD pipeline and how it is done there.
 
 
-## Represesentative SEM
+## Representative SEM
 
 Exported STL files can be found here: `safe-stage/models/src/assembly/thesis/models`
 
