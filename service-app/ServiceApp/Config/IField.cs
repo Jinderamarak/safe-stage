@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace ServiceApp.Models;
+namespace ServiceApp.Config;
 
 public interface IField : ICloneable
 {

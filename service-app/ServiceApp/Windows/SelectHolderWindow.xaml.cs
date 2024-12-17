@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using BindingsCs.Safe.Configurations;
-using ServiceApp.Models;
+using ServiceApp.Config;
 using ServiceApp.Utility;
 
 namespace ServiceApp.Windows;

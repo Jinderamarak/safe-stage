@@ -7,8 +7,8 @@ using System.Windows.Media.Media3D;
 using BindingsCs.Safe;
 using BindingsCs.Safe.Configurations;
 using BindingsCs.Safe.Types;
-using ServiceApp.Models;
-using ServiceApp.Models.Presets;
+using ServiceApp.Config;
+using ServiceApp.Config.Presets;
 using ServiceApp.Tasks;
 using ServiceApp.Utility;
 using ServiceApp.Utility.Extensions;
@@ -46,18 +46,6 @@ public partial class MainWindow : ReactiveWindow, IDisposable
         set => SetField(ref _holderTitle, value);
     }
 
-    public MeshGeometry3D? StageGeometry
-    {
-        get => _stageGeometry;
-        set => SetField(ref _stageGeometry, value);
-    }
-
-    public MeshGeometry3D? StaticGeometry
-    {
-        get => _staticGeometry;
-        set => SetField(ref _staticGeometry, value);
-    }
-
     public ObservableCollection<Id> Retracts { get; } = new();
 
     public Id? SelectedRetract
@@ -84,8 +72,6 @@ public partial class MainWindow : ReactiveWindow, IDisposable
 
     private string _configurationTitle = "No Configuration";
     private string _holderTitle = "No Holder";
-    private MeshGeometry3D? _stageGeometry;
-    private MeshGeometry3D? _staticGeometry;
 
     private Id? _selectedRetract;
 
@@ -159,16 +145,26 @@ public partial class MainWindow : ReactiveWindow, IDisposable
         return new TaskChain()
             .InBack(() =>
             {
-                return Shapes.TrianglesToPointsList(
-                    state.HasValue ? _microscope!.PresentStageAt(state.Value) : _microscope!.PresentStage()
-                );
+                var models =
+                    state.HasValue
+                        ? _microscope!.PresentStageAt(state.Value)
+                        : _microscope!.PresentStage();
+                return models.Select(Shapes.TrianglesToPointsList).ToList();
             })
-            .OnUi((List<Point3D> positions) =>
+            .OnUi((List<List<Point3D>> positions) =>
             {
-                StageGeometry = new MeshGeometry3D
-                {
-                    Positions = new Point3DCollection(positions)
-                };
+                StageModelGroup.Children.Clear();
+
+                var materials = Materials.StageRange(positions.Count);
+                foreach (var (points, material) in positions.Zip(materials))
+                    StageModelGroup.Children.Add(new GeometryModel3D
+                    {
+                        Material = material,
+                        Geometry = new MeshGeometry3D
+                        {
+                            Positions = new Point3DCollection(points)
+                        }
+                    });
             });
     }
 
@@ -178,19 +174,28 @@ public partial class MainWindow : ReactiveWindow, IDisposable
         return new TaskChain()
             .InBack(() =>
             {
-                return level switch
+                var models = level switch
                 {
-                    0 => Shapes.TrianglesToPointsList(_microscope!.PresentStaticNonObstructive()),
-                    1 => Shapes.TrianglesToPointsList(_microscope!.PresentStaticLessObstructive()),
-                    _ => Shapes.TrianglesToPointsList(_microscope!.PresentStaticFull())
+                    0 => _microscope!.PresentStaticNonObstructive(),
+                    1 => _microscope!.PresentStaticLessObstructive(),
+                    _ => _microscope!.PresentStaticFull()
                 };
+                return models.Select(Shapes.TrianglesToPointsList).ToList();
             })
-            .OnUi((List<Point3D> positions) =>
+            .OnUi((List<List<Point3D>> positions) =>
             {
-                StaticGeometry = new MeshGeometry3D
-                {
-                    Positions = new Point3DCollection(positions)
-                };
+                StaticModelGroup.Children.Clear();
+
+                var materials = Materials.StaticRange(positions.Count);
+                foreach (var (points, material) in positions.Zip(materials))
+                    StaticModelGroup.Children.Add(new GeometryModel3D
+                    {
+                        Material = material,
+                        Geometry = new MeshGeometry3D
+                        {
+                            Positions = new Point3DCollection(points)
+                        }
+                    });
             });
     }
 
@@ -203,10 +208,7 @@ public partial class MainWindow : ReactiveWindow, IDisposable
         {
             var id = Retracts[i];
             _retractIdToGeometryIndex[id] = i;
-            RetractModelGroup.Children.Add(new GeometryModel3D
-            {
-                Material = Materials.Retracts[i % Materials.Retracts.Length]
-            });
+            RetractModelGroup.Children.Add(new Model3DGroup());
         }
     }
 
@@ -216,19 +218,31 @@ public partial class MainWindow : ReactiveWindow, IDisposable
             .InBack(() =>
             {
                 var index = _retractIdToGeometryIndex[id];
-                var positions = Shapes.TrianglesToPointsList(
-                    state.HasValue ? _microscope!.PresentRetractAt(id, state.Value) : _microscope!.PresentRetract(id)
-                );
+                var model =
+                    state.HasValue
+                        ? _microscope!.PresentRetractAt(id, state.Value)
+                        : _microscope!.PresentRetract(id);
+                var positions = model.Select(Shapes.TrianglesToPointsList).ToList();
                 return (index, positions);
             })
-            .OnUi(((int, List<Point3D>) pair) =>
+            .OnUi(((int, List<List<Point3D>>) pair) =>
             {
                 var model = RetractModelGroup.Children[pair.Item1];
-                if (model is GeometryModel3D geometry)
-                    geometry.Geometry = new MeshGeometry3D()
-                    {
-                        Positions = new Point3DCollection(pair.Item2)
-                    };
+                if (model is Model3DGroup group)
+                {
+                    group.Children.Clear();
+
+                    var materials = Materials.RetractRange(pair.Item1, pair.Item2.Count);
+                    foreach (var (points, material) in pair.Item2.Zip(materials))
+                        group.Children.Add(new GeometryModel3D
+                        {
+                            Material = material,
+                            Geometry = new MeshGeometry3D
+                            {
+                                Positions = new Point3DCollection(points)
+                            }
+                        });
+                }
             });
     }
 
@@ -423,7 +437,7 @@ public partial class MainWindow : ReactiveWindow, IDisposable
                     OnPropertyChanged(nameof(HasPath));
                     OnPropertyChanged(nameof(StageInterpolationMax));
 
-                    StatusText = $"Path found in {time}ms. {_lastStagePath?.ToStatusMessage()}";
+                    StatusText = $"Path found in {time} ms. {_lastStagePath?.ToStatusMessage()}";
                     _lastStagePath?.ShowMessageBox();
 
                     PathModelGroup.Children.Clear();
@@ -506,7 +520,7 @@ public partial class MainWindow : ReactiveWindow, IDisposable
                     OnPropertyChanged(nameof(HasPath));
                     OnPropertyChanged(nameof(StageInterpolationMax));
 
-                    StatusText = $"Path found in {time}ms. {_lastRetractPath?.ToStatusMessage()}";
+                    StatusText = $"Path found in {time} ms. {_lastRetractPath?.ToStatusMessage()}";
                     _lastRetractPath?.ShowMessageBox();
 
                     PathModelGroup.Children.Clear();
@@ -534,16 +548,16 @@ public partial class MainWindow : ReactiveWindow, IDisposable
     private void OnPathInterpolationChanged(double interpolation)
     {
         var task = new TaskChain();
-        if (_interestedInStage)
+        if (_interestedInStage && _lastStagePath is not null)
         {
-            var state = Maths.PathInterpolation(_lastStagePath!, interpolation);
+            var state = Maths.PathInterpolation(_lastStagePath, interpolation);
             task.Chain(UpdateStageGeometry(state));
             if (_lastRetractId.HasValue) task.Chain(UpdateRetractGeometry(_lastRetractId.Value));
         }
-        else
+        else if (_lastRetractPath is not null && _lastRetractId.HasValue)
         {
-            var state = Maths.PathInterpolation(_lastRetractPath!, interpolation);
-            task.Chain(UpdateRetractGeometry(_lastRetractId!.Value, state));
+            var state = Maths.PathInterpolation(_lastRetractPath, interpolation);
+            task.Chain(UpdateRetractGeometry(_lastRetractId.Value, state));
             task.Chain(UpdateStageGeometry());
         }
 

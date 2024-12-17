@@ -1,7 +1,7 @@
 using BindingsCs.Safe.Configurations;
 using BindingsCs.Safe.Types;
 
-namespace ServiceApp.Models.Presets;
+namespace ServiceApp.Config.Presets;
 
 public static class ThesisPreset
 {

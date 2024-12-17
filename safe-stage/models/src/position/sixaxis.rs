@@ -186,7 +186,10 @@ impl SixAxis {
         .filter(|a| !a.is_nan())
         .map(|a| a.abs())
         .max_by(|a, b| a.partial_cmp(b).unwrap())
-        .unwrap()
+        .map_or_else(
+            || panic!("Cannot determine time_to: {self:?}, {other:?}, speed: {speed:?}"),
+            |x| x,
+        )
     }
 
     pub fn time_to_path(&self, path: &[SixAxis], speed: &SixAxis) -> f64 {
@@ -203,8 +206,13 @@ impl SixAxis {
         let dot_ab_ab = ab.dot(&ab);
         let t = dot_ap_ab / dot_ab_ab;
 
-        let t = t.clamp(0.0, 1.0);
-        let closest = start.lerp_t(end, t);
+        let closest = if t.is_nan() {
+            *start
+        } else {
+            let t = t.clamp(0.0, 1.0);
+            start.lerp_t(end, t)
+        };
+
         self.time_to(&closest, speed)
     }
 

@@ -1,5 +1,5 @@
 using System.Windows;
-using ServiceApp.Models;
+using ServiceApp.Config;
 using ServiceApp.Utility;
 
 namespace ServiceApp.Views;

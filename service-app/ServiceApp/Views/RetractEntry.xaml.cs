@@ -1,6 +1,6 @@
 using System.Windows;
 using BindingsCs.Safe.Types;
-using ServiceApp.Models;
+using ServiceApp.Config;
 using ServiceApp.Utility;
 
 namespace ServiceApp.Views;

@@ -4,7 +4,7 @@
                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                         xmlns:utility="clr-namespace:ServiceApp.Utility"
-                        xmlns:fields="clr-namespace:ServiceApp.Views.Fields"
+                        xmlns:fields="clr-namespace:ServiceApp.Config.Fields"
                         xmlns:converters="clr-namespace:ServiceApp.Converters"
                         mc:Ignorable="d"
                         Title="Safe Stage - Service Application" Height="810" Width="1000">
@@ -140,13 +140,8 @@
                             <Model3DGroup>
                                 <Model3DGroup.Children>
                                     <DirectionalLight x:Name="DirectLight" Color="#FFFFFFFF" Direction="-1,-1,-1" />
-                                    <Model3DGroup>
-                                        <GeometryModel3D Geometry="{Binding StageGeometry}"
-                                                         Material="{x:Static utility:Materials.Stage}"
-                                                         BackMaterial="{x:Static utility:Materials.StageBack}" />
-                                        <GeometryModel3D Geometry="{Binding StaticGeometry}"
-                                                         Material="{x:Static utility:Materials.Static}" />
-                                    </Model3DGroup>
+                                    <Model3DGroup x:Name="StageModelGroup" />
+                                    <Model3DGroup x:Name="StaticModelGroup" />
                                     <Model3DGroup x:Name="RetractModelGroup" />
                                     <Model3DGroup x:Name="PathModelGroup" />
                                 </Model3DGroup.Children>

@@ -1,6 +1,6 @@
 using BindingsCs.Safe.Types;
 
-namespace ServiceApp.Models.Presets;
+namespace ServiceApp.Config.Presets;
 
 public class Preset
 {

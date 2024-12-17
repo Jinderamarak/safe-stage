@@ -1,7 +1,7 @@
 use crate::common::heapstate::MinHeapState;
 use crate::common::reconstruct::reconstruct_path;
+use crate::eager::space::space_3d::Grid3DSpace;
 use crate::path::PathResult;
-use crate::precompute::space::space_3d::Grid3DSpace;
 use crate::strategy::PathStrategy;
 use collisions::common::Collides;
 use collisions::complex::group::ColliderGroup;

@@ -1,8 +1,8 @@
 using System.Reflection;
 
-namespace ServiceApp.Models;
+namespace ServiceApp.Config;
 
-public class ConfigLoader
+public static class ConfigLoader
 {
     public static IEnumerable<ConfigVariant> LoadConfigurations(Type source)
     {

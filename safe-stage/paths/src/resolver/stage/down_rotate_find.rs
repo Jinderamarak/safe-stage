@@ -1,10 +1,10 @@
 use crate::common::timing::timed;
-use crate::lazy::pathing::rotation_point_par::SafeRotationPointParallelStrategy;
+use crate::deferred::pathing::rotation_point_par::SafeRotationPointParallelStrategy;
+use crate::eager::pathing::a_star::AStar3DSpaceStrategy;
+use crate::eager::space::sampled_space_3d::sample_grid_space_3d_par;
+use crate::eager::space::space_3d::Grid3DSpace;
 use crate::path::PathResult;
 use crate::postprocess::smooth_par::smooth_path_par;
-use crate::precompute::pathing::a_star::AStar3DSpaceStrategy;
-use crate::precompute::space::sampled_space_3d::sample_grid_space_3d_par;
-use crate::precompute::space::space_3d::Grid3DSpace;
 use crate::resolver::stage::StagePathResolver;
 use crate::resolver::{PathResolver, StateUpdateError};
 use crate::strategy::PathStrategy;

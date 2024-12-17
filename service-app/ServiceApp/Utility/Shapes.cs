@@ -6,6 +6,13 @@ namespace ServiceApp.Utility;
 
 public static class Shapes
 {
+    /// <summary>
+    /// Generates a cube geometry as MeshGeometry3D.
+    /// </summary>
+    /// <param name="a">The size of the first edge.</param>
+    /// <param name="b">The size of the second edge.</param>
+    /// <param name="c">The size of the third edge.</param>
+    /// <returns>A MeshGeometry3D representing the cube.</returns>
     public static MeshGeometry3D CreateCubeGeometry(double a, double b, double c)
     {
         var mesh = new MeshGeometry3D();
@@ -206,6 +213,11 @@ public static class Shapes
         }
     }
 
+    /// <summary>
+    /// Creates a geometry for a path defined by a list of nodes.
+    /// </summary>
+    /// <param name="nodes">The list of nodes defining the path.</param>
+    /// <returns>An enumerable of GeometryModel3D objects representing the path.</returns>
     public static IEnumerable<GeometryModel3D> CreatePathGeometries(List<SixAxis> nodes)
     {
         var nodeGeometry = CreateCubeGeometry(3e-3, 3e-3, 3e-3);
