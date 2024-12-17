@@ -1,4 +1,4 @@
-use crate::precompute::space::space_3d::Grid3DSpace;
+use crate::eager::space::space_3d::Grid3DSpace;
 use bitvec::vec::BitVec;
 use collisions::common::Collides;
 use collisions::complex::group::ColliderGroup;

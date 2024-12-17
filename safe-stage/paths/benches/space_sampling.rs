@@ -3,8 +3,8 @@ use maths::Vector3;
 use models::assembly::thesis;
 use models::assembly::thesis::{ThesisChamber, ThesisStage};
 use models::parts::chamber::Chamber;
-use paths::precompute::space::sampled_space_3d::sample_grid_space_3d_par;
-use paths::precompute::space::space_3d::Grid3DSpace;
+use paths::eager::space::sampled_space_3d::sample_grid_space_3d_par;
+use paths::eager::space::space_3d::Grid3DSpace;
 
 fn sample_space(stage: &ThesisStage, chamber: &ThesisChamber) -> Grid3DSpace {
     let (min, max) = thesis::LIMITS;

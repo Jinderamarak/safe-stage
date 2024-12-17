@@ -1,5 +1,5 @@
 use crate::common::timing::timed;
-use crate::lazy::pathing::linear_par::LinearParallelStrategy;
+use crate::deferred::pathing::linear_par::LinearParallelStrategy;
 use crate::path::PathResult;
 use crate::resolver::retract::RetractPathResolver;
 use crate::resolver::{PathResolver, StateUpdateError};
