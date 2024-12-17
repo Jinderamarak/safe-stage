@@ -9,6 +9,7 @@ public class StageConfig
         InnerConfig = innerConfig;
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.thesis_stage"/>
     public static StageConfig ThesisStage()
     {
         return new StageConfig(Unsafe.NativeMethods.thesis_stage());

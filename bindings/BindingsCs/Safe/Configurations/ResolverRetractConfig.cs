@@ -11,6 +11,7 @@ public class ResolverRetractConfig
         InnerConfig = innerConfig;
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.retract_linear_resolver"/>
     public static ResolverRetractConfig Linear(LinearState stepSize)
     {
         return new ResolverRetractConfig(Unsafe.NativeMethods.retract_linear_resolver(stepSize.Inner));

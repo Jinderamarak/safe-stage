@@ -15,6 +15,7 @@ public class Microscope : IDisposable
         _microscope = microscope;
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_from_config"/>
     public static Microscope FromConfiguration(Configuration configuration)
     {
         lock (configuration)
@@ -29,6 +30,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_update_holder"/>
     public void UpdateHolder(HolderConfig holder)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -43,6 +45,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_remove_holder"/>
     public void RemoveHolder()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -56,6 +59,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_update_sample_height_map"/>
     public void UpdateSampleHeightMap(double[] heightMap, nuint sizeX, nuint sizeY, double realX, double realY)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -71,6 +75,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_clear_sample"/>
     public void ClearSample()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -84,6 +89,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_update_stage_state"/>
     public void UpdateStageState(SixAxis state)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -97,6 +103,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_update_retract_state"/>
     public void UpdateRetractState(Id id, LinearState state)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -112,6 +119,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_update_resolvers"/>
     public void UpdateResolvers()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -126,6 +134,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_find_stage_path"/>
     public PathResult<SixAxis> FindStagePath(SixAxis target)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -140,6 +149,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_find_retract_path"/>
     public PathResult<LinearState> FindRetractPath(Id id, LinearState target)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -154,6 +164,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_present_static_full"/>
     public List<TriangleBuffer> PresentStaticFull()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -167,6 +178,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_present_static_less_obstructive"/>
     public List<TriangleBuffer> PresentStaticLessObstructive()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -181,6 +193,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_present_static_non_obstructive"/>
     public List<TriangleBuffer> PresentStaticNonObstructive()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -195,6 +208,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_present_stage"/>
     public List<TriangleBuffer> PresentStage()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -208,6 +222,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_present_stage_at"/>
     public List<TriangleBuffer> PresentStageAt(SixAxis state)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -222,6 +237,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_present_retract"/>
     public List<TriangleBuffer> PresentRetract(Id id)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -236,6 +252,7 @@ public class Microscope : IDisposable
         }
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.microscope_present_retract_at"/>
     public List<TriangleBuffer> PresentRetractAt(Id id, LinearState state)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);

@@ -9,11 +9,13 @@ public class HolderConfig
         InnerConfig = innerConfig;
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.thesis_holder_circle"/>
     public static HolderConfig ThesisHolderCircle()
     {
         return new HolderConfig(Unsafe.NativeMethods.thesis_holder_circle());
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.thesis_holder_square"/>
     public static HolderConfig ThesisHolderSquare()
     {
         return new HolderConfig(Unsafe.NativeMethods.thesis_holder_square());

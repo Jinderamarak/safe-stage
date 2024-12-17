@@ -39,6 +39,7 @@ public class ConfigurationBuilder : IDisposable
         _disposed = false;
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.builder_with_chamber"/>
     public ConfigurationBuilder WithChamber(ChamberConfig chamberConfig)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -50,6 +51,7 @@ public class ConfigurationBuilder : IDisposable
         return this;
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.builder_with_stage"/>
     public ConfigurationBuilder WithStage(StageConfig stageConfig, ResolverStageConfig resolverStageConfig)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -62,6 +64,7 @@ public class ConfigurationBuilder : IDisposable
         return this;
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.builder_with_equipment"/>
     public ConfigurationBuilder WithEquipment(EquipmentConfig equipmentConfig)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -73,6 +76,7 @@ public class ConfigurationBuilder : IDisposable
         return this;
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.builder_with_retract"/>
     public ConfigurationBuilder WithRetract(Id id, RetractConfig retractConfig,
         ResolverRetractConfig resolverRetractConfig)
     {
@@ -86,6 +90,7 @@ public class ConfigurationBuilder : IDisposable
         return this;
     }
 
+    /// <inheritdoc cref="Unsafe.NativeMethods.builder_build"/>
     public Configuration Build()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
