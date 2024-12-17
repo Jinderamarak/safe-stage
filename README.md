@@ -31,6 +31,7 @@ Only Windows and .NET runtime are needed to run a compiled binary of the service
 - installed Rust with version 1.83 or newer
 - installed .NET SDK 8 or newer
 - installed `cargo-expand` or selected nightly chain (run `cargo install cargo-expand` to install) - required for generating bindings
+  - Nightly toolchain can be used as a fallback (running without `cargo-expand`), but might be unstable
 - (optionally) setup `miri` with nightly toolchain to test undefined behavior
 - (optionally) setup `nextest` to run unit tests with reports
 
