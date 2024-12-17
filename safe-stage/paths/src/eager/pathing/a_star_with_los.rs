@@ -1,5 +1,6 @@
 use crate::common::heapstate::MinHeapState;
 use crate::common::reconstruct::reconstruct_path;
+use crate::common::sight::line_of_sight_step_par;
 use crate::eager::space::space_3d::Grid3DSpace;
 use crate::path::PathResult;
 use crate::strategy::PathStrategy;
@@ -13,18 +14,25 @@ use std::collections::{BinaryHeap, HashMap};
 
 type GridPoint = (usize, usize, usize);
 
-pub struct AStar3DSpaceStrategy<'a> {
+pub struct AStar3DSpaceWithLoSStrategy<'a> {
     space: &'a Grid3DSpace,
     speed: Vector3,
     epsilon: Vector3,
+    los_step: SixAxis,
 }
 
-impl<'a> AStar3DSpaceStrategy<'a> {
-    pub fn new(space: &'a Grid3DSpace, speed: Vector3, epsilon: Vector3) -> Self {
+impl<'a> AStar3DSpaceWithLoSStrategy<'a> {
+    pub fn new(
+        space: &'a Grid3DSpace,
+        speed: Vector3,
+        epsilon: Vector3,
+        los_step: Vector3,
+    ) -> Self {
         Self {
             space,
             speed,
             epsilon,
+            los_step: SixAxis::from_position(los_step),
         }
     }
 
@@ -59,9 +67,34 @@ impl<'a> AStar3DSpaceStrategy<'a> {
         let d = to - from;
         self.with_speed(&d).len()
     }
+
+    #[inline]
+    fn has_line_of_sight<M, I>(
+        &self,
+        rot: &Vector3,
+        from: &Vector3,
+        to: &Vector3,
+        movable: &M,
+        immovable: &I,
+    ) -> bool
+    where
+        M: Movable<SixAxis> + Sync,
+        I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
+    {
+        let sight_from = SixAxis {
+            pos: *from,
+            rot: *rot,
+        };
+        let sight_to = SixAxis {
+            pos: *to,
+            rot: *rot,
+        };
+
+        line_of_sight_step_par(&sight_from, &sight_to, movable, immovable, &self.los_step)
+    }
 }
 
-impl PathStrategy<SixAxis> for AStar3DSpaceStrategy<'_> {
+impl PathStrategy<SixAxis> for AStar3DSpaceWithLoSStrategy<'_> {
     fn find_path<M, I>(
         &self,
         from: &SixAxis,
@@ -77,12 +110,16 @@ impl PathStrategy<SixAxis> for AStar3DSpaceStrategy<'_> {
             return PathResult::InvalidStart(*from);
         }
 
-        let grid_start = if let Some(start) = self
-            .space
-            .around_on_grid(&from.pos)
-            .into_iter()
-            .find(|(x, y, z)| !self.space.is_occupied(*x, *y, *z))
-        {
+        let rotation = from.rot;
+        let grid_start = if let Some(start) =
+            self.space
+                .around_on_grid(&from.pos)
+                .into_iter()
+                .find(|(x, y, z)| {
+                    let global = self.space.grid_to_global(&(*x, *y, *z));
+                    !self.space.is_occupied(*x, *y, *z)
+                        && self.has_line_of_sight(&rotation, &from.pos, &global, movable, immovable)
+                }) {
             start
         } else {
             return PathResult::InvalidStart(*from);
@@ -125,6 +162,17 @@ impl PathStrategy<SixAxis> for AStar3DSpaceStrategy<'_> {
 
             for neighbor in self.space.neighbors_iter(current.0, current.1, current.2) {
                 let neighbor_global = self.space.grid_to_global(&neighbor);
+
+                if !self.has_line_of_sight(
+                    &rotation,
+                    &current_global,
+                    &neighbor_global,
+                    movable,
+                    immovable,
+                ) {
+                    continue;
+                }
+
                 if immovable.collides_with(&movable.move_to(&into_sixaxis(&neighbor_global, from)))
                 {
                     continue;

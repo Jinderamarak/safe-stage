@@ -1,6 +1,6 @@
 use crate::common::timing::timed;
 use crate::deferred::pathing::rotation_point_par::SafeRotationPointParallelStrategy;
-use crate::eager::pathing::a_star::AStar3DSpaceStrategy;
+use crate::eager::pathing::a_star_with_los::AStar3DSpaceWithLoSStrategy;
 use crate::eager::space::sampled_space_3d::sample_grid_space_3d_par;
 use crate::eager::space::space_3d::Grid3DSpace;
 use crate::path::PathResult;
@@ -24,6 +24,7 @@ pub struct DownRotateFindResolver {
     sample_step: Vector3,
     sample_space: Option<Grid3DSpace>,
     sample_epsilon: Vector3,
+    los_step: Vector3,
     smoothing_step: SixAxis,
 }
 
@@ -37,6 +38,7 @@ impl DownRotateFindResolver {
         sample_max: Vector3,
         sample_step: Vector3,
         sample_epsilon: Vector3,
+        los_step: Vector3,
         smoothing_step: SixAxis,
     ) -> Self {
         let safe_rotation =
@@ -50,6 +52,7 @@ impl DownRotateFindResolver {
             sample_step,
             sample_space,
             sample_epsilon,
+            los_step,
             smoothing_step,
         }
     }
@@ -141,9 +144,12 @@ where
         }
 
         let strategy = match (&self.sample_space, &resampled) {
-            (_, Some(space)) | (Some(space), _) => {
-                AStar3DSpaceStrategy::new(space, self.move_speed, self.sample_epsilon)
-            }
+            (_, Some(space)) | (Some(space), _) => AStar3DSpaceWithLoSStrategy::new(
+                space,
+                self.move_speed,
+                self.sample_epsilon,
+                self.los_step,
+            ),
             (None, None) => {
                 unreachable!("Resolver was not properly initialized by updating its state!");
             }

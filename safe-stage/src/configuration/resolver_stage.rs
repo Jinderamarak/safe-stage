@@ -5,6 +5,7 @@ use paths::resolver::stage::linear::StageLinearResolver;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "ffi", repr(C, u8))]
+#[allow(clippy::large_enum_variant)] //  This enum is created only during configuration, it is fine
 pub enum ResolverStageConfig {
     StageLinearResolver {
         step_size: CSixAxis,
@@ -17,6 +18,7 @@ pub enum ResolverStageConfig {
         sample_max: CVector3,
         sample_step: CVector3,
         sample_epsilon: CVector3,
+        los_step: CVector3,
         smoothing_step: CSixAxis,
     },
     UnitVariant(CSixAxis),
@@ -40,6 +42,7 @@ impl ResolverStageConfig {
         sample_max: CVector3,
         sample_step: CVector3,
         sample_epsilon: CVector3,
+        los_step: CVector3,
         smoothing_step: CSixAxis,
     ) -> Self {
         ResolverStageConfig::DownRotateFindResolver {
@@ -50,6 +53,7 @@ impl ResolverStageConfig {
             sample_max,
             sample_step,
             sample_epsilon,
+            los_step,
             smoothing_step,
         }
     }
@@ -67,6 +71,7 @@ impl ResolverStageConfig {
                 sample_max,
                 sample_step,
                 sample_epsilon,
+                los_step,
                 smoothing_step,
             } => ConcreteStageResolver::new(DownRotateFindResolver::new(
                 down_point.into(),
@@ -76,6 +81,7 @@ impl ResolverStageConfig {
                 sample_max.into(),
                 sample_step.into(),
                 sample_epsilon.into(),
+                los_step.into(),
                 smoothing_step.into(),
             )),
             _ => unimplemented!(),

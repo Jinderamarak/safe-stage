@@ -30,6 +30,7 @@ public static class ThesisPreset
             new Vector3(125e-3, 125e-3, 125e-3),
             new Vector3(10e-3, 10e-3, 10e-3),
             new Vector3(6e-3, 6e-3, 6e-3),
+            new Vector3(1e-3, 1e-3, 1e-3),
             new SixAxis(1e-3, 1e-3, 1e-3, deg, deg, deg)
         };
         foreach (var (field, value) in stageResolver.Fields.Zip(fields)) field.SetValue(value);
