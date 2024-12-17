@@ -48,25 +48,31 @@ impl PathStrategy<SixAxis> for SafeRotationHeightParallelStrategy {
         let (height_steps, height_step) =
             height_stepping(from.pos.z(), self.height_min, self.height_step);
 
-        let first = (0..=height_steps).into_par_iter().find_first(|i| {
-            let h = (from.pos.z() - *i as f64 * height_step).max(self.height_min);
-            for i in 0..=rotation_steps {
-                let t = (i as f64 / rotation_steps as f64).map_nan(0.0);
-                let rot = from.rot.lerp(&to.rot, t);
-                let state = SixAxis {
-                    pos: Vector3::new(from.pos.x(), from.pos.y(), h),
-                    rot,
-                };
+        let first = (0..=height_steps)
+            .into_par_iter()
+            .map(|i| {
+                let h = (from.pos.z() - i as f64 * height_step).max(self.height_min);
+                for i in 0..=rotation_steps {
+                    let t = (i as f64 / rotation_steps as f64).map_nan(0.0);
+                    let rot = from.rot.lerp(&to.rot, t);
+                    let state = SixAxis {
+                        pos: Vector3::new(from.pos.x(), from.pos.y(), h),
+                        rot,
+                    };
 
-                if immovable.collides_with(&movable.move_to(&state)) {
-                    return false;
+                    if immovable.collides_with(&movable.move_to(&state)) {
+                        if i == 0 {
+                            return (i, Some(false));
+                        }
+                        return (i, None);
+                    }
                 }
-            }
 
-            true
-        });
+                (i, Some(true))
+            })
+            .find_first(|(_, valid)| valid.is_some());
 
-        if let Some(i) = first {
+        if let Some((i, Some(true))) = first {
             let height = from.pos.z() - i as f64 * height_step;
             let lowered_state = SixAxis {
                 pos: Vector3::new(from.pos.x(), from.pos.y(), height),

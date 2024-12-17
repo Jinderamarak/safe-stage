@@ -58,6 +58,9 @@ impl PathStrategy<SixAxis> for SafeRotationHeightStrategy {
                 };
 
                 if immovable.collides_with(&movable.move_to(&state)) {
+                    if i == 0 {
+                        return PathResult::UnreachableEnd(None);
+                    }
                     collided = true;
                     break;
                 }

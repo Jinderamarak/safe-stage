@@ -43,25 +43,29 @@ impl PathStrategy<SixAxis> for SafeRotationPointParallelStrategy {
         let rotation_steps = vector_stepping(&from.rot, &to.rot, &self.rotation_step);
         let move_steps = vector_stepping(&from.pos, &self.tend_point, &self.move_step);
 
-        let first = (0..=move_steps).into_par_iter().find_first(|i| {
-            let t = (*i as f64 / move_steps as f64).map_nan(0.0);
-            log::debug!("Iteration for {i:?} with t: {t:?}");
+        let first = (0..=move_steps)
+            .into_par_iter()
+            .map(|i| {
+                let t = (i as f64 / move_steps as f64).map_nan(0.0);
+                let pos = from.pos.lerp(&self.tend_point, t);
+                for j in 0..=rotation_steps {
+                    let t = (j as f64 / rotation_steps as f64).map_nan(0.0);
+                    let rot = from.rot.lerp(&to.rot, t);
+                    let state = SixAxis { pos, rot };
 
-            let pos = from.pos.lerp(&self.tend_point, t);
-            for j in 0..=rotation_steps {
-                let t = (j as f64 / rotation_steps as f64).map_nan(0.0);
-                let rot = from.rot.lerp(&to.rot, t);
-                let state = SixAxis { pos, rot };
-
-                if immovable.collides_with(&movable.move_to(&state)) {
-                    return false;
+                    if immovable.collides_with(&movable.move_to(&state)) {
+                        if j == 0 {
+                            return (i, Some(false));
+                        }
+                        return (i, None);
+                    }
                 }
-            }
 
-            true
-        });
+                (i, Some(true))
+            })
+            .find_first(|(_, valid)| valid.is_some());
 
-        if let Some(i) = first {
+        if let Some((i, Some(true))) = first {
             let t = (i as f64 / move_steps as f64).map_nan(0.0);
             let pos = from.pos.lerp(&self.tend_point, t);
             let lowered_state = SixAxis { pos, rot: from.rot };
