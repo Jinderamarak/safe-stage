@@ -10,7 +10,7 @@ use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use std::collections::{BinaryHeap, HashMap, HashSet};
 
-/// Theta* pathfinding strategy implementation.
+/// # Theta* Pathfinding Strategy
 pub struct ThetaStarStrategy<N> {
     move_step: f64,
     move_cost: f64,

@@ -10,7 +10,7 @@ use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use std::collections::{BinaryHeap, HashMap};
 
-/// A* pathfinding strategy implementation.
+/// # A* Pathfinding Strategy
 pub struct AStarStrategy<N> {
     move_step: f64,
     move_cost: f64,

@@ -1,6 +1,6 @@
 use crate::collides_group_impl;
-use crate::common::{Collides, Rotation, Transformation, Translation};
-use crate::complex::bvh_sphere_recursive::{bounding_sphere, BvhSphereRecursive};
+use crate::common::{Collides, Rotation, Transformation, Translation, Treeable};
+use crate::complex::bvh_recursive::BvhRecursive;
 use crate::complex::tree::{LinearNode, LinearTree, LinearTreeNode, LinearTreePtr, RecursiveTree};
 use crate::primitive::{SphereCollider, TriangleCollider};
 use maths::{Quaternion, Vector3};
@@ -14,26 +14,31 @@ use rayon::prelude::*;
 ///
 /// Uses binary tree in linear memory for storing nodes.
 ///
-/// Currently slower than [BvhSphereRecursive].
+/// Has faster transformation, but slower collision detection than [BvhSphereRecursive].
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone)]
 pub struct BvhSphereLinear(pub(crate) LinearTree<SphereCollider, TriangleCollider>);
 
 impl BvhSphereLinear {
+    /// Builds a BVH from a list of triangles.
+    ///
+    /// **Expects a non-empty list of triangles.**
     pub fn build(triangles: &[TriangleCollider]) -> Self {
-        let naive = BvhSphereRecursive::build(triangles);
+        let naive = BvhRecursive::build(triangles);
         let tree = RecursiveTree::clone(&naive.0);
         let linear = LinearTree::from(tree);
         BvhSphereLinear(linear)
     }
 
+    /// Concatenates two BVHs into one.
     pub fn concat(self, other: BvhSphereLinear) -> BvhSphereLinear {
         let left = self.0.key(&self.0.root());
         let right = other.0.key(&other.0.root());
-        let bounding = bounding_sphere(left, right);
+        let bounding = left.bound_children(right);
         BvhSphereLinear(self.0.concat(&other.0, bounding))
     }
 
+    /// Returns a list of triangles in the BVH.
     pub fn triangle_buffer(&self) -> Vec<Vector3> {
         #[cfg(feature = "rayon-bvh-linear")]
         let data_iter = self.0.raw().par_iter();

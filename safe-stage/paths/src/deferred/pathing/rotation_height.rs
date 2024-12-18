@@ -7,6 +7,11 @@ use maths::{NaNExtension, Vector3};
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 
+/// # Safe Rotation Height Strategy
+/// Moves the stage down with the given step until it reaches a height, where it can safely rotate.
+/// Then it rotates the stage to the target rotation.
+///
+/// Parallel version available with [SafeRotationHeightParallelStrategy].
 pub struct SafeRotationHeightStrategy {
     height_min: f64,
     height_step: f64,

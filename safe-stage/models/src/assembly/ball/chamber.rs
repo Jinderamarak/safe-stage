@@ -1,14 +1,14 @@
 use crate::loader::load_stl_from_bytes;
-use collisions::complex::BvhSphere;
+use collisions::PrimaryCollider;
 
 const DATA: &[u8] = include_bytes!("./models/BallArena.stl");
 
 pub struct BallChamber {
-    tree: BvhSphere,
+    tree: PrimaryCollider,
 }
 
 impl BallChamber {
-    pub fn collider(&self) -> &BvhSphere {
+    pub fn collider(&self) -> &PrimaryCollider {
         &self.tree
     }
 }
@@ -16,7 +16,7 @@ impl BallChamber {
 impl Default for BallChamber {
     fn default() -> Self {
         let triangles = load_stl_from_bytes(DATA).unwrap();
-        let tree = BvhSphere::build(&triangles);
+        let tree = PrimaryCollider::build(&triangles);
         BallChamber { tree }
     }
 }

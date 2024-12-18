@@ -1,6 +1,5 @@
 use crate::collides_group_impl;
 use crate::common::{Bounded, Collides, Projectable, Rotation, Transformation, Translation};
-use crate::primitive::builder::WithBuilder;
 use crate::primitive::{AlignedBoxCollider, OrientedBoxCollider, PointCollider, SphereCollider};
 use maths::{Quaternion, Vector3};
 
@@ -12,17 +11,12 @@ use maths::{Quaternion, Vector3};
 /// use maths::Vector3;
 /// use collisions::primitive::{Collider, PointCollider, AlignedBoxCollider};
 /// use collisions::common::Collides;
-/// use collisions::primitive::builder::{AddCenter, AddRadius, BuildCollider};
 ///
 /// let point = PointCollider::new(Vector3::new(0.0, 0.0, 0.0));
 /// let collider_point = Collider::from(point);
 ///
 /// let collider_box = Collider::aligned_box(-1.0, -1.0, -1.0, 2.0, 2.0, 2.0);
-///
-/// let collider_sphere = Collider::builder()
-///     .radius(1.0)
-///     .center_xyz(-2.0, -2.0, -2.0)
-///     .build();
+/// let collider_sphere = Collider::sphere(-2.0, -2.0, -2.0, 1.0);
 ///
 /// assert!(collider_point.collides_with(&collider_box));
 /// assert!(!collider_point.collides_with(&collider_sphere));
@@ -75,10 +69,6 @@ impl Collider {
             Vector3::new(sx, sy, sz),
             Quaternion::from_euler(&Vector3::new(rx, ry, rz)),
         ))
-    }
-
-    pub fn builder() -> WithBuilder {
-        WithBuilder::start()
     }
 }
 

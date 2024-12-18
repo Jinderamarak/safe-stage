@@ -8,4 +8,9 @@ pub trait Bounded {
 
     /// Returns the maximum point of the bounding box.
     fn max(&self) -> Vector3;
+
+    /// Returns the center of the bounding box.
+    fn center(&self) -> Vector3 {
+        (self.min() + self.max()) / 2.0
+    }
 }

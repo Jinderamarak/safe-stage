@@ -8,6 +8,13 @@ use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use rayon::prelude::*;
 
+/// # Parallel Safe Rotation Point Strategy
+/// Moves the stage towards a safe point by the given step until the rotation can be safely done.
+/// Then it rotates the stage to the target rotation.
+///
+/// **Runs in parallel using Rayon.**
+///
+/// Single-threaded version available with [SafeRotationPointStrategy].
 pub struct SafeRotationPointParallelStrategy {
     tend_point: Vector3,
     move_step: Vector3,

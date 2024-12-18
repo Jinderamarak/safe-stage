@@ -9,12 +9,17 @@ pub enum RetractConfig {
 }
 
 impl RetractConfig {
+    /// Create a new **ThesisRetract** configuration.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn thesis_retract() -> Self {
         RetractConfig::ThesisRetract
     }
 
+    /// Create a new **ExampleRetractionWithConfig** configuration.
+    ///
+    /// This is an example on how to represent a configuration with parameters.
+    /// Building the retract with this configuration is not implemented.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn example_retraction_with_config(arm_length: f64, speed: f64) -> Self {

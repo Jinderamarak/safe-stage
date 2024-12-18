@@ -1,27 +1,28 @@
 //! # Complex collision structures
 //! Composite data structures for accelerating collision detection.
+//!
 //! Differences:
 //!  - [BvhTree] - boxes for bounding volumes, slower transformations, tighter bounds,
-//!     any `Collider` composites
-//!  - [BvhSphere] - spheres for bounding volumes, faster transformations, looser bounds,
-//!     only triangular meshes
+//!     any `Collider` composites, during rotation, AABBs are converted to OBBs
+//!  - [BvhRecursive] - generic bounding volume hierarchy,
+//!     recommended to use with [AlignedBoxCollider]
+//!  - [BvhSphereLinear] - bounding sphere hierarchy, implemented with Vec as node storage,
+//!     very fast transformations slower collision detection
+//! - [BvhSphereRecursive] - bounding sphere hierarchy, variant of [BvhRecursive] but optimized
+//!     for [SphereCollider] as the bounding shape
 
-mod bvh;
+use crate::collides_group_impl;
+use crate::complex::bvh_recursive::BvhRecursive;
+use crate::primitive::AlignedBoxCollider;
+
+pub mod bvh;
+pub mod bvh_recursive;
 pub mod bvh_sphere_linear;
 pub mod bvh_sphere_recursive;
 pub mod group;
 pub(crate) mod tree;
 
-pub use bvh::BvhTree;
-
-#[cfg(all(feature = "bvh-linear", feature = "bvh-recursive"))]
-compile_error!("features `bvh-linear` and `bvh-recursive` are mutually exclusive, pick preferred");
-
-#[cfg(all(not(feature = "bvh-linear"), not(feature = "bvh-recursive")))]
-compile_error!("one of features `bvh-linear` and `bvh-recursive` must be picked");
-
-#[cfg(all(feature = "bvh-recursive", not(feature = "bvh-linear")))]
-pub use bvh_sphere_recursive::BvhSphereRecursive as BvhSphere;
-
-#[cfg(all(feature = "bvh-linear", not(feature = "bvh-recursive")))]
-pub use bvh_sphere_linear::BvhSphereLinear as BvhSphere;
+collides_group_impl!(
+    BvhRecursive<AlignedBoxCollider>,
+    BvhRecursive<AlignedBoxCollider>
+);

@@ -10,18 +10,24 @@ pub enum EquipmentConfig {
 }
 
 impl EquipmentConfig {
+    /// Create a new **ThesisDetectorAlpha** configuration.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn thesis_detector_alpha() -> Self {
         EquipmentConfig::ThesisDetectorAlpha
     }
 
+    /// Create a new **ThesisDetectorBeta** configuration.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn thesis_detector_beta() -> Self {
         EquipmentConfig::ThesisDetectorBeta
     }
 
+    /// Create a new **ExampleEquipmentWithConfig** configuration.
+    ///
+    /// This is an example on how to represent a configuration with parameters.
+    /// Building the equipment with this configuration is not implemented.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn example_equipment_with_config(position: f64, size: u32) -> Self {

@@ -1,12 +1,12 @@
 use collisions::complex::group::ColliderGroup;
-use collisions::complex::BvhSphere;
+use collisions::PrimaryCollider;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use maths::Vector3;
 use models::assembly::thesis::ThesisStage;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 
-fn move_stage(stage: &ThesisStage, position: &SixAxis) -> ColliderGroup<BvhSphere> {
+fn move_stage(stage: &ThesisStage, position: &SixAxis) -> ColliderGroup<PrimaryCollider> {
     stage.move_to(position)
 }
 

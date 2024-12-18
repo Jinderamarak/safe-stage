@@ -26,12 +26,14 @@ pub enum ResolverStageConfig {
 }
 
 impl ResolverStageConfig {
+    /// Create a new **StageLinearResolver** configuration.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn stage_linear_resolver(step_size: CSixAxis) -> Self {
         ResolverStageConfig::StageLinearResolver { step_size }
     }
 
+    /// Create a new **DownRotateFindResolver** configuration.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn down_rotate_find_resolver(

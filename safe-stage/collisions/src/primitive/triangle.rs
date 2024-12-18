@@ -3,9 +3,8 @@ use crate::common::{Collides, Rotation, Transformation, Translation};
 use crate::primitive::algo::guigue_2003;
 use maths::{Quaternion, Vector3};
 
-//  Common vertex buffer adds too much complexity for not a lot of gain,
-//  and it introduces indirect memory access
-
+/// # Triangle Collider
+/// Collision primitive for representing a triangle.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone)]
 pub struct TriangleCollider {
@@ -21,6 +20,9 @@ impl PartialEq for TriangleCollider {
 }
 
 impl TriangleCollider {
+    /// Creates a new `TriangleCollider` with vertices `a`, `b`, and `c`.
+    ///
+    /// **Expects all vertices to be different.**
     pub fn new(a: Vector3, b: Vector3, c: Vector3) -> Self {
         debug_assert!(
             a != b && b != c && c != a,
@@ -30,6 +32,7 @@ impl TriangleCollider {
         Self { a, b, c }
     }
 
+    /// Returns the vertices of the triangle.
     pub fn points(&self) -> (&Vector3, &Vector3, &Vector3) {
         (&self.a, &self.b, &self.c)
     }

@@ -8,6 +8,13 @@ use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use rayon::prelude::*;
 
+/// # Parallel Safe Rotation Height Strategy
+/// Moves the stage down with the given step until it reaches a height, where it can safely rotate.
+/// Then it rotates the stage to the target rotation.
+///
+/// **Runs in parallel using Rayon.**
+///
+/// Single-threaded version available with [SafeRotationHeightStrategy].
 pub struct SafeRotationHeightParallelStrategy {
     height_min: f64,
     height_step: f64,

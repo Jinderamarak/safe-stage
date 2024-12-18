@@ -1,6 +1,8 @@
 use crate::collides_group_impl;
-use crate::common::{Bounded, Collides, Projectable, Rotation, Transformation, Translation};
-use crate::primitive::{OrientedBoxCollider, PointCollider, SphereCollider};
+use crate::common::{
+    Bounded, Collides, Projectable, Rotation, Transformation, Translation, Treeable,
+};
+use crate::primitive::{OrientedBoxCollider, PointCollider, SphereCollider, TriangleCollider};
 use itertools::Itertools;
 use maths::{Quaternion, Vector3};
 
@@ -20,57 +22,78 @@ use maths::{Quaternion, Vector3};
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub struct AlignedBoxCollider {
-    center: Vector3,
-    size: Vector3,
+    min: Vector3,
+    max: Vector3,
 }
 
 impl AlignedBoxCollider {
     /// Creates a new `AlignedBoxCollider` with the given `center` and `size`.
     pub fn new(center: Vector3, size: Vector3) -> Self {
+        let size = size.abs();
         Self {
-            center,
-            size: Vector3::new(size.x().abs(), size.y().abs(), size.z().abs()),
+            min: center - size / 2.0,
+            max: center + size / 2.0,
         }
     }
 
-    /// Returns the center of the box.
     #[inline]
-    pub const fn center(&self) -> Vector3 {
-        self.center
+    pub const fn from_min_max(min: Vector3, max: Vector3) -> Self {
+        Self { min, max }
     }
 
     /// Returns the size of the box.
     #[inline]
-    pub const fn size(&self) -> Vector3 {
-        self.size
+    pub fn size(&self) -> Vector3 {
+        self.max - self.min
     }
 
     #[inline]
     fn corners(&self) -> [Vector3; 8] {
-        let half_size = self.size() / 2.0;
-        let negative_pos = self.center - half_size;
-        let positive_pos = self.center + half_size;
-
         [
-            Vector3::new(negative_pos.x(), negative_pos.y(), negative_pos.z()),
-            Vector3::new(positive_pos.x(), negative_pos.y(), negative_pos.z()),
-            Vector3::new(negative_pos.x(), positive_pos.y(), negative_pos.z()),
-            Vector3::new(positive_pos.x(), positive_pos.y(), negative_pos.z()),
-            Vector3::new(negative_pos.x(), negative_pos.y(), positive_pos.z()),
-            Vector3::new(positive_pos.x(), negative_pos.y(), positive_pos.z()),
-            Vector3::new(negative_pos.x(), positive_pos.y(), positive_pos.z()),
-            Vector3::new(positive_pos.x(), positive_pos.y(), positive_pos.z()),
+            Vector3::new(self.min.x(), self.min.y(), self.min.z()),
+            Vector3::new(self.max.x(), self.min.y(), self.min.z()),
+            Vector3::new(self.min.x(), self.max.y(), self.min.z()),
+            Vector3::new(self.max.x(), self.max.y(), self.min.z()),
+            Vector3::new(self.min.x(), self.min.y(), self.max.z()),
+            Vector3::new(self.max.x(), self.min.y(), self.max.z()),
+            Vector3::new(self.min.x(), self.max.y(), self.max.z()),
+            Vector3::new(self.max.x(), self.max.y(), self.max.z()),
         ]
     }
 }
 
-impl Bounded for AlignedBoxCollider {
-    fn min(&self) -> Vector3 {
-        self.center - self.size / 2.0
+impl Treeable for AlignedBoxCollider {
+    fn bound_children(&self, other: &Self) -> Self {
+        let min = self.min.minimized(&other.min);
+        let max = self.max.maximized(&other.max);
+        Self::from_min_max(min, max)
     }
 
+    fn bound_triangle(triangle: &TriangleCollider) -> Self {
+        let (a, b, c) = triangle.points();
+        let min = Vector3::new(
+            a.x().min(b.x()).min(c.x()),
+            a.y().min(b.y()).min(c.y()),
+            a.z().min(b.z()).min(c.z()),
+        );
+        let max = Vector3::new(
+            a.x().max(b.x()).max(c.x()),
+            a.y().max(b.y()).max(c.y()),
+            a.z().max(b.z()).max(c.z()),
+        );
+        Self::from_min_max(min, max)
+    }
+}
+
+impl Bounded for AlignedBoxCollider {
+    #[inline]
+    fn min(&self) -> Vector3 {
+        self.min
+    }
+
+    #[inline]
     fn max(&self) -> Vector3 {
-        self.center + self.size / 2.0
+        self.max
     }
 }
 
@@ -97,7 +120,7 @@ impl Rotation<OrientedBoxCollider> for AlignedBoxCollider {
 
 impl Translation for AlignedBoxCollider {
     fn translate(&self, translation: &Vector3) -> Self {
-        Self::new(self.center + translation, self.size)
+        Self::new(self.center() + translation, self.size())
     }
 }
 
@@ -114,10 +137,10 @@ impl Transformation<OrientedBoxCollider> for AlignedBoxCollider {
 
 impl Collides<Self> for AlignedBoxCollider {
     fn collides_with(&self, other: &Self) -> bool {
-        let self_min = self.min();
-        let self_max = self.max();
-        let other_min = other.min();
-        let other_max = other.max();
+        let self_min = self.min;
+        let self_max = self.max;
+        let other_min = other.min;
+        let other_max = other.max;
 
         self_min.x() <= other_max.x()
             && self_max.x() >= other_min.x()

@@ -9,17 +9,13 @@ license-file.workspace = true
 publish.workspace = true
 
 [features]
-default = ["bvh-recursive", "rayon-group"]
+default = ["rayon-group"]
 # Adds `serde` support
 serde = ["dep:serde", "maths/serde"]
 # Enables `rayon` for operations in `ColliderGroup`
 rayon-group = ["dep:rayon"]
 # Enables `rayon` for operations in `BvhSphereLinear`
 rayon-bvh-linear = ["dep:rayon"]
-# Prefers `BvhSphereLinear` for `BvhSphere`
-bvh-linear = []
-# Prefers `BvhSphereRecursive` for `BvhSphere`
-bvh-recursive = []
 
 [[bench]]
 name = "primitive_collision"

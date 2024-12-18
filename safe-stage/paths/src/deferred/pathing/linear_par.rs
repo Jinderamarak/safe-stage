@@ -9,6 +9,12 @@ use models::position::linear::LinearState;
 use models::position::sixaxis::SixAxis;
 use rayon::prelude::*;
 
+/// # Parallel Linear Pathfinding Strategy
+/// Moves in a straight line from start to end with fixed step.
+///
+/// **Runs in parallel using Rayon.**
+///
+/// Single-threaded version available with [LinearStrategy].
 pub struct LinearParallelStrategy<P> {
     step_size: P,
 }

@@ -9,12 +9,17 @@ pub enum ChamberConfig {
 }
 
 impl ChamberConfig {
+    /// Create a new **ThesisChamber** configuration.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn thesis_chamber() -> Self {
         ChamberConfig::ThesisChamber
     }
 
+    /// Create a new **ExampleChamberWithConfig** configuration.
+    ///
+    /// This is an example on how to represent a configuration with parameters.
+    /// Building the chamber with this configuration is not implemented.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn example_chamber_with_config(offset_x: f64, size: u32) -> Self {

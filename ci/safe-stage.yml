@@ -5,7 +5,7 @@ include:
   extends: .rust-template
   variables:
     SERDE_FEATURE: --all -F serde
-    LINEAR_FEATURE: -p collisions --no-default-features -F rayon-bvh-linear -F bvh-linear
+    LINEAR_FEATURE: -p collisions --no-default-features -F rayon-bvh-linear
     FFI_FEATURE: -F ffi
 
 safe-stage:lint:

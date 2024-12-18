@@ -9,6 +9,7 @@ pub enum ResolverRetractConfig {
 }
 
 impl ResolverRetractConfig {
+    /// Create a new **RetractLinearResolver** configuration.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn retract_linear_resolver(step_size: CLinearState) -> Self {

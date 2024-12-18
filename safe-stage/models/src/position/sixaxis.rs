@@ -4,6 +4,10 @@ use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Sub};
 
+/// # SixAxis
+/// A structure representing a position and rotation in 3D space.
+///
+/// Primarily used to represent the state of a stage.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct SixAxis {

@@ -1,5 +1,7 @@
 use models::position::sixaxis::SixAxis;
 
+/// # Path Result
+/// Result of a pathfinding algorithm.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone)]
 pub enum PathResult<P> {

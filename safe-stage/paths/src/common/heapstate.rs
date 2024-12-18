@@ -1,5 +1,6 @@
 use std::{cmp::Ordering, fmt::Debug};
 
+/// # Minimum Heap State
 /// A state with a weight ordered by the weight in flipped order
 /// so that the smallest weight is at the top of the heap.
 #[derive(Debug, Clone, PartialEq)]

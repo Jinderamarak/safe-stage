@@ -14,6 +14,13 @@ use std::collections::{BinaryHeap, HashMap};
 
 type GridPoint = (usize, usize, usize);
 
+/// # A* 3D Space with Line of Sight Strategy
+/// A* pathfinding strategy for a precomputed 3D grid space
+/// with line of sight check between the neighbors.
+///
+/// The strategy uses the given speed to calculate the heuristic.
+///
+/// **Uses Rayon for parallel line of sight checks.**
 pub struct AStar3DSpaceWithLoSStrategy<'a> {
     space: &'a Grid3DSpace,
     speed: Vector3,

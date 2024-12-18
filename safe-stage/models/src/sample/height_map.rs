@@ -1,8 +1,7 @@
 use collisions::primitive::TriangleCollider;
 use maths::{Vector2, Vector3};
 
-//  marching squares algorithm
-
+/// Generates a triangle mesh from a height map with a marching squares algorithm.
 pub fn height_map_to_sample_model(
     height_map: &[f64],
     size_x: usize,

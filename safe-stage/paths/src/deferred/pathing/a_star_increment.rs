@@ -10,6 +10,8 @@ use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use std::collections::{BinaryHeap, HashMap};
 
+/// # A* Incremental Pathfinding Strategy
+/// Uses a previously found path as the input for the heuristic.
 pub struct AStarIncrementStrategy<N> {
     previous: Vec<SixAxis>,
     speed: SixAxis,
