@@ -10,18 +10,24 @@ pub enum HolderConfig {
 }
 
 impl HolderConfig {
+    /// Create a new **ThesisHolderCircle** configuration.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn thesis_holder_circle() -> Self {
         HolderConfig::ThesisHolderCircle
     }
 
+    /// Create a new **ThesisHolderSquare** configuration.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn thesis_holder_square() -> Self {
         HolderConfig::ThesisHolderSquare
     }
 
+    /// Create a new **ExampleHolderWithConfig** configuration.
+    ///
+    /// This is an example on how to represent a configuration with parameters.
+    /// Building the holder with this configuration is not implemented.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn example_holder_with_config(height: f64, width: f64) -> Self {

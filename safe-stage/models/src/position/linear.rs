@@ -1,3 +1,7 @@
+/// # Linear State
+/// A linear state that can be in one of three states: `None`, `Partial`, or `Full`.
+///
+/// Primarily used to represent the state of a retractable device.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum LinearState {

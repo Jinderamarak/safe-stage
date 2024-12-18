@@ -1,6 +1,8 @@
 use bitvec::vec::BitVec;
 use std::hint::unreachable_unchecked;
 
+/// # 1D Grid Space
+/// A 1D grid space with a given size and bounds represented by a bit vector.
 pub struct Grid1DSpace {
     d: usize,
     min: f64,
@@ -20,7 +22,7 @@ impl Grid1DSpace {
     }
 
     /// # Safety
-    /// The data fields is initialized to capacity of 0 unusable data access.
+    /// The data field is initialized to a capacity of 0 and will panic when accessing data.
     pub unsafe fn uninitialized(d: usize, min: f64, max: f64) -> Self {
         Self {
             d,

@@ -1,3 +1,6 @@
+//! # Models
+//! Focused on modeling the parts of an electron microscope.
+
 pub mod assembly;
 pub mod loader;
 pub mod movable;

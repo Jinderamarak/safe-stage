@@ -39,6 +39,9 @@ where
     true
 }
 
+/// Checks if there is a line of sight between two coordinates by moving in a given step.
+///
+/// Parallel version available with [line_of_sight_par].
 pub fn line_of_sight_step<M, I>(
     from: &SixAxis,
     to: &SixAxis,
@@ -58,6 +61,11 @@ where
     })
 }
 
+/// Checks if there is a line of sight between two coordinates by moving in a given step.
+///
+/// **Runs in parallel using Rayon.**
+///
+/// Single-threaded version available with [line_of_sight_step].
 pub fn line_of_sight_step_par<M, I>(
     from: &SixAxis,
     to: &SixAxis,

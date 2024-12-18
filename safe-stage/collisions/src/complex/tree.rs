@@ -10,14 +10,24 @@ pub enum RecursiveTree<K, V> {
 }
 
 impl<K, V> RecursiveTree<K, V> {
+    /// Concatenates two trees into one.
     pub fn concat(self, other: RecursiveTree<K, V>, key: K) -> RecursiveTree<K, V> {
         RecursiveTree::Branch(key, Box::new(self), Box::new(other))
     }
 
+    /// Returns the depth of the tree.
     pub fn depth(&self) -> usize {
         match self {
             RecursiveTree::Leaf(_, _) => 0,
             RecursiveTree::Branch(_, left, right) => left.depth().max(right.depth()) + 1,
+        }
+    }
+
+    #[inline]
+    pub const fn key(&self) -> &K {
+        match self {
+            RecursiveTree::Leaf(key, _) => key,
+            RecursiveTree::Branch(key, _, _) => key,
         }
     }
 }

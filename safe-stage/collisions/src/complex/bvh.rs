@@ -6,7 +6,7 @@ use maths::{Axis, Quaternion, Vector3};
 
 /// # Bounding Volume Hierarchy
 /// A tree structure composed of primitive colliders
-/// for accelerating collisions between complex objects.
+/// for accelerating collisions between composite objects.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub enum BvhTree {
@@ -15,6 +15,7 @@ pub enum BvhTree {
 }
 
 impl BvhTree {
+    /// Builds the BVH tree from a list of colliders.
     pub fn build(objects: &[Collider]) -> Option<BvhTree> {
         if objects.is_empty() {
             return None;
@@ -41,6 +42,7 @@ impl BvhTree {
         ))
     }
 
+    /// Concatenates two BVH trees into a new one.
     pub fn concat(self, other: BvhTree) -> BvhTree {
         let first = match &self {
             Self::Branch(c, _, _) => c,

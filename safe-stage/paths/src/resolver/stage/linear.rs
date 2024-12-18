@@ -10,6 +10,11 @@ use collisions::PrimaryCollider;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 
+/// # Stage Linear Resolver
+/// Path resolver intended for a stage.
+/// Resolves the path using linear interpolation with fixed step.
+///
+/// **Runs in parallel using Rayon.**
 pub struct StageLinearResolver {
     strategy: LinearParallelStrategy<SixAxis>,
 }

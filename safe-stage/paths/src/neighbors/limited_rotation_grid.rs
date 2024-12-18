@@ -2,6 +2,9 @@ use crate::neighbors::NeighborStrategy;
 use maths::Vector3;
 use models::position::sixaxis::SixAxis;
 
+/// # Limited Rotation Grid
+/// A neighbor strategy for a grid. Generates neighbors for a given SixAxis position
+/// with a rotation limited to the given range.
 pub struct LimitedRotationGrid {
     step: SixAxis,
     start: Vector3,

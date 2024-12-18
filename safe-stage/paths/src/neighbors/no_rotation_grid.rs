@@ -2,6 +2,8 @@ use crate::neighbors::NeighborStrategy;
 use maths::{Vector2, Vector3};
 use models::position::sixaxis::SixAxis;
 
+/// # No Rotation Grid
+/// A neighbor strategy for a grid of dimensions `D` with constant rotation.
 pub struct NoRotationGrid<const D: u8> {
     step: Vector3,
 }

@@ -2,6 +2,8 @@ use bitvec::vec::BitVec;
 use maths::Vector3;
 use std::hint::unreachable_unchecked;
 
+/// # 3D Grid Space
+/// A 3D grid space with a given size and bounds represented by a bit vector.
 pub struct Grid3DSpace {
     dx: usize,
     dy: usize,
@@ -25,7 +27,7 @@ impl Grid3DSpace {
     }
 
     /// # Safety
-    /// The data fields is initialized to capacity of 0 unusable data access.
+    /// The data field is initialized to a capacity of 0 and will panic when accessing data.
     pub unsafe fn uninitialized(
         dx: usize,
         dy: usize,

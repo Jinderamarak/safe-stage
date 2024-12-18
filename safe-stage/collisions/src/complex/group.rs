@@ -1,5 +1,4 @@
 use crate::common::Collides;
-use crate::complex::BvhSphere;
 
 #[cfg(feature = "rayon-group")]
 use rayon::prelude::*;
@@ -11,9 +10,19 @@ macro_rules! collider_group {
     }
 }
 
+use crate::PrimaryCollider;
 pub use collider_group;
 use maths::Vector3;
 
+/// # Group of colliders
+/// Simple collection for colliders.
+///
+/// When used for checking collision, it will return true if any of the colliders in the group
+/// collide.
+///
+/// With the `rayon-group` feature, it will use parallel iterators for checking collision.
+///
+/// Can also be constructed with the `collider_group!` macro.
 pub struct ColliderGroup<T>(pub Vec<T>);
 
 impl<T> ColliderGroup<T> {
@@ -27,9 +36,10 @@ impl<T> ColliderGroup<T> {
     }
 }
 
-impl ColliderGroup<BvhSphere> {
+impl ColliderGroup<PrimaryCollider> {
+    /// Builds a single BVH from all the colliders in the group.
     #[cfg(feature = "rayon-group")]
-    pub fn into_bvh(self) -> BvhSphere {
+    pub fn into_bvh(self) -> PrimaryCollider {
         self.0
             .into_par_iter()
             .map(Some)
@@ -44,14 +54,16 @@ impl ColliderGroup<BvhSphere> {
             .unwrap()
     }
 
+    /// Builds a single BVH from all the colliders in the group.
     #[cfg(not(feature = "rayon-group"))]
-    pub fn into_bvh(self) -> BvhSphere {
+    pub fn into_bvh(self) -> PrimaryCollider {
         self.0
             .into_iter()
             .reduce(|a, b| a.concat(b))
             .expect("ColliderGroup cannot be empty")
     }
 
+    /// Returns a buffer of all the triangles in the group.
     pub fn triangle_buffer_per_item<T, M>(&self, mapper: M) -> Vec<Vec<T>>
     where
         T: Send,

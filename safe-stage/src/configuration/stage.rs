@@ -12,12 +12,17 @@ pub enum StageConfig {
 }
 
 impl StageConfig {
+    /// Create a new **ThesisStage** configuration.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn thesis_stage() -> Self {
         StageConfig::ThesisStage
     }
 
+    /// Create a new **ExampleStageWithConfig** configuration.
+    ///
+    /// This is an example on how to represent a configuration with parameters.
+    /// Building the stage with this configuration is not implemented.
     #[cfg(feature = "ffi")]
     #[no_mangle]
     pub extern "C" fn example_stage_with_config(calibration_x: f64, tilt_correction: f64) -> Self {

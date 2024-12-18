@@ -13,7 +13,7 @@ The safety system itself is written in Rust.
 
 ### [`bindings`](bindings/README.md)
 
-Bindings for the `safe-stage` Rust library. Currently, safe bindings only for C#, but header files can be generated for C and C++.
+Bindings for the `safe-stage` Rust library. Currently, safe bindings only for C#, but unsafe header files are also generated for C and C++.
 
 ### [`service-app`](bindings/README.md)
 
@@ -29,6 +29,7 @@ Only Windows and .NET runtime are needed to run a compiled binary of the service
 ### Building
 
 - installed Rust with version 1.83 or newer
+  - As of 18/12/2024, the *Nightly* version of the Rust toolchain results in a slightly better performance and is therefore recommended
 - installed .NET SDK 8 or newer
 - installed `cargo-expand` or selected nightly chain (run `cargo install cargo-expand` to install) - required for generating bindings
   - Nightly toolchain can be used as a fallback (running without `cargo-expand`), but might be unstable

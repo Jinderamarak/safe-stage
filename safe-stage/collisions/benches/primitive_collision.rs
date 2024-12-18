@@ -11,6 +11,10 @@ where
     base.collides_with(colliding) && !base.collides_with(non_colliding)
 }
 
+/// Compare the performance of primitive collisions of the following shapes:
+/// - Sphere-Sphere
+/// - Sphere-AABB
+/// - AABB-AABB
 fn bench_primitive_collisions(c: &mut Criterion) {
     let sphere_base = SphereCollider::new(Vector3::new(0.0, 0.0, 0.0), 1.0);
     let sphere_colliding = SphereCollider::new(Vector3::new(1.0, 0.0, 0.0), 2.0);

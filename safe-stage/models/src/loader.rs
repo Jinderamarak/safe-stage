@@ -21,7 +21,7 @@ pub fn load_stl(reader: impl BufRead) -> Result<Vec<TriangleCollider>, StlError>
     let data = StlData::read_buffer(reader)?;
     let mut triangles = Vec::new();
     for triangle in &data.triangles {
-        //  TODO: Handle degenerate triangles
+        // This may panic if the triangle has NaN values or is degenerate.
         triangles.push(TriangleCollider::new(
             array_to_vector(&triangle.v1),
             array_to_vector(&triangle.v2),

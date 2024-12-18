@@ -8,6 +8,10 @@ use models::movable::Movable;
 use models::position::linear::LinearState;
 use models::position::sixaxis::SixAxis;
 
+/// # Linear Pathfinding Strategy
+/// Moves in a straight line from start to end with a fixed step size.
+///
+/// Parallel version available with [LinearParallelStrategy].
 pub struct LinearStrategy<P> {
     step_size: P,
 }

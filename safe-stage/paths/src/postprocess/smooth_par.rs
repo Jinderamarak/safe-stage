@@ -6,6 +6,11 @@ use collisions::PrimaryCollider;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 
+/// Smooths the path by removing intermediate nodes if there is a line of sight to a next node.
+///
+/// **Runs in parallel using Rayon.**
+///
+/// Single-threaded version available with [smooth_path].
 pub fn smooth_path_par<M, I>(
     path: PathResult<SixAxis>,
     movable: &M,

@@ -8,6 +8,9 @@ use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use rayon::prelude::*;
 
+/// Samples the 3D space with the given step and rotation.
+///
+/// Parallel version available with [sample_grid_space_3d_par].
 pub fn sample_grid_space_3d<M, I>(
     min: &Vector3,
     max: &Vector3,
@@ -49,6 +52,11 @@ where
     space
 }
 
+/// Samples the 3D space with the given step and rotation.
+///
+/// **Runs in parallel using Rayon.**
+///
+/// Single-threaded version available with [sample_grid_space_3d].
 pub fn sample_grid_space_3d_par<M, I>(
     min: &Vector3,
     max: &Vector3,

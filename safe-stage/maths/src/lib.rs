@@ -1,4 +1,4 @@
-//! # Math Library
+//! # Maths
 //! Small collection of basic math types and functions.
 //! All functions operate with angles in radians.
 

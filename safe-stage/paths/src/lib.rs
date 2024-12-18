@@ -1,3 +1,6 @@
+//! # Paths
+//! Focused on pathfinding algorithms optimized for an electron microscope.
+
 mod common;
 pub mod deferred;
 pub mod eager;

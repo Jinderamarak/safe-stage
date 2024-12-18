@@ -8,6 +8,8 @@ use std::collections::{BinaryHeap, HashMap};
 
 type Graph = HashMap<usize, Vec<usize>>;
 
+/// # Basic Probabilistic Roadmap Strategy
+/// Implementation of a Probabilistic Road-Map pathfinding.
 pub struct BasicPrmStrategy {
     samples: Vec<SixAxis>,
     graph: Graph,

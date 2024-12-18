@@ -9,12 +9,16 @@ use models::movable::Movable;
 use std::sync::Arc;
 use thiserror::Error;
 
+/// # State Update Error
+/// Error of a resolver state update.
 #[derive(Error, Debug)]
 pub enum StateUpdateError {
     #[error("Invalid state")]
     InvalidState,
 }
 
+/// # Path Resolver
+/// Resolves a path between two points and holds state to do it faster.
 pub trait PathResolver<P, M, I>
 where
     M: Movable<P> + Sync,

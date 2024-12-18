@@ -1,4 +1,5 @@
 pub trait NaNExtension {
+    /// Maps `NaN` value to the given default value.
     fn map_nan(self, default: Self) -> Self;
 }
 

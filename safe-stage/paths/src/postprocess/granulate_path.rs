@@ -2,6 +2,7 @@ use crate::path::PathResult;
 use maths::NaNExtension;
 use models::position::sixaxis::SixAxis;
 
+/// Granulates the path by adding intermediate nodes.
 pub fn granulate_path(path: PathResult<SixAxis>, step: &SixAxis) -> PathResult<SixAxis> {
     path.map(|p| granulate_path_nodes(p, step))
 }

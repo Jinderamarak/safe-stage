@@ -68,7 +68,6 @@ concrete_part_impl!(ConcreteStage, Stage);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use collisions::complex::bvh_sphere_recursive::BvhSphereRecursive;
     use collisions::complex::group::ColliderGroup;
     use collisions::PrimaryCollider;
     use models::movable::Movable;
@@ -96,7 +95,7 @@ mod tests {
 
     struct TestEquipment;
     impl Equipment for TestEquipment {
-        fn collider(&self) -> ColliderGroup<BvhSphereRecursive> {
+        fn collider(&self) -> ColliderGroup<PrimaryCollider> {
             unreachable!()
         }
     }
@@ -111,7 +110,7 @@ mod tests {
         fn cloned(&self) -> Box<dyn Holder> {
             unreachable!()
         }
-        fn collider(&self) -> ColliderGroup<BvhSphereRecursive> {
+        fn collider(&self) -> ColliderGroup<PrimaryCollider> {
             unreachable!()
         }
         fn swap_sample(&mut self, _sample: Option<PrimaryCollider>) {

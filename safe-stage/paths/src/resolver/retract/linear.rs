@@ -10,6 +10,11 @@ use collisions::PrimaryCollider;
 use models::movable::Movable;
 use models::position::linear::LinearState;
 
+/// # Retract Linear Resolver
+/// Path resolver intended for a retractable device.
+/// Resolves the path using linear interpolation with fixed step.
+///
+/// **Runs in parallel using Rayon.**
 pub struct RetractLinearResolver {
     strategy: LinearParallelStrategy<LinearState>,
 }

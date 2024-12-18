@@ -16,6 +16,12 @@ use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use std::thread;
 
+/// # Down Rotate Find Resolver
+/// Path resolver intended for a stage.
+/// Resolver the path by combining [SafeRotationPointParallelStrategy],
+/// [AStar3DSpaceWithLoSStrategy] and [smooth_path_par].
+///
+/// **Runs in parallel using Rayon.**
 pub struct DownRotateFindResolver {
     safe_rotation: SafeRotationPointParallelStrategy,
     move_speed: Vector3,
