@@ -88,7 +88,7 @@ jobs:
         working-directory: ./safe-stage
 
       - name: Finalize Test Report
-        uses: dorny/test-report@v1
+        uses: dorny/test-reporter@v1
         if: success() || failure()
         with:
           name: Results for ${{ steps.extraction.profile }}

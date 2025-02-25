@@ -6,7 +6,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  service-app-release:
+  service-app-build:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
