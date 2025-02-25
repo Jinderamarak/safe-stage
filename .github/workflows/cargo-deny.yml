@@ -1,0 +1,23 @@
+name: Cargo Dependencies
+on:
+  pull_request:
+    branches: [$default-branch]
+    paths:
+      - "**/Cargo.lock"
+      - "**/Cargo.toml"
+      - "**/deny.toml"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  cargo-deny:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Cargo Dependencies
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check
+          manifest-path: safe-stage/Cargo.toml

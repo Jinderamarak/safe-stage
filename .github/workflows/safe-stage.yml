@@ -1,0 +1,103 @@
+name: Check Safe Stage
+on:
+  push:
+    branches: [$default-branch]
+    paths:
+      - "safe-stage/*"
+  pull_request:
+    branches: [$default-branch]
+    paths:
+      - "safe-stage/*"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  safe-stage-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        FEATURES: ["--all", "-F ffi"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ./safe-stage/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Add rustfmt and clippy
+        run: rustup component add rustup clippy
+
+      - name: Check Formatting
+        run: cargo fmt --all --check
+        working-directory: ./safe-stage
+
+      - name: Build with Features "${{ matrix.FEATURES }}"
+        run: cargo build --locked ${{ matrix.FEATURES }}
+        working-directory: ./safe-stage
+
+      - name: Run clippy with Features "${{ matrix.FEATURES }}"
+        run: cargo clippy --locked ${{ matrix.FEATURES }} -- -D warnings
+        working-directory: ./safe-stage
+
+  safe-stage-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        PROFILE_FEATURES:
+          [
+            "ci-default;--all",
+            "ci-features-serde;--all -F serde",
+            "ci-features-linear;-p collisions --no-default-features -F rayon-bvh-linear",
+            "ci-features-ffi;-F ffi",
+          ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ./safe-stage/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Add nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Extract Profile and Features
+        id: extraction
+        run: |
+          PROFILE_FEATURES="${{ matrix.PROFILE_FEATURES }}"
+
+          # Split the string at the semicolon
+          IFS=';' read -r PROFILE FEATURES <<< "$PROFILE_FEATURES"
+
+          echo "PROFILE=$PROFILE"
+          echo "FEATURES=$FEATURES"
+
+          # Set the outputs for use in subsequent steps
+          echo "::set-output name=profile::$PROFILE"
+          echo "::set-output name=features::$FEATURES"
+
+      - name: Run Documentation Tests with Profile "${{ steps.extraction.profile }}"
+        run: cargo test --locked --doc ${{ steps.extraction.features }}
+        working-directory: ./safe-stage
+
+      - name: Run Tests with Profile "${{ steps.extraction.profile }}"
+        run: cargo nextest run --locked --config-file .nextest.toml -P ${{ steps.extraction.profile }} ${{ steps.extraction.features }}
+        working-directory: ./safe-stage
+
+      - name: Finalize Test Report
+        uses: dorny/test-report@v1
+        if: success() || failure()
+        with:
+          name: Results for ${{ steps.extraction.profile }}
+          reporter: java-junit
+          path: safe-stage/target/nextest/${{ steps.extraction.profile }}/junit-report.xml

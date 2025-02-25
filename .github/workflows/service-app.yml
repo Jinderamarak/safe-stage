@@ -1,0 +1,32 @@
+name: Build Service Application
+on:
+  push:
+    branches: [$default-branch]
+  pull_request:
+    branches: [$default-branch]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  service-app-release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Rust
+        run: rustup default stable
+
+      - name: Add cargo-expand
+        run: cargo install cargo-expand
+
+      - name: Build Safe Stage
+        run: |
+          cd ./safe-stage
+          cargo run -p bindings
+          cargo build --release -F ffi
+
+      - name: Build Service Application
+        run: |
+          cd ./service-app
+          dotnet build
