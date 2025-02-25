@@ -1,6 +1,11 @@
 name: Cargo Dependencies
 on:
-  push:
+  pull_request:
+    branches: [$default-branch]
+    paths:
+      - "**/Cargo.lock"
+      - "**/Cargo.toml"
+      - "**/deny.toml"
 
 env:
   CARGO_TERM_COLOR: always

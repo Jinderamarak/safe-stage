@@ -1,6 +1,13 @@
 name: Check Safe Stage Safety
 on:
   push:
+    branches: [$default-branch]
+    paths:
+      - "safe-stage/src/*"
+  pull_request:
+    branches: [$default-branch]
+    paths:
+      - "safe-stage/src/*"
 
 env:
   CARGO_TERM_COLOR: always

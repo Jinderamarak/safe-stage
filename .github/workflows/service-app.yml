@@ -1,6 +1,9 @@
 name: Build Service Application
 on:
   push:
+    branches: [$default-branch]
+  pull_request:
+    branches: [$default-branch]
 
 env:
   CARGO_TERM_COLOR: always
