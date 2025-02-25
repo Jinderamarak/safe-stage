@@ -23,9 +23,6 @@ jobs:
             ./safe-stage/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Add rustfmt and clippy
-        run: rustup component add rustup clippy
-
       - name: Check Formatting
         run: cargo fmt --all --check
         working-directory: ./safe-stage
