@@ -9,7 +9,7 @@ jobs:
   service-app-release:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Rust
         run: rustup default stable
