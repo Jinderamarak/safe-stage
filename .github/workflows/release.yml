@@ -19,14 +19,14 @@ jobs:
 
       - name: Build Safe Stage
         run: |
-          cd safe-stage
           cargo run -p bindings
           cargo build --release -F ffi
+        working-directory: ./safe-stage
 
       - name: Publish Service Application
         run: |
-          cd ../service-app
           dotnet publish
+        working-directory: ./service-app
 
       - name: Archive Publish Directory
         run: Compress-Archive -Path service-app/ServiceApp/bin/Release/net8.0-windows/publish -DestinationPath service-app_publish.zip

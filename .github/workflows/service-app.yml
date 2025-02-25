@@ -30,11 +30,11 @@ jobs:
 
       - name: Build Safe Stage
         run: |
-          cd ./safe-stage
           cargo run -p bindings
           cargo build --release -F ffi
+        working-directory: ./safe-stage
 
       - name: Build Service Application
         run: |
-          cd ./service-app
           dotnet build
+        working-directory: ./service-app
