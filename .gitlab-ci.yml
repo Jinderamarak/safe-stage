@@ -12,9 +12,9 @@ stages:
   - test
 
 include:
-  - ci/templates.yml
-  - ci/bindings.yml
-  - ci/caching.yml
-  - ci/repo.yml
-  - ci/safe-stage.yml
-  - ci/service-app.yml
+  - .gitlab/templates.yml
+  - .gitlab/bindings.yml
+  - .gitlab/caching.yml
+  - .gitlab/repo.yml
+  - .gitlab/safe-stage.yml
+  - .gitlab/service-app.yml
