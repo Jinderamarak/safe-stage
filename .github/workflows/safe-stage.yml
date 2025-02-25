@@ -73,8 +73,8 @@ jobs:
           echo "FEATURES=$FEATURES"
 
           # Set the outputs for use in subsequent steps
-          echo "::set-output name=profile::$PROFILE"
-          echo "::set-output name=features::$FEATURES"
+          echo "profile=$PROFILE" >> "$GITHUB_OUTPUT"
+          echo "features=$FEATURES" >> "$GITHUB_OUTPUT"
 
       - name: Run Documentation Tests with Profile "${{ steps.extraction.profile }}"
         run: cargo test --locked --doc ${{ steps.extraction.features }}
