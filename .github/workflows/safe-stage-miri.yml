@@ -1,0 +1,42 @@
+name: Check Safe Stage Safety
+on:
+  push:
+    branches: [$default-branch]
+    paths:
+      - "safe-stage/src/*"
+  pull_request:
+    branches: [$default-branch]
+    paths:
+      - "safe-stage/src/*"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  safe-stage-miri:
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust with miri
+        uses: taiki-e/github-actions/install-rust@main
+        with:
+          toolchain: nightly
+          component: miri
+
+      - name: Add nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Run Tests with Miri
+        run: cargo miri nextest run --locked --config-file .nextest.toml -F ffi
+        working-directory: ./safe-stage
+
+      - name: Finalize Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Results for miri tests
+          reporter: java-junit
+          path: safe-stage/target/nextest/default-miri/junit-report.xml

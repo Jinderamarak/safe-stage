@@ -1,5 +1,5 @@
 include:
-  - ci/templates.yml
+  - .gitlab/templates.yml
 
 repo:check:cargo:
   extends: .rust-template

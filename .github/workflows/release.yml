@@ -1,0 +1,53 @@
+name: Build and Release Service Application
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  service-app-release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        run: rustup default stable
+
+      - name: Add cargo-expand
+        run: cargo install cargo-expand
+
+      - name: Build Safe Stage
+        run: |
+          cargo run -p bindings
+          cargo build --release -F ffi
+        working-directory: ./safe-stage
+
+      - name: Publish Service Application
+        run: |
+          dotnet publish
+        working-directory: ./service-app
+
+      - name: Archive Publish Directory
+        run: Compress-Archive -Path service-app/ServiceApp/bin/Release/net8.0-windows/publish -DestinationPath service-app_publish.zip
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: true
+          prerelease: false
+
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: service-app_publish.zip
+          asset_name: service-app_publish.zip
+          asset_content_type: application/zip
