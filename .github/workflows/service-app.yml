@@ -1,7 +1,7 @@
 name: Build Service Application
 on:
   push:
-    branches: [$default-branch, release-pipeline]
+    branches: [$default-branch]
   pull_request:
     branches: [$default-branch]
 
@@ -36,7 +36,7 @@ jobs:
       - name: Build Safe Stage
         run: |
           cargo run -p bindings
-          cargo build --release -F ffi
+          cargo build -F ffi
         working-directory: ./safe-stage
 
       - name: Build Service Application
