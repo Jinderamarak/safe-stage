@@ -29,12 +29,14 @@ jobs:
 
       - name: Add cargo-expand
         if: steps.cache-cargo.outputs.cache-hit != 'true'
-        run: cargo install cargo-expand
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-expand
 
       - name: Build Safe Stage
         run: |
           cargo run -p bindings
-          cargo build --release -F ffi
+          cargo build -F ffi
         working-directory: ./safe-stage
 
       - name: Build Service Application
