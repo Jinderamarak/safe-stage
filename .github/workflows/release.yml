@@ -30,7 +30,7 @@ jobs:
         working-directory: ./service-app
 
       - name: Archive Publish Directory
-        run: Compress-Archive -Path service-app/ServiceApp/bin/Release/net8.0-windows/publish -DestinationPath service-app.zip
+        run: Compress-Archive -Path service-app/ServiceApp/bin/Release/net8.0-windows/publish/* -DestinationPath service-app.zip
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
