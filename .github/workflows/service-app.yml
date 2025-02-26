@@ -29,7 +29,9 @@ jobs:
 
       - name: Add cargo-expand
         if: steps.cache-cargo.outputs.cache-hit != 'true'
-        uses: taiki-e/install-action@cargo-expand
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-expand
 
       - name: Build Safe Stage
         run: |

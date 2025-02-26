@@ -16,7 +16,9 @@ jobs:
         run: rustup default stable
 
       - name: Add cargo-expand
-        uses: taiki-e/install-action@cargo-expand
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-expand
 
       - name: Build Safe Stage
         run: |
