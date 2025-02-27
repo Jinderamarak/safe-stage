@@ -12,15 +12,19 @@
 //!     for [SphereCollider] as the bounding shape
 
 use crate::collides_group_impl;
+use crate::complex::bvh_array::BvhTreeArr;
 use crate::complex::bvh_recursive::BvhRecursive;
 use crate::primitive::AlignedBoxCollider;
 
 pub mod bvh;
+pub mod bvh_array;
 pub mod bvh_recursive;
 pub mod bvh_sphere_linear;
 pub mod bvh_sphere_recursive;
 pub mod group;
 pub(crate) mod tree;
+
+collides_group_impl!(BvhTreeArr, BvhTreeArr);
 
 collides_group_impl!(
     BvhRecursive<AlignedBoxCollider>,

@@ -1,4 +1,5 @@
 use crate::loader::load_stl_from_bytes;
+use collisions::primitive::TriangleCollider;
 use collisions::PrimaryCollider;
 
 const DATA: &[u8] = include_bytes!("./models/BallArena.stl");
@@ -15,8 +16,12 @@ impl BallChamber {
 
 impl Default for BallChamber {
     fn default() -> Self {
-        let triangles = load_stl_from_bytes(DATA).unwrap();
+        let triangles = ball_chamber_triangles();
         let tree = PrimaryCollider::build(&triangles);
         BallChamber { tree }
     }
+}
+
+pub fn ball_chamber_triangles() -> Vec<TriangleCollider> {
+    load_stl_from_bytes(DATA).unwrap()
 }

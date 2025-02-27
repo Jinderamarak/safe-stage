@@ -4,6 +4,7 @@ use maths::Vector3;
 mod chamber;
 mod stage;
 
+pub use chamber::ball_chamber_triangles;
 pub use chamber::BallChamber;
 pub use stage::ball_stage_triangles;
 pub use stage::BallStage;
