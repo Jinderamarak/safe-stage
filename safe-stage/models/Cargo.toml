@@ -13,11 +13,19 @@ publish.workspace = true
 serde = ["dep:serde", "collisions/serde", "maths/serde"]
 
 [[bench]]
-name = "linear_recursive_tree"
+name = "stage_movement"
 harness = false
 
 [[bench]]
-name = "stage_movement"
+name = "tree_compare_build"
+harness = false
+
+[[bench]]
+name = "tree_compare_collision"
+harness = false
+
+[[bench]]
+name = "tree_compare_transform"
 harness = false
 
 [dependencies]
