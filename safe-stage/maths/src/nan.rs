@@ -1,3 +1,5 @@
+use std::intrinsics::unlikely;
+
 pub trait NaNExtension {
     /// Maps `NaN` value to the given default value.
     fn map_nan(self, default: Self) -> Self;
@@ -6,7 +8,7 @@ pub trait NaNExtension {
 impl NaNExtension for f64 {
     #[inline]
     fn map_nan(self, default: Self) -> Self {
-        if self.is_nan() {
+        if unlikely(self.is_nan()) {
             default
         } else {
             self

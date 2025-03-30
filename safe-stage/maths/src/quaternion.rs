@@ -1,4 +1,5 @@
 use crate::Vector3;
+use std::intrinsics::{fadd_fast, fdiv_fast, fmul_fast, fsub_fast, unlikely};
 use std::ops::Mul;
 
 /// # Quaternion
@@ -81,28 +82,65 @@ impl Quaternion {
         let yc = half.z().cos();
         let ys = half.z().sin();
 
-        let w = rc * pc * yc + rs * ps * ys;
-        let x = rs * pc * yc - rc * ps * ys;
-        let y = rc * ps * yc + rs * pc * ys;
-        let z = rc * pc * ys - rs * ps * yc;
+        unsafe {
+            let w = fadd_fast(
+                fmul_fast(fmul_fast(rc, pc), yc),
+                fmul_fast(fmul_fast(rs, ps), ys),
+            );
+            let x = fsub_fast(
+                fmul_fast(fmul_fast(rs, pc), yc),
+                fmul_fast(fmul_fast(rc, ps), ys),
+            );
+            let y = fadd_fast(
+                fmul_fast(fmul_fast(rc, ps), yc),
+                fmul_fast(fmul_fast(rs, pc), ys),
+            );
+            let z = fsub_fast(
+                fmul_fast(fmul_fast(rc, pc), ys),
+                fmul_fast(fmul_fast(rs, ps), yc),
+            );
 
-        Self::normalized(w, x, y, z)
+            Self::normalized(w, x, y, z)
+        }
     }
 
     /// Converts a quaternion to euler angles according to the right hand thumb rule.
     pub fn to_euler(self) -> Vector3 {
-        let t0 = 2.0 * (self.w * self.x + self.y * self.z);
-        let t1 = 1.0 - 2.0 * (self.x * self.x + self.y * self.y);
-        let x = t0.atan2(t1);
+        unsafe {
+            let t0 = fmul_fast(
+                2.0,
+                fadd_fast(fmul_fast(self.w, self.x), fmul_fast(self.y, self.z)),
+            );
+            let t1 = fsub_fast(
+                1.0,
+                fmul_fast(
+                    2.0,
+                    fadd_fast(fmul_fast(self.x, self.x), fmul_fast(self.y, self.y)),
+                ),
+            );
+            let x = t0.atan2(t1);
 
-        let t2 = 2.0 * (self.w * self.y - self.z * self.x);
-        let y = t2.clamp(-1.0, 1.0).asin();
+            let t2 = fmul_fast(
+                2.0,
+                fsub_fast(fmul_fast(self.w, self.y), fmul_fast(self.z, self.x)),
+            );
+            let y = t2.clamp(-1.0, 1.0).asin();
 
-        let t3 = 2.0 * (self.w * self.z + self.x * self.y);
-        let t4 = 1.0 - 2.0 * (self.y * self.y + self.z * self.z);
-        let z = t3.atan2(t4);
+            let t3 = fmul_fast(
+                2.0,
+                fadd_fast(fmul_fast(self.w, self.z), fmul_fast(self.x, self.y)),
+            );
+            let t4 = fsub_fast(
+                1.0,
+                fmul_fast(
+                    2.0,
+                    fadd_fast(fmul_fast(self.y, self.y), fmul_fast(self.z, self.z)),
+                ),
+            );
+            let z = t3.atan2(t4);
 
-        Vector3::new(x, y, z)
+            Vector3::new(x, y, z)
+        }
     }
 
     /// Creates a quaternion from an axis and an angle.
@@ -136,17 +174,30 @@ impl Quaternion {
     /// Returns the length of the quaternion.
     #[inline]
     pub fn len(&self) -> f64 {
-        (self.w * self.w + self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+        unsafe {
+            fadd_fast(
+                fadd_fast(fmul_fast(self.w, self.w), fmul_fast(self.x, self.x)),
+                fadd_fast(fmul_fast(self.y, self.y), fmul_fast(self.z, self.z)),
+            )
+            .sqrt()
+        }
     }
 
     /// Returns the normalized quaternion.
     #[inline]
     pub fn normalize(&self) -> Self {
         let len = self.len();
-        if len == 0.0 {
+        if unlikely(len == 0.0) {
             *self
         } else {
-            Self::raw(self.w / len, self.x / len, self.y / len, self.z / len)
+            unsafe {
+                Self::raw(
+                    fdiv_fast(self.w, len),
+                    fdiv_fast(self.x, len),
+                    fdiv_fast(self.y, len),
+                    fdiv_fast(self.z, len),
+                )
+            }
         }
     }
 }
@@ -171,11 +222,49 @@ macro_rules! mul_impl {
 
             #[inline]
             fn mul(self, other: $t2) -> Self::Output {
-                Quaternion {
-                    w: self.w * other.w - self.x * other.x - self.y * other.y - self.z * other.z,
-                    x: self.w * other.x + self.x * other.w + self.y * other.z - self.z * other.y,
-                    y: self.w * other.y - self.x * other.z + self.y * other.w + self.z * other.x,
-                    z: self.w * other.z + self.x * other.y - self.y * other.x + self.z * other.w,
+                unsafe {
+                    Quaternion::raw(
+                        fsub_fast(
+                            fsub_fast(
+                                fsub_fast(
+                                    fmul_fast(self.w, other.w),
+                                    fmul_fast(self.x, other.x),
+                                ),
+                                fmul_fast(self.y, other.y),
+                            ),
+                            fmul_fast(self.z, other.z),
+                        ),
+                        fsub_fast(
+                            fadd_fast(
+                                fadd_fast(
+                                    fmul_fast(self.w, other.x),
+                                    fmul_fast(self.x, other.w),
+                                ),
+                                fmul_fast(self.y, other.z),
+                            ),
+                            fmul_fast(self.z, other.y),
+                        ),
+                        fadd_fast(
+                            fsub_fast(
+                                fmul_fast(self.w, other.y),
+                                fmul_fast(self.x, other.z),
+                            ),
+                            fadd_fast(
+                                fmul_fast(self.y, other.w),
+                                fmul_fast(self.z, other.x),
+                            ),
+                        ),
+                        fadd_fast(
+                            fsub_fast(
+                                fadd_fast(
+                                    fmul_fast(self.w, other.z),
+                                    fmul_fast(self.x, other.y),
+                                ),
+                                fmul_fast(self.y, other.x),
+                            ),
+                            fmul_fast(self.z, other.w),
+                        ),
+                    )
                 }
             }
         }
