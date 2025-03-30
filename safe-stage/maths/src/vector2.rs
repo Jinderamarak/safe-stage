@@ -1,3 +1,4 @@
+use std::intrinsics::{fadd_fast, fdiv_fast, fmul_fast, fsub_fast, unlikely};
 use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub};
 
 /// # Vector 2D
@@ -51,15 +52,15 @@ impl Vector2 {
 
     /// Returns the dot product of the vector and the `other` vector.
     #[inline]
-    pub const fn dot(&self, other: &Vector2) -> f64 {
-        self.x * other.x + self.y * other.y
+    pub fn dot(&self, other: &Vector2) -> f64 {
+        unsafe { fadd_fast(fmul_fast(self.x, other.x), fmul_fast(self.y, other.y)) }
     }
 
     /// Returns 2D cross product.
     /// Represents signed magnitude of the vector in 3D space.
     #[inline]
-    pub const fn cross(&self, other: &Vector2) -> f64 {
-        self.x * other.y - self.y * other.x
+    pub fn cross(&self, other: &Vector2) -> f64 {
+        unsafe { fsub_fast(fmul_fast(self.x, other.y), fmul_fast(self.y, other.x)) }
     }
 
     /// Returns the length of the vector.
@@ -72,10 +73,10 @@ impl Vector2 {
     #[inline]
     pub fn normalize(&self) -> Self {
         let len = self.len();
-        if len > 0.0 {
-            *self / len
-        } else {
+        if unlikely(len == 0.0) {
             *self
+        } else {
+            *self / len
         }
     }
 
@@ -108,7 +109,12 @@ macro_rules! add_impl {
 
             #[inline]
             fn add(self, other: $t2) -> Self::Output {
-                Vector2::new(self.x + other.x, self.y + other.y)
+                unsafe {
+                    Vector2::new(
+                        fadd_fast(self.x, other.x),
+                        fadd_fast(self.y, other.y),
+                    )
+                }
             }
         }
     )*)
@@ -136,7 +142,12 @@ macro_rules! sub_impl {
 
             #[inline]
             fn sub(self, other: $t2) -> Self::Output {
-                Vector2::new(self.x - other.x, self.y - other.y)
+                unsafe {
+                    Vector2::new(
+                        fsub_fast(self.x, other.x),
+                        fsub_fast(self.y, other.y),
+                    )
+                }
             }
         }
     )*)
@@ -151,7 +162,12 @@ macro_rules! mul_impl {
 
             #[inline]
             fn mul(self, scalar: f64) -> Self::Output {
-                Vector2::new(self.x * scalar, self.y * scalar)
+                unsafe {
+                    Vector2::new(
+                        fmul_fast(self.x, scalar),
+                        fmul_fast(self.y, scalar),
+                    )
+                }
             }
         }
     )*)
@@ -166,7 +182,12 @@ macro_rules! div_impl {
 
             #[inline]
             fn div(self, scalar: f64) -> Self::Output {
-                Vector2::new(self.x / scalar, self.y / scalar)
+                unsafe {
+                    Vector2::new(
+                        fdiv_fast(self.x, scalar),
+                        fdiv_fast(self.y, scalar),
+                    )
+                }
             }
         }
     )*)

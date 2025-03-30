@@ -1,5 +1,6 @@
 use crate::Axis;
 use crate::Quaternion;
+use std::intrinsics::{fadd_fast, fdiv_fast, fmul_fast, fsub_fast, unlikely};
 use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub};
 
 /// # Vector 3D
@@ -83,23 +84,30 @@ impl Vector3 {
 
     /// Returns the dot product of the vector and the `other` vector.
     #[inline]
-    pub const fn dot(&self, other: &Vector3) -> f64 {
-        self.x * other.x + self.y * other.y + self.z * other.z
+    pub fn dot(&self, other: &Vector3) -> f64 {
+        unsafe {
+            fadd_fast(
+                fadd_fast(fmul_fast(self.x, other.x), fmul_fast(self.y, other.y)),
+                fmul_fast(self.z, other.z),
+            )
+        }
     }
 
     /// Returns the cross product of the vector and the `other` vector.
     #[inline]
-    pub const fn cross(&self, other: &Vector3) -> Vector3 {
-        Vector3::new(
-            self.y * other.z - self.z * other.y,
-            self.z * other.x - self.x * other.z,
-            self.x * other.y - self.y * other.x,
-        )
+    pub fn cross(&self, other: &Vector3) -> Vector3 {
+        unsafe {
+            Vector3::new(
+                fsub_fast(fmul_fast(self.y, other.z), fmul_fast(self.z, other.y)),
+                fsub_fast(fmul_fast(self.z, other.x), fmul_fast(self.x, other.z)),
+                fsub_fast(fmul_fast(self.x, other.y), fmul_fast(self.y, other.x)),
+            )
+        }
     }
 
     /// Returns the length of the vector **squared**
     #[inline]
-    pub const fn len2(&self) -> f64 {
+    pub fn len2(&self) -> f64 {
         self.dot(self)
     }
 
@@ -113,16 +121,16 @@ impl Vector3 {
     #[inline]
     pub fn normalize(&self) -> Self {
         let len = self.len();
-        if len > 0.0 {
-            *self / len
-        } else {
+        if unlikely(len == 0.0) {
             *self
+        } else {
+            *self / len
         }
     }
 
     /// Returns the vector with each component clamped to the given min and max values.
     #[inline]
-    pub fn clamp(&self, min: &Vector3, max: &Vector3) -> Vector3 {
+    pub const fn clamp(&self, min: &Vector3, max: &Vector3) -> Vector3 {
         Vector3::new(
             self.x.clamp(min.x, max.x),
             self.y.clamp(min.y, max.y),
@@ -132,7 +140,7 @@ impl Vector3 {
 
     /// Takes the minimal components of the two vectors.
     #[inline]
-    pub fn minimized(&self, other: &Vector3) -> Vector3 {
+    pub const fn minimized(&self, other: &Vector3) -> Vector3 {
         Vector3::new(
             self.x.min(other.x),
             self.y.min(other.y),
@@ -142,7 +150,7 @@ impl Vector3 {
 
     /// Takes the maximal components of the two vectors.
     #[inline]
-    pub fn maximized(&self, other: &Vector3) -> Vector3 {
+    pub const fn maximized(&self, other: &Vector3) -> Vector3 {
         Vector3::new(
             self.x.max(other.x),
             self.y.max(other.y),
@@ -152,7 +160,7 @@ impl Vector3 {
 
     /// Returns the absolute vector.
     #[inline]
-    pub fn abs(&self) -> Vector3 {
+    pub const fn abs(&self) -> Vector3 {
         Vector3::new(self.x.abs(), self.y.abs(), self.z.abs())
     }
 
@@ -185,7 +193,13 @@ macro_rules! add_impl {
 
             #[inline]
             fn add(self, other: $t2) -> Self::Output {
-                Vector3::new(self.x + other.x, self.y + other.y, self.z + other.z)
+                unsafe {
+                    Vector3::new(
+                        fadd_fast(self.x, other.x),
+                        fadd_fast(self.y, other.y),
+                        fadd_fast(self.z, other.z),
+                    )
+                }
             }
         }
     )*)
@@ -213,7 +227,13 @@ macro_rules! sub_impl {
 
             #[inline]
             fn sub(self, other: $t2) -> Self::Output {
-                Vector3::new(self.x - other.x, self.y - other.y, self.z - other.z)
+                unsafe {
+                    Vector3::new(
+                        fsub_fast(self.x, other.x),
+                        fsub_fast(self.y, other.y),
+                        fsub_fast(self.z, other.z),
+                    )
+                }
             }
         }
     )*)
@@ -228,7 +248,13 @@ macro_rules! mul_impl {
 
             #[inline]
             fn mul(self, scalar: f64) -> Vector3 {
-                Vector3::new(self.x * scalar, self.y * scalar, self.z * scalar)
+                unsafe {
+                    Vector3::new(
+                        fmul_fast(self.x, scalar),
+                        fmul_fast(self.y, scalar),
+                        fmul_fast(self.z, scalar),
+                    )
+                }
             }
         }
     )*)
@@ -243,7 +269,13 @@ macro_rules! div_impl {
 
             #[inline]
             fn div(self, scalar: f64) -> Vector3 {
-                Vector3::new(self.x / scalar, self.y / scalar, self.z / scalar)
+                unsafe {
+                    Vector3::new(
+                        fdiv_fast(self.x, scalar),
+                        fdiv_fast(self.y, scalar),
+                        fdiv_fast(self.z, scalar),
+                    )
+                }
             }
         }
     )*)
