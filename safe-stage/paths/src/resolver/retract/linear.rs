@@ -4,9 +4,7 @@ use crate::path::PathResult;
 use crate::resolver::retract::RetractPathResolver;
 use crate::resolver::{PathResolver, StateUpdateError};
 use crate::strategy::PathStrategy;
-use collisions::common::Collides;
-use collisions::complex::group::ColliderGroup;
-use collisions::PrimaryCollider;
+use models::collider::ModelCollider;
 use models::movable::Movable;
 use models::position::linear::LinearState;
 
@@ -29,16 +27,12 @@ impl RetractLinearResolver {
 
 impl RetractPathResolver for RetractLinearResolver {}
 
-impl<M, I> PathResolver<LinearState, M, I> for RetractLinearResolver
-where
-    M: Movable<LinearState> + Sync,
-    I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
-{
+impl PathResolver<LinearState> for RetractLinearResolver {
     fn update_state(
         &mut self,
         new: &LinearState,
-        movable: &M,
-        immovable: &I,
+        movable: &dyn Movable<LinearState>,
+        immovable: &dyn ModelCollider,
     ) -> Result<(), StateUpdateError> {
         if immovable.collides_with(&movable.move_to(new)) {
             return Err(StateUpdateError::InvalidState);
@@ -51,8 +45,8 @@ where
         &self,
         from: &LinearState,
         to: &LinearState,
-        movable: &M,
-        immovable: &I,
+        movable: &dyn Movable<LinearState>,
+        immovable: &dyn ModelCollider,
     ) -> PathResult<LinearState> {
         let (path, time_to_path) =
             timed!({ self.strategy.find_path(from, to, movable, immovable) });

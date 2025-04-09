@@ -22,7 +22,7 @@ pub struct ThesisRetract {
 }
 
 impl Retract for ThesisRetract {
-    fn as_movable(&self) -> Arc<dyn Movable<LinearState> + Send + Sync> {
+    fn as_movable(&self) -> Arc<dyn Movable<LinearState>> {
         Arc::new(self.clone())
     }
 }

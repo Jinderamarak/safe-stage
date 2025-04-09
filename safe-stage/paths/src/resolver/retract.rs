@@ -1,9 +1,6 @@
-use crate::resolver::{DynamicImmovable, DynamicMovable, PathResolver};
+use crate::resolver::PathResolver;
 use models::position::linear::LinearState;
 
 pub mod linear;
 
-pub trait RetractPathResolver:
-    PathResolver<LinearState, DynamicMovable<LinearState>, DynamicImmovable>
-{
-}
+pub trait RetractPathResolver: PathResolver<LinearState> {}
