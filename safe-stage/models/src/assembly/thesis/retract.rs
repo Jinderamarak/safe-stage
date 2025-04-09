@@ -1,9 +1,9 @@
+use crate::immovable::Immovable;
 use crate::loader::load_stl_from_bytes;
 use crate::movable::Movable;
 use crate::parts::retract::Retract;
 use crate::position::linear::LinearState;
 use collisions::common::Translation;
-use collisions::complex::group::ColliderGroup;
 use collisions::{collider_group, PrimaryCollider};
 use maths::Vector3;
 use std::sync::Arc;
@@ -22,7 +22,7 @@ pub struct ThesisRetract {
 }
 
 impl Retract for ThesisRetract {
-    fn as_arc(&self) -> Arc<dyn Movable<LinearState> + Send + Sync> {
+    fn as_movable(&self) -> Arc<dyn Movable<LinearState>> {
         Arc::new(self.clone())
     }
 }
@@ -44,7 +44,7 @@ impl Default for ThesisRetract {
 }
 
 impl Movable<LinearState> for ThesisRetract {
-    fn move_to(&self, position: &LinearState) -> ColliderGroup<PrimaryCollider> {
+    fn move_to(&self, position: &LinearState) -> Immovable {
         match position {
             LinearState::None => collider_group!(self.entry.clone(), self.retracted.clone()),
             LinearState::Full => collider_group!(self.entry.clone(), self.inserted.clone()),

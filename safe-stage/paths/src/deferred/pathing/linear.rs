@@ -1,9 +1,8 @@
 use crate::path::PathResult;
 use crate::strategy::PathStrategy;
 use collisions::common::Collides;
-use collisions::complex::group::ColliderGroup;
-use collisions::PrimaryCollider;
 use maths::NaNExtension;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::linear::LinearState;
 use models::position::sixaxis::SixAxis;
@@ -23,17 +22,13 @@ impl<P> LinearStrategy<P> {
 }
 
 impl PathStrategy<SixAxis> for LinearStrategy<SixAxis> {
-    fn find_path<M, I>(
+    fn find_path(
         &self,
         from: &SixAxis,
         to: &SixAxis,
-        movable: &M,
-        immovable: &I,
-    ) -> PathResult<SixAxis>
-    where
-        M: Movable<SixAxis> + Sync,
-        I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
-    {
+        movable: &dyn Movable<SixAxis>,
+        immovable: &Immovable,
+    ) -> PathResult<SixAxis> {
         if immovable.collides_with(&movable.move_to(from)) {
             return PathResult::InvalidStart(*from);
         }
@@ -59,17 +54,13 @@ impl PathStrategy<SixAxis> for LinearStrategy<SixAxis> {
 }
 
 impl PathStrategy<LinearState> for LinearStrategy<LinearState> {
-    fn find_path<M, I>(
+    fn find_path(
         &self,
         from: &LinearState,
         to: &LinearState,
-        movable: &M,
-        immovable: &I,
-    ) -> PathResult<LinearState>
-    where
-        M: Movable<LinearState> + Sync,
-        I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
-    {
+        movable: &dyn Movable<LinearState>,
+        immovable: &Immovable,
+    ) -> PathResult<LinearState> {
         if immovable.collides_with(&movable.move_to(from)) {
             return PathResult::InvalidStart(*from);
         }

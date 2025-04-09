@@ -1,6 +1,6 @@
+use crate::immovable::Immovable;
 use crate::loader::load_stl_from_bytes;
 use crate::parts::equipment::Equipment;
-use collisions::complex::group::ColliderGroup;
 use collisions::{collider_group, PrimaryCollider};
 
 const DETECTOR_ALPHA: &[u8] = include_bytes!("./models/Detector Alpha.stl");
@@ -17,7 +17,7 @@ impl Default for ThesisDetectorAlpha {
 }
 
 impl Equipment for ThesisDetectorAlpha {
-    fn collider(&self) -> ColliderGroup<PrimaryCollider> {
+    fn collider(&self) -> Immovable {
         collider_group!(self.0.clone())
     }
 }
@@ -33,7 +33,7 @@ impl Default for ThesisDetectorBeta {
 }
 
 impl Equipment for ThesisDetectorBeta {
-    fn collider(&self) -> ColliderGroup<PrimaryCollider> {
+    fn collider(&self) -> Immovable {
         collider_group!(self.0.clone())
     }
 }

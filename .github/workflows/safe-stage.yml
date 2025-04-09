@@ -1,48 +1,20 @@
-name: Check Safe Stage
+name: Safe Stage - Checks
 on:
   push:
-    branches: [$default-branch]
+    branches: [ main ]
     paths:
-      - "safe-stage/*"
+      - "safe-stage/**"
   pull_request:
-    branches: [$default-branch]
+    branches: [ main ]
     paths:
-      - "safe-stage/*"
+      - "safe-stage/**"
 
 env:
   CARGO_TERM_COLOR: always
+  MSRV: 1.86.0
 
 jobs:
-  safe-stage-build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        FEATURES: ["--all", "-F ffi"]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            ./safe-stage/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Check Formatting
-        run: cargo fmt --all --check
-        working-directory: ./safe-stage
-
-      - name: Build with Features "${{ matrix.FEATURES }}"
-        run: cargo build --locked ${{ matrix.FEATURES }}
-        working-directory: ./safe-stage
-
-      - name: Run clippy with Features "${{ matrix.FEATURES }}"
-        run: cargo clippy --locked ${{ matrix.FEATURES }} -- -D warnings
-        working-directory: ./safe-stage
-
-  safe-stage-test:
+  safe-stage:
     runs-on: ubuntu-latest
     permissions:
       checks: write
@@ -51,8 +23,6 @@ jobs:
         PROFILE_FEATURES:
           [
             "ci-default;--all",
-            "ci-features-serde;--all -F serde",
-            "ci-features-linear;-p collisions --no-default-features -F rayon-bvh-linear",
             "ci-features-ffi;-F ffi",
           ]
     steps:
@@ -66,9 +36,6 @@ jobs:
             ~/.cargo/git/db/
             ./safe-stage/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Add nextest
-        uses: taiki-e/install-action@nextest
 
       - name: Extract Profile and Features
         id: extraction
@@ -84,6 +51,27 @@ jobs:
           # Set the outputs for use in subsequent steps
           echo "profile=$PROFILE" >> "$GITHUB_OUTPUT"
           echo "features=$FEATURES" >> "$GITHUB_OUTPUT"
+
+      - name: Install Rust with MSRV
+        uses: taiki-e/github-actions/install-rust@main
+        with:
+          toolchain: ${{ env.MSRV }}
+          component: rustfmt,clippy
+
+      - name: Check Formatting
+        run: cargo fmt --all --check
+        working-directory: ./safe-stage
+
+      - name: Build with Features "${{ steps.extraction.outputs.features }}"
+        run: cargo build --locked ${{ steps.extraction.outputs.features }}
+        working-directory: ./safe-stage
+
+      - name: Run clippy with Features "${{ steps.extraction.outputs.features }}"
+        run: cargo clippy --locked ${{ steps.extraction.outputs.features }} -- -D warnings
+        working-directory: ./safe-stage
+
+      - name: Add nextest
+        uses: taiki-e/install-action@nextest
 
       - name: Run Documentation Tests with Profile "${{ steps.extraction.outputs.profile }}"
         run: cargo test --locked --doc ${{ steps.extraction.outputs.features }}

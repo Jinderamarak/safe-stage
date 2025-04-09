@@ -1,12 +1,11 @@
-use collisions::complex::group::ColliderGroup;
-use collisions::PrimaryCollider;
+use crate::immovable::Immovable;
 
 /// # Chamber
 pub trait Chamber: Send + Sync {
     /// Get the full representation of the chamber.
-    fn full(&self) -> ColliderGroup<PrimaryCollider>;
+    fn full(&self) -> Immovable;
     /// Get the representation of the chamber with less obstructive parts.
-    fn less_obstructive(&self) -> ColliderGroup<PrimaryCollider>;
+    fn less_obstructive(&self) -> Immovable;
     /// Get the representation of the chamber only with non-obstructive parts.
-    fn non_obstructive(&self) -> ColliderGroup<PrimaryCollider>;
+    fn non_obstructive(&self) -> Immovable;
 }

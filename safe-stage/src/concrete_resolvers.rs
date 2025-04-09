@@ -66,21 +66,22 @@ concrete_resolver_impl!(ConcreteStageResolver, StagePathResolver);
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    use models::immovable::Immovable;
+    use models::movable::Movable;
     use models::position::linear::LinearState;
     use models::position::sixaxis::SixAxis;
     use paths::path::PathResult;
-    use paths::resolver::{DynamicImmovable, DynamicMovable, PathResolver, StateUpdateError};
+    use paths::resolver::{PathResolver, StateUpdateError};
 
     struct TestRetractResolver;
     impl RetractPathResolver for TestRetractResolver {}
-    impl PathResolver<LinearState, DynamicMovable<LinearState>, DynamicImmovable>
-        for TestRetractResolver
-    {
+    impl PathResolver<LinearState> for TestRetractResolver {
         fn update_state(
             &mut self,
             _new: &LinearState,
-            _movable: &DynamicMovable<LinearState>,
-            _immovable: &DynamicImmovable,
+            _movable: &dyn Movable<LinearState>,
+            _immovable: &Immovable,
         ) -> Result<(), StateUpdateError> {
             unreachable!()
         }
@@ -89,8 +90,8 @@ mod tests {
             &self,
             _from: &LinearState,
             _to: &LinearState,
-            _movable: &DynamicMovable<LinearState>,
-            _immovable: &DynamicImmovable,
+            _movable: &dyn Movable<LinearState>,
+            _immovable: &Immovable,
         ) -> PathResult<LinearState> {
             unreachable!()
         }
@@ -103,12 +104,12 @@ mod tests {
 
     struct TestStageResolver;
     impl StagePathResolver for TestStageResolver {}
-    impl PathResolver<SixAxis, DynamicMovable<SixAxis>, DynamicImmovable> for TestStageResolver {
+    impl PathResolver<SixAxis> for TestStageResolver {
         fn update_state(
             &mut self,
             _new: &SixAxis,
-            _movable: &DynamicMovable<SixAxis>,
-            _immovable: &DynamicImmovable,
+            _movable: &dyn Movable<SixAxis>,
+            _immovable: &Immovable,
         ) -> Result<(), StateUpdateError> {
             unreachable!()
         }
@@ -117,8 +118,8 @@ mod tests {
             &self,
             _from: &SixAxis,
             _to: &SixAxis,
-            _movable: &DynamicMovable<SixAxis>,
-            _immovable: &DynamicImmovable,
+            _movable: &dyn Movable<SixAxis>,
+            _immovable: &Immovable,
         ) -> PathResult<SixAxis> {
             unreachable!()
         }

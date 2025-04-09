@@ -1,4 +1,4 @@
-name: Build and Release Service Application
+name: Build and Release
 on:
   push:
     tags:
@@ -23,10 +23,10 @@ jobs:
       - name: Build Safe Stage
         run: |
           cargo run -p bindings
-          cargo build --release -F ffi
+          cargo build --release --features ffi
         working-directory: ./safe-stage
 
-      - name: Publish Service Application
+      - name: Build Service App
         run: |
           dotnet publish
         working-directory: ./service-app

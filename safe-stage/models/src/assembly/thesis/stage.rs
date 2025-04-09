@@ -1,3 +1,4 @@
+use crate::immovable::Immovable;
 use crate::loader::load_stl_from_bytes;
 use crate::movable::Movable;
 use crate::parts::holder::Holder;
@@ -36,7 +37,7 @@ impl Clone for ThesisStage {
 }
 
 impl Stage for ThesisStage {
-    fn as_arc(&self) -> Arc<dyn Movable<SixAxis> + Send + Sync> {
+    fn as_movable(&self) -> Arc<dyn Movable<SixAxis>> {
         Arc::new(self.clone())
     }
     fn swap_holder(&mut self, holder: Option<Box<dyn Holder>>) {
@@ -67,7 +68,7 @@ impl Default for ThesisStage {
 }
 
 impl Movable<SixAxis> for ThesisStage {
-    fn move_to(&self, coords: &SixAxis) -> ColliderGroup<PrimaryCollider> {
+    fn move_to(&self, coords: &SixAxis) -> Immovable {
         let offset = coords.pos + STAGE_POSITION;
         let tilt = Quaternion::from_euler(&Vector3::new(0.0, coords.rot.y(), 0.0));
         let rotation = Quaternion::from_euler(&Vector3::new(0.0, 0.0, coords.rot.z()));

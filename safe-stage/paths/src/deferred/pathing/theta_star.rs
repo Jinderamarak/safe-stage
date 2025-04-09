@@ -4,8 +4,7 @@ use crate::common::sight::line_of_sight;
 use crate::neighbors::NeighborStrategy;
 use crate::{common::heapstate::MinHeapState, path::PathResult, strategy::PathStrategy};
 use collisions::common::Collides;
-use collisions::complex::group::ColliderGroup;
-use collisions::PrimaryCollider;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use std::collections::{BinaryHeap, HashMap, HashSet};
@@ -46,7 +45,7 @@ where
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn update_vertex<M, I>(
+    fn update_vertex(
         &self,
         s: &SixAxis,
         sn: &SixAxis,
@@ -54,12 +53,9 @@ where
         gscore: &mut HashMap<SixAxis, f64>,
         parent: &mut HashMap<SixAxis, SixAxis>,
         open: &mut BinaryHeap<MinHeapState<f64, SixAxis>>,
-        movable: &M,
-        immovable: &I,
-    ) where
-        M: Movable<SixAxis>,
-        I: Collides<ColliderGroup<PrimaryCollider>>,
-    {
+        movable: &dyn Movable<SixAxis>,
+        immovable: &Immovable,
+    ) {
         #[allow(deprecated)]
         if line_of_sight(
             &parent[s],
@@ -96,17 +92,13 @@ impl<N> PathStrategy<SixAxis> for ThetaStarStrategy<N>
 where
     N: NeighborStrategy<SixAxis>,
 {
-    fn find_path<M, I>(
+    fn find_path(
         &self,
         start: &SixAxis,
         end: &SixAxis,
-        movable: &M,
-        immovable: &I,
-    ) -> PathResult<SixAxis>
-    where
-        M: Movable<SixAxis> + Sync,
-        I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
-    {
+        movable: &dyn Movable<SixAxis>,
+        immovable: &Immovable,
+    ) -> PathResult<SixAxis> {
         if immovable.collides_with(&movable.move_to(start)) {
             return PathResult::InvalidStart(*start);
         }

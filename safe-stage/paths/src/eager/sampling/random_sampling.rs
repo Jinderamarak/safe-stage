@@ -1,23 +1,18 @@
 use collisions::common::Collides;
-use collisions::complex::group::ColliderGroup;
-use collisions::PrimaryCollider;
 use maths::Vector3;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use rand::random;
 use rayon::prelude::*;
 
-pub fn random_samples<M, I>(
+pub fn random_samples(
     min: &SixAxis,
     max: &SixAxis,
-    immovable: &I,
-    movable: &M,
+    movable: &dyn Movable<SixAxis>,
+    immovable: &Immovable,
     count: usize,
-) -> Vec<SixAxis>
-where
-    M: Movable<SixAxis>,
-    I: Collides<ColliderGroup<PrimaryCollider>>,
-{
+) -> Vec<SixAxis> {
     let range = max - min;
     let mut samples = Vec::with_capacity(count);
     while samples.len() < count {
@@ -32,17 +27,13 @@ where
     samples
 }
 
-pub fn random_samples_par<M, I>(
+pub fn random_samples_par(
     min: &SixAxis,
     max: &SixAxis,
-    immovable: &I,
-    movable: &M,
+    movable: &dyn Movable<SixAxis>,
+    immovable: &Immovable,
     count: usize,
-) -> Vec<SixAxis>
-where
-    M: Movable<SixAxis> + Sync,
-    I: Sync + Collides<ColliderGroup<PrimaryCollider>>,
-{
+) -> Vec<SixAxis> {
     let range = max - min;
     (0..count)
         .into_par_iter()

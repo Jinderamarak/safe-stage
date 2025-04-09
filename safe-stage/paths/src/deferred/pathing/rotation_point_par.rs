@@ -1,9 +1,8 @@
 use crate::path::PathResult;
 use crate::strategy::PathStrategy;
 use collisions::common::Collides;
-use collisions::complex::group::ColliderGroup;
-use collisions::PrimaryCollider;
 use maths::{NaNExtension, Vector3};
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use rayon::prelude::*;
@@ -32,17 +31,13 @@ impl SafeRotationPointParallelStrategy {
 }
 
 impl PathStrategy<SixAxis> for SafeRotationPointParallelStrategy {
-    fn find_path<M, I>(
+    fn find_path(
         &self,
         from: &SixAxis,
         to: &SixAxis,
-        movable: &M,
-        immovable: &I,
-    ) -> PathResult<SixAxis>
-    where
-        M: Movable<SixAxis> + Sync,
-        I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
-    {
+        movable: &dyn Movable<SixAxis>,
+        immovable: &Immovable,
+    ) -> PathResult<SixAxis> {
         if immovable.collides_with(&movable.move_to(from)) {
             return PathResult::InvalidStart(*from);
         }

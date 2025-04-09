@@ -130,7 +130,7 @@ mod tests {
         }
     }
     impl Retract for TestRetract {
-        fn as_arc(&self) -> Arc<dyn Movable<LinearState> + Send + Sync> {
+        fn as_movable(&self) -> Arc<dyn Movable<LinearState>> {
             unreachable!()
         }
     }
@@ -147,7 +147,7 @@ mod tests {
         }
     }
     impl Stage for TestStage {
-        fn as_arc(&self) -> Arc<dyn Movable<SixAxis> + Send + Sync> {
+        fn as_movable(&self) -> Arc<dyn Movable<SixAxis>> {
             unreachable!()
         }
         fn swap_holder(&mut self, _holder: Option<Box<dyn Holder>>) {

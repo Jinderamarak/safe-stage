@@ -5,9 +5,8 @@ use crate::eager::space::space_3d::Grid3DSpace;
 use crate::path::PathResult;
 use crate::strategy::PathStrategy;
 use collisions::common::Collides;
-use collisions::complex::group::ColliderGroup;
-use collisions::PrimaryCollider;
 use maths::Vector3;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use std::collections::{BinaryHeap, HashMap};
@@ -76,18 +75,14 @@ impl<'a> AStar3DSpaceWithLoSStrategy<'a> {
     }
 
     #[inline]
-    fn has_line_of_sight<M, I>(
+    fn has_line_of_sight(
         &self,
         rot: &Vector3,
         from: &Vector3,
         to: &Vector3,
-        movable: &M,
-        immovable: &I,
-    ) -> bool
-    where
-        M: Movable<SixAxis> + Sync,
-        I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
-    {
+        movable: &dyn Movable<SixAxis>,
+        immovable: &Immovable,
+    ) -> bool {
         let sight_from = SixAxis {
             pos: *from,
             rot: *rot,
@@ -102,17 +97,13 @@ impl<'a> AStar3DSpaceWithLoSStrategy<'a> {
 }
 
 impl PathStrategy<SixAxis> for AStar3DSpaceWithLoSStrategy<'_> {
-    fn find_path<M, I>(
+    fn find_path(
         &self,
         from: &SixAxis,
         to: &SixAxis,
-        movable: &M,
-        immovable: &I,
-    ) -> PathResult<SixAxis>
-    where
-        M: Movable<SixAxis> + Sync,
-        I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
-    {
+        movable: &dyn Movable<SixAxis>,
+        immovable: &Immovable,
+    ) -> PathResult<SixAxis> {
         if immovable.collides_with(&movable.move_to(from)) {
             return PathResult::InvalidStart(*from);
         }

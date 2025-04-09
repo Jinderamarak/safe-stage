@@ -9,9 +9,8 @@ use crate::resolver::stage::StagePathResolver;
 use crate::resolver::{PathResolver, StateUpdateError};
 use crate::strategy::PathStrategy;
 use collisions::common::Collides;
-use collisions::complex::group::ColliderGroup;
-use collisions::PrimaryCollider;
 use maths::Vector3;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use std::thread;
@@ -66,16 +65,12 @@ impl DownRotateFindResolver {
 
 impl StagePathResolver for DownRotateFindResolver {}
 
-impl<M, I> PathResolver<SixAxis, M, I> for DownRotateFindResolver
-where
-    M: Movable<SixAxis> + Sync,
-    I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
-{
+impl PathResolver<SixAxis> for DownRotateFindResolver {
     fn update_state(
         &mut self,
         new: &SixAxis,
-        movable: &M,
-        immovable: &I,
+        movable: &dyn Movable<SixAxis>,
+        immovable: &Immovable,
     ) -> Result<(), StateUpdateError> {
         if immovable.collides_with(&movable.move_to(new)) {
             return Err(StateUpdateError::InvalidState);
@@ -85,8 +80,8 @@ where
             Some(sample_grid_space_3d_par(
                 &self.sample_min,
                 &self.sample_max,
-                immovable,
                 movable,
+                immovable,
                 &self.sample_step,
                 &new.rot,
             ))
@@ -102,8 +97,8 @@ where
         &self,
         from: &SixAxis,
         to: &SixAxis,
-        movable: &M,
-        immovable: &I,
+        movable: &dyn Movable<SixAxis>,
+        immovable: &Immovable,
     ) -> PathResult<SixAxis> {
         let mut start = *from;
         let mut prepath = Vec::new();
@@ -118,8 +113,8 @@ where
                         sample_grid_space_3d_par(
                             &self.sample_min,
                             &self.sample_max,
-                            immovable,
                             movable,
+                            immovable,
                             &self.sample_step,
                             &start.rot,
                         )
