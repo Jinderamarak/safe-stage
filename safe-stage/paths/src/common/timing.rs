@@ -1,3 +1,4 @@
+#[macro_export]
 macro_rules! timed {
     ($block:block) => {{
         let start = std::time::Instant::now();
@@ -6,4 +7,4 @@ macro_rules! timed {
     }};
 }
 
-pub(crate) use timed;
+pub use timed;
