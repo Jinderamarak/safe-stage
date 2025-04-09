@@ -4,9 +4,9 @@ use crate::position::sixaxis::SixAxis;
 use std::sync::Arc;
 
 /// # Stage
-pub trait Stage: Movable<SixAxis> + Send + Sync {
+pub trait Stage: Movable<SixAxis> {
     /// Get the Stage as [Arc] reference.
-    fn as_movable(&self) -> Arc<dyn Movable<SixAxis> + Send + Sync>;
+    fn as_movable(&self) -> Arc<dyn Movable<SixAxis>>;
     /// Swap the attached holder with the given one.
     fn swap_holder(&mut self, holder: Option<Box<dyn Holder>>);
     /// Get the active holder.

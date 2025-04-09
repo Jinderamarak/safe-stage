@@ -36,7 +36,7 @@ impl Clone for ThesisStage {
 }
 
 impl Stage for ThesisStage {
-    fn as_movable(&self) -> Arc<dyn Movable<SixAxis> + Send + Sync> {
+    fn as_movable(&self) -> Arc<dyn Movable<SixAxis>> {
         Arc::new(self.clone())
     }
     fn swap_holder(&mut self, holder: Option<Box<dyn Holder>>) {

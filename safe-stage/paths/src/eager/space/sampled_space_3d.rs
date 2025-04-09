@@ -1,9 +1,7 @@
 use crate::eager::space::space_3d::Grid3DSpace;
 use bitvec::vec::BitVec;
-use collisions::common::Collides;
-use collisions::complex::group::ColliderGroup;
-use collisions::PrimaryCollider;
 use maths::Vector3;
+use models::collider::ModelCollider;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use rayon::prelude::*;
@@ -11,18 +9,14 @@ use rayon::prelude::*;
 /// Samples the 3D space with the given step and rotation.
 ///
 /// Parallel version available with [sample_grid_space_3d_par].
-pub fn sample_grid_space_3d<M, I>(
+pub fn sample_grid_space_3d(
     min: &Vector3,
     max: &Vector3,
-    immovable: &I,
-    movable: &M,
+    movable: &dyn Movable<SixAxis>,
+    immovable: &dyn ModelCollider,
     step: &Vector3,
     rotation: &Vector3,
-) -> Grid3DSpace
-where
-    M: Movable<SixAxis>,
-    I: Collides<ColliderGroup<PrimaryCollider>>,
-{
+) -> Grid3DSpace {
     let diff = max - min;
     let (x, y, z) = (
         range(diff.x(), step.x()),
@@ -57,18 +51,14 @@ where
 /// **Runs in parallel using Rayon.**
 ///
 /// Single-threaded version available with [sample_grid_space_3d].
-pub fn sample_grid_space_3d_par<M, I>(
+pub fn sample_grid_space_3d_par(
     min: &Vector3,
     max: &Vector3,
-    immovable: &I,
-    movable: &M,
+    movable: &dyn Movable<SixAxis>,
+    immovable: &dyn ModelCollider,
     step: &Vector3,
     rotation: &Vector3,
-) -> Grid3DSpace
-where
-    M: Movable<SixAxis> + Sync,
-    I: Sync + Collides<ColliderGroup<PrimaryCollider>>,
-{
+) -> Grid3DSpace {
     let diff = max - min;
     let (dx, dy, dz) = (
         range(diff.x(), step.x()),

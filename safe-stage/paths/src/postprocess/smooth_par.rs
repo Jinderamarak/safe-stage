@@ -1,8 +1,6 @@
 use crate::common::sight::line_of_sight_step_par;
 use crate::path::PathResult;
-use collisions::common::Collides;
-use collisions::complex::group::ColliderGroup;
-use collisions::PrimaryCollider;
+use models::collider::ModelCollider;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 
@@ -11,29 +9,21 @@ use models::position::sixaxis::SixAxis;
 /// **Runs in parallel using Rayon.**
 ///
 /// Single-threaded version available with [smooth_path].
-pub fn smooth_path_par<M, I>(
+pub fn smooth_path_par(
     path: PathResult<SixAxis>,
-    movable: &M,
-    immovable: &I,
+    movable: &dyn Movable<SixAxis>,
+    immovable: &dyn ModelCollider,
     step: &SixAxis,
-) -> PathResult<SixAxis>
-where
-    M: Movable<SixAxis> + Sync,
-    I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
-{
+) -> PathResult<SixAxis> {
     path.map(|p| smooth_path_nodes_par(p, movable, immovable, step))
 }
 
-fn smooth_path_nodes_par<M, I>(
+fn smooth_path_nodes_par(
     path: &[SixAxis],
-    movable: &M,
-    immovable: &I,
+    movable: &dyn Movable<SixAxis>,
+    immovable: &dyn ModelCollider,
     step: &SixAxis,
-) -> Vec<SixAxis>
-where
-    M: Movable<SixAxis> + Sync,
-    I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
-{
+) -> Vec<SixAxis> {
     let mut smooth = vec![path[0]];
     let mut k = 0;
     for i in 1..path.len() - 1 {

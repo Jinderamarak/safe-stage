@@ -4,9 +4,7 @@ use crate::path::PathResult;
 use crate::resolver::stage::StagePathResolver;
 use crate::resolver::{PathResolver, StateUpdateError};
 use crate::strategy::PathStrategy;
-use collisions::common::Collides;
-use collisions::complex::group::ColliderGroup;
-use collisions::PrimaryCollider;
+use models::collider::ModelCollider;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 
@@ -29,16 +27,12 @@ impl StageLinearResolver {
 
 impl StagePathResolver for StageLinearResolver {}
 
-impl<M, I> PathResolver<SixAxis, M, I> for StageLinearResolver
-where
-    M: Movable<SixAxis> + Sync,
-    I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
-{
+impl PathResolver<SixAxis> for StageLinearResolver {
     fn update_state(
         &mut self,
         new: &SixAxis,
-        movable: &M,
-        immovable: &I,
+        movable: &dyn Movable<SixAxis>,
+        immovable: &dyn ModelCollider,
     ) -> Result<(), StateUpdateError> {
         if immovable.collides_with(&movable.move_to(new)) {
             return Err(StateUpdateError::InvalidState);
@@ -51,8 +45,8 @@ where
         &self,
         from: &SixAxis,
         to: &SixAxis,
-        movable: &M,
-        immovable: &I,
+        movable: &dyn Movable<SixAxis>,
+        immovable: &dyn ModelCollider,
     ) -> PathResult<SixAxis> {
         let (path, time_to_path) =
             timed!({ self.strategy.find_path(from, to, movable, immovable) });

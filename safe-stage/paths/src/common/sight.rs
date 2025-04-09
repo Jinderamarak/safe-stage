@@ -2,24 +2,21 @@ use collisions::common::Collides;
 use collisions::complex::group::ColliderGroup;
 use collisions::PrimaryCollider;
 use maths::NaNExtension;
+use models::collider::ModelCollider;
 use models::{movable::Movable, position::sixaxis::SixAxis};
 use rayon::prelude::*;
 
 /// Check if there is a line of sight between two coordinates
 /// by using linear interpolation with fixed step.
 #[deprecated]
-pub fn line_of_sight<M, I>(
+pub fn line_of_sight(
     from: &SixAxis,
     to: &SixAxis,
-    movable: &M,
-    immovable: &I,
+    movable: &dyn Movable<SixAxis>,
+    immovable: &dyn Collides<ColliderGroup<PrimaryCollider>>,
     move_step: f64,
     rotate_step: f64,
-) -> bool
-where
-    M: Movable<SixAxis>,
-    I: Collides<ColliderGroup<PrimaryCollider>>,
-{
+) -> bool {
     let diff_pos = (to.pos - from.pos).abs();
     let diff_rot = from.shortest_rotation(to);
 
@@ -42,17 +39,13 @@ where
 /// Checks if there is a line of sight between two coordinates by moving in a given step.
 ///
 /// Parallel version available with [line_of_sight_par].
-pub fn line_of_sight_step<M, I>(
+pub fn line_of_sight_step(
     from: &SixAxis,
     to: &SixAxis,
-    movable: &M,
-    immovable: &I,
+    movable: &dyn Movable<SixAxis>,
+    immovable: &dyn Collides<ColliderGroup<PrimaryCollider>>,
     step: &SixAxis,
-) -> bool
-where
-    M: Movable<SixAxis>,
-    I: Collides<ColliderGroup<PrimaryCollider>>,
-{
+) -> bool {
     let max_steps = from.stepping(to, step);
     (0..=max_steps).all(|i| {
         let t = (i as f64 / max_steps as f64).map_nan(0.0);
@@ -66,17 +59,13 @@ where
 /// **Runs in parallel using Rayon.**
 ///
 /// Single-threaded version available with [line_of_sight_step].
-pub fn line_of_sight_step_par<M, I>(
+pub fn line_of_sight_step_par(
     from: &SixAxis,
     to: &SixAxis,
-    movable: &M,
-    immovable: &I,
+    movable: &dyn Movable<SixAxis>,
+    immovable: &dyn ModelCollider,
     step: &SixAxis,
-) -> bool
-where
-    M: Movable<SixAxis> + Sync,
-    I: Collides<ColliderGroup<PrimaryCollider>> + Sync + Send,
-{
+) -> bool {
     let max_steps = from.stepping(to, step);
     (0..=max_steps).into_par_iter().all(|i| {
         let t = (i as f64 / max_steps as f64).map_nan(0.0);

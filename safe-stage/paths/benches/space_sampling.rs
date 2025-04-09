@@ -12,8 +12,8 @@ fn sample_space(stage: &ThesisStage, chamber: &ThesisChamber) -> Grid3DSpace {
     sample_grid_space_3d_par(
         &min.pos,
         &max.pos,
-        &chamber.full(),
         stage,
+        &chamber.full(),
         &step,
         &Vector3::ZERO,
     )

@@ -2,6 +2,7 @@ use collisions::common::Collides;
 use collisions::complex::group::ColliderGroup;
 use collisions::PrimaryCollider;
 use maths::Vector3;
+use models::collider::ModelCollider;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use rayon::prelude::*;
@@ -62,17 +63,13 @@ where
     samples
 }
 
-pub fn grid_samples_par<M, I>(
+pub fn grid_samples_par(
     min: &SixAxis,
     max: &SixAxis,
-    immovable: &I,
-    movable: &M,
+    movable: &dyn Movable<SixAxis>,
+    immovable: &dyn ModelCollider,
     step: &SixAxis,
-) -> Vec<SixAxis>
-where
-    M: Movable<SixAxis> + Sync,
-    I: Sync + Collides<ColliderGroup<PrimaryCollider>>,
-{
+) -> Vec<SixAxis> {
     let diff = max - min;
     let (x, y, z, rx, ry, rz) = (
         range(diff.pos.x(), step.pos.x()),

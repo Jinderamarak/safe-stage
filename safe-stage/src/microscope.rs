@@ -9,10 +9,12 @@ use crate::types::{CLinearState, CPathResultLinearState, CPathResultSixAxis, CSi
 use collisions::complex::group::ColliderGroup;
 use collisions::PrimaryCollider;
 use maths::Vector2;
+use models::collider::ModelCollider;
+use models::movable::Movable;
 use models::position::linear::LinearState;
 use models::position::sixaxis::SixAxis;
 use models::sample::height_map::height_map_to_sample_model;
-use paths::resolver::{DynamicImmovable, DynamicMovable, StateUpdateError as ResolverUpdateError};
+use paths::resolver::StateUpdateError as ResolverUpdateError;
 use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;
@@ -386,16 +388,15 @@ impl Microscope {
         }
     }
 
-    fn movable_stage(&self) -> DynamicMovable<SixAxis> {
-        let movable = self.stage.get_ref().as_movable();
-        DynamicMovable(movable)
+    fn movable_stage(&self) -> Arc<dyn Movable<SixAxis>> {
+        self.stage.get_ref().as_movable()
     }
 
-    fn movable_retract(&self, id: Id) -> Option<DynamicMovable<LinearState>> {
+    fn movable_retract(&self, id: Id) -> Option<Arc<dyn Movable<LinearState>>> {
         self.retracts
             .inner()
             .get(&id)
-            .map(|(r, _, _)| DynamicMovable(r.get_ref().as_movable()))
+            .map(|(r, _, _)| r.get_ref().as_movable())
     }
 
     fn add_equipment(
@@ -413,30 +414,32 @@ impl Microscope {
         self.add_equipment(immovable)
     }
 
-    fn immovable_without_stage(&self) -> DynamicImmovable {
+    fn immovable_without_stage(&self) -> Arc<dyn ModelCollider> {
         let mut immovable = self.always_immovable();
         for (r, _, s) in self.retracts.inner().values() {
             immovable.extend(r.get_ref().move_to(&s.into()));
         }
-        DynamicImmovable(Arc::new(immovable))
+        Arc::new(immovable)
     }
 
     /// Stage is considered the only relevant part for retracts
-    fn immovable_stage(&self) -> DynamicImmovable {
+    fn immovable_stage(&self) -> Arc<dyn ModelCollider> {
         let immovable = self
             .stage
             .get_ref()
             .move_to(&SixAxis::from(&self.stage_state));
-        DynamicImmovable(Arc::new(immovable))
+        Arc::new(immovable)
     }
 
     fn update_stage_resolver_state(&mut self, state: &CSixAxis) -> Result<(), StateUpdateError> {
         let movable = self.movable_stage();
         let immovable = self.immovable_without_stage();
 
-        self.stage_resolver
-            .get_mut()
-            .update_state(&SixAxis::from(state), &movable, &immovable)?;
+        self.stage_resolver.get_mut().update_state(
+            &SixAxis::from(state),
+            movable.as_ref(),
+            immovable.as_ref(),
+        )?;
         Ok(())
     }
 
@@ -454,7 +457,11 @@ impl Microscope {
             .unwrap()
             .1
             .get_mut()
-            .update_state(&LinearState::from(state), &movable, &immovable)?;
+            .update_state(
+                &LinearState::from(state),
+                movable.as_ref(),
+                immovable.as_ref(),
+            )?;
         Ok(())
     }
 
@@ -498,8 +505,8 @@ impl Microscope {
         let result = self.stage_resolver.get_ref().resolve_path(
             &SixAxis::from(&from),
             &SixAxis::from(state),
-            &movable,
-            &immovable,
+            movable.as_ref(),
+            immovable.as_ref(),
         );
         CPathResultSixAxis::from(result)
     }
@@ -511,8 +518,8 @@ impl Microscope {
         let result = self.retracts.inner()[&id].1.get_ref().resolve_path(
             &LinearState::from(&from),
             &LinearState::from(state),
-            &movable,
-            &immovable,
+            movable.as_ref(),
+            immovable.as_ref(),
         );
         CPathResultLinearState::from(result)
     }
