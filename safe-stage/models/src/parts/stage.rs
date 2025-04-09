@@ -6,7 +6,7 @@ use std::sync::Arc;
 /// # Stage
 pub trait Stage: Movable<SixAxis> + Send + Sync {
     /// Get the Stage as [Arc] reference.
-    fn as_arc(&self) -> Arc<dyn Movable<SixAxis> + Send + Sync>;
+    fn as_movable(&self) -> Arc<dyn Movable<SixAxis> + Send + Sync>;
     /// Swap the attached holder with the given one.
     fn swap_holder(&mut self, holder: Option<Box<dyn Holder>>);
     /// Get the active holder.

@@ -387,7 +387,7 @@ impl Microscope {
     }
 
     fn movable_stage(&self) -> DynamicMovable<SixAxis> {
-        let movable = self.stage.get_ref().as_arc();
+        let movable = self.stage.get_ref().as_movable();
         DynamicMovable(movable)
     }
 
@@ -395,7 +395,7 @@ impl Microscope {
         self.retracts
             .inner()
             .get(&id)
-            .map(|(r, _, _)| DynamicMovable(r.get_ref().as_arc()))
+            .map(|(r, _, _)| DynamicMovable(r.get_ref().as_movable()))
     }
 
     fn add_equipment(
