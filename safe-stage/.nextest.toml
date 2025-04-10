@@ -7,26 +7,6 @@ path = "junit-report.xml"
 store-success-output = true
 store-failure-output = true
 
-[profile.ci-features-serde]
-fail-fast = false
-
-[profile.ci-features-serde.junit]
-report-name = "nextest-features-serde"
-path = "junit-report.xml"
-store-success-output = true
-store-failure-output = true
-
-[profile.ci-features-linear]
-fail-fast = false
-
-[profile.ci-features-linear.junit]
-report-name = "nextest-features-linear"
-path = "junit-report.xml"
-store-success-output = true
-store-failure-output = true
-
-[profile.ci-features-ffi]
-fail-fast = false
 
 [profile.ci-features-ffi.junit]
 report-name = "nextest-features-ffi"

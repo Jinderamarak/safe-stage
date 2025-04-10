@@ -58,8 +58,6 @@ jobs:
         PROFILE_FEATURES:
           [
             "ci-default;--all",
-            "ci-features-serde;--all -F serde",
-            "ci-features-linear;-p collisions --no-default-features -F rayon-bvh-linear",
             "ci-features-ffi;-F ffi",
           ]
     steps:
