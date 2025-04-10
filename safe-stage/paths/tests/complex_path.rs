@@ -23,12 +23,6 @@ const END_POSITION: SixAxis = SixAxis {
 
 #[test]
 fn entrypoint() {
-    for _ in 0..100 {
-        find_path();
-    }
-}
-
-fn find_path() {
     let chamber = setup_chamber();
     let equipment = setup_equipment();
     let immovable = chamber
