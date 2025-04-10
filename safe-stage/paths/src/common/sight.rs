@@ -38,27 +38,7 @@ pub fn line_of_sight(
 
 /// Checks if there is a line of sight between two coordinates by moving in a given step.
 ///
-/// Parallel version available with [line_of_sight_par].
-pub fn line_of_sight_step(
-    from: &SixAxis,
-    to: &SixAxis,
-    movable: &dyn Movable<SixAxis>,
-    immovable: &dyn Collides<ColliderGroup<PrimaryCollider>>,
-    step: &SixAxis,
-) -> bool {
-    let max_steps = from.stepping(to, step);
-    (0..=max_steps).all(|i| {
-        let t = (i as f64 / max_steps as f64).map_nan(0.0);
-        let state = from.lerp_t(to, t);
-        !immovable.collides_with(&movable.move_to(&state))
-    })
-}
-
-/// Checks if there is a line of sight between two coordinates by moving in a given step.
-///
 /// **Runs in parallel using Rayon.**
-///
-/// Single-threaded version available with [line_of_sight_step].
 pub fn line_of_sight_step_par(
     from: &SixAxis,
     to: &SixAxis,
