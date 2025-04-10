@@ -30,7 +30,7 @@ fn entrypoint() {
 
 fn find_path() {
     let chamber = setup_chamber();
-    let equipment = setup_equpment();
+    let equipment = setup_equipment();
     let immovable = chamber
         .full()
         .extended(equipment[0].collider())
@@ -60,7 +60,7 @@ fn setup_chamber() -> Box<dyn Chamber> {
     Box::new(ThesisChamber::default())
 }
 
-fn setup_equpment() -> Box<[Box<dyn Equipment>]> {
+fn setup_equipment() -> Box<[Box<dyn Equipment>]> {
     Box::new([
         Box::new(ThesisDetectorAlpha::default()),
         Box::new(ThesisDetectorBeta::default()),

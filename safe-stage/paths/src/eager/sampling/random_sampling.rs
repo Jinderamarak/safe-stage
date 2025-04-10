@@ -1,5 +1,6 @@
+use collisions::common::Collides;
 use maths::Vector3;
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use rand::random;
@@ -9,7 +10,7 @@ pub fn random_samples(
     min: &SixAxis,
     max: &SixAxis,
     movable: &dyn Movable<SixAxis>,
-    immovable: &dyn ModelCollider,
+    immovable: &Immovable,
     count: usize,
 ) -> Vec<SixAxis> {
     let range = max - min;
@@ -30,7 +31,7 @@ pub fn random_samples_par(
     min: &SixAxis,
     max: &SixAxis,
     movable: &dyn Movable<SixAxis>,
-    immovable: &dyn ModelCollider,
+    immovable: &Immovable,
     count: usize,
 ) -> Vec<SixAxis> {
     let range = max - min;

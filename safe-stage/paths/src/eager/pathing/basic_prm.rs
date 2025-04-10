@@ -1,6 +1,7 @@
 use crate::{common::heapstate::MinHeapState, path::PathResult, strategy::PathStrategy};
+use collisions::common::Collides;
 use maths::Vector3;
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::{movable::Movable, position::sixaxis::SixAxis};
 use std::collections::{BinaryHeap, HashMap};
 
@@ -58,7 +59,7 @@ impl PathStrategy<SixAxis> for BasicPrmStrategy {
         from: &SixAxis,
         to: &SixAxis,
         movable: &dyn Movable<SixAxis>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> PathResult<SixAxis> {
         if immovable.collides_with(&movable.move_to(from)) {
             return PathResult::InvalidStart(*from);

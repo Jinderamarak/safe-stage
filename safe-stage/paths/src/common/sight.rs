@@ -2,7 +2,7 @@ use collisions::common::Collides;
 use collisions::complex::group::ColliderGroup;
 use collisions::PrimaryCollider;
 use maths::NaNExtension;
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::{movable::Movable, position::sixaxis::SixAxis};
 use rayon::prelude::*;
 
@@ -63,7 +63,7 @@ pub fn line_of_sight_step_par(
     from: &SixAxis,
     to: &SixAxis,
     movable: &dyn Movable<SixAxis>,
-    immovable: &dyn ModelCollider,
+    immovable: &Immovable,
     step: &SixAxis,
 ) -> bool {
     let max_steps = from.stepping(to, step);

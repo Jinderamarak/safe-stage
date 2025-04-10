@@ -3,7 +3,8 @@ use crate::common::reconstruct::reconstruct_path;
 use crate::neighbors::NeighborStrategy;
 use crate::path::PathResult;
 use crate::strategy::PathStrategy;
-use models::collider::ModelCollider;
+use collisions::common::Collides;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use std::collections::{BinaryHeap, HashMap};
@@ -50,7 +51,7 @@ where
         from: &SixAxis,
         to: &SixAxis,
         movable: &dyn Movable<SixAxis>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> PathResult<SixAxis> {
         if immovable.collides_with(&movable.move_to(from)) {
             return PathResult::InvalidStart(*from);

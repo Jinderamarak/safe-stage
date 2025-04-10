@@ -1,7 +1,8 @@
 use crate::eager::space::space_3d::Grid3DSpace;
 use bitvec::vec::BitVec;
+use collisions::common::Collides;
 use maths::Vector3;
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use rayon::prelude::*;
@@ -13,7 +14,7 @@ pub fn sample_grid_space_3d(
     min: &Vector3,
     max: &Vector3,
     movable: &dyn Movable<SixAxis>,
-    immovable: &dyn ModelCollider,
+    immovable: &Immovable,
     step: &Vector3,
     rotation: &Vector3,
 ) -> Grid3DSpace {
@@ -55,7 +56,7 @@ pub fn sample_grid_space_3d_par(
     min: &Vector3,
     max: &Vector3,
     movable: &dyn Movable<SixAxis>,
-    immovable: &dyn ModelCollider,
+    immovable: &Immovable,
     step: &Vector3,
     rotation: &Vector3,
 ) -> Grid3DSpace {

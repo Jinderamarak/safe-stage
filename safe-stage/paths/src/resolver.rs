@@ -2,7 +2,7 @@ pub mod retract;
 pub mod stage;
 
 use crate::path::PathResult;
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use thiserror::Error;
 
@@ -21,7 +21,7 @@ pub trait PathResolver<P> {
         &mut self,
         new: &P,
         movable: &dyn Movable<P>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> Result<(), StateUpdateError>;
 
     fn resolve_path(
@@ -29,6 +29,6 @@ pub trait PathResolver<P> {
         from: &P,
         to: &P,
         movable: &dyn Movable<P>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> PathResult<P>;
 }

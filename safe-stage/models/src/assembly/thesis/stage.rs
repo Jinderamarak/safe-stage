@@ -1,3 +1,4 @@
+use crate::immovable::Immovable;
 use crate::loader::load_stl_from_bytes;
 use crate::movable::Movable;
 use crate::parts::holder::Holder;
@@ -67,7 +68,7 @@ impl Default for ThesisStage {
 }
 
 impl Movable<SixAxis> for ThesisStage {
-    fn move_to(&self, coords: &SixAxis) -> ColliderGroup<PrimaryCollider> {
+    fn move_to(&self, coords: &SixAxis) -> Immovable {
         let offset = coords.pos + STAGE_POSITION;
         let tilt = Quaternion::from_euler(&Vector3::new(0.0, coords.rot.y(), 0.0));
         let rotation = Quaternion::from_euler(&Vector3::new(0.0, 0.0, coords.rot.z()));

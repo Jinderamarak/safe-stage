@@ -2,7 +2,7 @@ use collisions::common::Collides;
 use collisions::complex::group::ColliderGroup;
 use collisions::PrimaryCollider;
 use maths::Vector3;
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use rayon::prelude::*;
@@ -67,7 +67,7 @@ pub fn grid_samples_par(
     min: &SixAxis,
     max: &SixAxis,
     movable: &dyn Movable<SixAxis>,
-    immovable: &dyn ModelCollider,
+    immovable: &Immovable,
     step: &SixAxis,
 ) -> Vec<SixAxis> {
     let diff = max - min;

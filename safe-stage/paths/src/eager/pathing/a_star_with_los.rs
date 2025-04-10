@@ -4,8 +4,9 @@ use crate::common::sight::line_of_sight_step_par;
 use crate::eager::space::space_3d::Grid3DSpace;
 use crate::path::PathResult;
 use crate::strategy::PathStrategy;
+use collisions::common::Collides;
 use maths::Vector3;
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use std::collections::{BinaryHeap, HashMap};
@@ -80,7 +81,7 @@ impl<'a> AStar3DSpaceWithLoSStrategy<'a> {
         from: &Vector3,
         to: &Vector3,
         movable: &dyn Movable<SixAxis>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> bool {
         let sight_from = SixAxis {
             pos: *from,
@@ -101,7 +102,7 @@ impl PathStrategy<SixAxis> for AStar3DSpaceWithLoSStrategy<'_> {
         from: &SixAxis,
         to: &SixAxis,
         movable: &dyn Movable<SixAxis>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> PathResult<SixAxis> {
         if immovable.collides_with(&movable.move_to(from)) {
             return PathResult::InvalidStart(*from);

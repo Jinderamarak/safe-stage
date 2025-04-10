@@ -3,7 +3,8 @@ use crate::common::reconstruct::reconstruct_path;
 use crate::common::sight::line_of_sight;
 use crate::neighbors::NeighborStrategy;
 use crate::{common::heapstate::MinHeapState, path::PathResult, strategy::PathStrategy};
-use models::collider::ModelCollider;
+use collisions::common::Collides;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use std::collections::{BinaryHeap, HashMap, HashSet};
@@ -53,7 +54,7 @@ where
         parent: &mut HashMap<SixAxis, SixAxis>,
         open: &mut BinaryHeap<MinHeapState<f64, SixAxis>>,
         movable: &dyn Movable<SixAxis>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) {
         #[allow(deprecated)]
         if line_of_sight(
@@ -96,7 +97,7 @@ where
         start: &SixAxis,
         end: &SixAxis,
         movable: &dyn Movable<SixAxis>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> PathResult<SixAxis> {
         if immovable.collides_with(&movable.move_to(start)) {
             return PathResult::InvalidStart(*start);
