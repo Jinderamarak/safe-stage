@@ -28,7 +28,7 @@ Only Windows and .NET runtime are needed to run a compiled binary of the service
 
 ### Building
 
-- installed Rust with version 1.83 or newer
+- installed Rust with version 1.86 or newer
   - As of 18/12/2024, the *Nightly* version of the Rust toolchain results in a slightly better performance and is therefore recommended
 - installed .NET SDK 8 or newer
 - installed `cargo-expand` or selected nightly chain (run `cargo install cargo-expand` to install) - required for generating bindings
@@ -38,7 +38,7 @@ Only Windows and .NET runtime are needed to run a compiled binary of the service
 
 ### MSRV (Minimum Supported Rust Version)
 
-- `1.83.0` - due to stabilization of floats in `const` context
+- `1.86.0` - floats in `const` context, trait upcasting coercion
 
 
 ## Building
