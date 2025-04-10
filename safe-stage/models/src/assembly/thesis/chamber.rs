@@ -1,7 +1,7 @@
+use crate::immovable::Immovable;
 use crate::loader::load_stl_from_bytes;
 use crate::parts::chamber::Chamber;
 use collisions::common::Translation;
-use collisions::complex::group::ColliderGroup;
 use collisions::{collider_group, PrimaryCollider};
 use maths::Vector3;
 
@@ -21,7 +21,7 @@ pub struct ThesisChamber {
 }
 
 impl Chamber for ThesisChamber {
-    fn full(&self) -> ColliderGroup<PrimaryCollider> {
+    fn full(&self) -> Immovable {
         collider_group!(
             self.pole_piece.clone(),
             self.walls.clone(),
@@ -29,11 +29,11 @@ impl Chamber for ThesisChamber {
         )
     }
 
-    fn less_obstructive(&self) -> ColliderGroup<PrimaryCollider> {
+    fn less_obstructive(&self) -> Immovable {
         collider_group!(self.pole_piece.clone(), self.walls.clone())
     }
 
-    fn non_obstructive(&self) -> ColliderGroup<PrimaryCollider> {
+    fn non_obstructive(&self) -> Immovable {
         collider_group!(self.pole_piece.clone())
     }
 }

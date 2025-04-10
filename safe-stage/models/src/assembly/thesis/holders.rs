@@ -1,7 +1,7 @@
+use crate::immovable::Immovable;
 use crate::loader::load_stl_from_bytes;
 use crate::parts::holder::Holder;
 use collisions::common::{Rotation, Translation};
-use collisions::complex::group::ColliderGroup;
 use collisions::{collider_group, PrimaryCollider};
 use maths::{Quaternion, Vector3};
 use std::sync::LazyLock;
@@ -38,7 +38,7 @@ macro_rules! thesis_holder_impl {
                 Box::new(self.clone())
             }
 
-            fn collider(&self) -> ColliderGroup<PrimaryCollider> {
+            fn collider(&self) -> Immovable {
                 if let Some(sample) = &self.sample {
                     collider_group!(self.body.clone(), sample.clone())
                 } else {

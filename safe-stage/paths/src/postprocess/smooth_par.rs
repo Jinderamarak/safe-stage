@@ -1,6 +1,6 @@
 use crate::common::sight::line_of_sight_step_par;
 use crate::path::PathResult;
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 
@@ -12,7 +12,7 @@ use models::position::sixaxis::SixAxis;
 pub fn smooth_path_par(
     path: PathResult<SixAxis>,
     movable: &dyn Movable<SixAxis>,
-    immovable: &dyn ModelCollider,
+    immovable: &Immovable,
     step: &SixAxis,
 ) -> PathResult<SixAxis> {
     path.map(|p| smooth_path_nodes_par(p, movable, immovable, step))
@@ -21,7 +21,7 @@ pub fn smooth_path_par(
 fn smooth_path_nodes_par(
     path: &[SixAxis],
     movable: &dyn Movable<SixAxis>,
-    immovable: &dyn ModelCollider,
+    immovable: &Immovable,
     step: &SixAxis,
 ) -> Vec<SixAxis> {
     let mut smooth = vec![path[0]];

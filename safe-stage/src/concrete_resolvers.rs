@@ -66,10 +66,8 @@ concrete_resolver_impl!(ConcreteStageResolver, StagePathResolver);
 #[cfg(test)]
 mod tests {
     use super::*;
-    
-    
-    
-    use models::collider::ModelCollider;
+
+    use models::immovable::Immovable;
     use models::movable::Movable;
     use models::position::linear::LinearState;
     use models::position::sixaxis::SixAxis;
@@ -83,7 +81,7 @@ mod tests {
             &mut self,
             _new: &LinearState,
             _movable: &dyn Movable<LinearState>,
-            _immovable: &dyn ModelCollider,
+            _immovable: &Immovable,
         ) -> Result<(), StateUpdateError> {
             unreachable!()
         }
@@ -93,7 +91,7 @@ mod tests {
             _from: &LinearState,
             _to: &LinearState,
             _movable: &dyn Movable<LinearState>,
-            _immovable: &dyn ModelCollider,
+            _immovable: &Immovable,
         ) -> PathResult<LinearState> {
             unreachable!()
         }
@@ -111,7 +109,7 @@ mod tests {
             &mut self,
             _new: &SixAxis,
             _movable: &dyn Movable<SixAxis>,
-            _immovable: &dyn ModelCollider,
+            _immovable: &Immovable,
         ) -> Result<(), StateUpdateError> {
             unreachable!()
         }
@@ -121,7 +119,7 @@ mod tests {
             _from: &SixAxis,
             _to: &SixAxis,
             _movable: &dyn Movable<SixAxis>,
-            _immovable: &dyn ModelCollider,
+            _immovable: &Immovable,
         ) -> PathResult<SixAxis> {
             unreachable!()
         }

@@ -1,5 +1,5 @@
 use crate::path::PathResult;
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::movable::Movable;
 
 /// # Path strategy
@@ -11,6 +11,6 @@ pub trait PathStrategy<P> {
         from: &P,
         to: &P,
         movable: &dyn Movable<P>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> PathResult<P>;
 }

@@ -8,8 +8,9 @@ use crate::postprocess::smooth_par::smooth_path_par;
 use crate::resolver::stage::StagePathResolver;
 use crate::resolver::{PathResolver, StateUpdateError};
 use crate::strategy::PathStrategy;
+use collisions::common::Collides;
 use maths::Vector3;
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 use std::thread;
@@ -69,7 +70,7 @@ impl PathResolver<SixAxis> for DownRotateFindResolver {
         &mut self,
         new: &SixAxis,
         movable: &dyn Movable<SixAxis>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> Result<(), StateUpdateError> {
         if immovable.collides_with(&movable.move_to(new)) {
             return Err(StateUpdateError::InvalidState);
@@ -97,7 +98,7 @@ impl PathResolver<SixAxis> for DownRotateFindResolver {
         from: &SixAxis,
         to: &SixAxis,
         movable: &dyn Movable<SixAxis>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> PathResult<SixAxis> {
         let mut start = *from;
         let mut prepath = Vec::new();

@@ -1,7 +1,8 @@
 use crate::path::PathResult;
 use crate::strategy::PathStrategy;
+use collisions::common::Collides;
 use maths::{NaNExtension, Vector3};
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::sixaxis::SixAxis;
 
@@ -32,7 +33,7 @@ impl PathStrategy<SixAxis> for SafeRotationHeightStrategy {
         from: &SixAxis,
         to: &SixAxis,
         movable: &dyn Movable<SixAxis>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> PathResult<SixAxis> {
         if immovable.collides_with(&movable.move_to(from)) {
             return PathResult::InvalidStart(*from);

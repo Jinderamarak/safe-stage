@@ -4,7 +4,8 @@ use crate::path::PathResult;
 use crate::resolver::retract::RetractPathResolver;
 use crate::resolver::{PathResolver, StateUpdateError};
 use crate::strategy::PathStrategy;
-use models::collider::ModelCollider;
+use collisions::common::Collides;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::linear::LinearState;
 
@@ -32,7 +33,7 @@ impl PathResolver<LinearState> for RetractLinearResolver {
         &mut self,
         new: &LinearState,
         movable: &dyn Movable<LinearState>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> Result<(), StateUpdateError> {
         if immovable.collides_with(&movable.move_to(new)) {
             return Err(StateUpdateError::InvalidState);
@@ -46,7 +47,7 @@ impl PathResolver<LinearState> for RetractLinearResolver {
         from: &LinearState,
         to: &LinearState,
         movable: &dyn Movable<LinearState>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> PathResult<LinearState> {
         let (path, time_to_path) =
             timed!({ self.strategy.find_path(from, to, movable, immovable) });

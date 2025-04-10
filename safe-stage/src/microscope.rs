@@ -9,7 +9,7 @@ use crate::types::{CLinearState, CPathResultLinearState, CPathResultSixAxis, CSi
 use collisions::complex::group::ColliderGroup;
 use collisions::PrimaryCollider;
 use maths::Vector2;
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::linear::LinearState;
 use models::position::sixaxis::SixAxis;
@@ -414,21 +414,21 @@ impl Microscope {
         self.add_equipment(immovable)
     }
 
-    fn immovable_without_stage(&self) -> Arc<dyn ModelCollider> {
+    fn immovable_without_stage(&self) -> Immovable {
         let mut immovable = self.always_immovable();
         for (r, _, s) in self.retracts.inner().values() {
             immovable.extend(r.get_ref().move_to(&s.into()));
         }
-        Arc::new(immovable)
+        immovable
     }
 
     /// Stage is considered the only relevant part for retracts
-    fn immovable_stage(&self) -> Arc<dyn ModelCollider> {
+    fn immovable_stage(&self) -> Immovable {
         let immovable = self
             .stage
             .get_ref()
             .move_to(&SixAxis::from(&self.stage_state));
-        Arc::new(immovable)
+        immovable
     }
 
     fn update_stage_resolver_state(&mut self, state: &CSixAxis) -> Result<(), StateUpdateError> {
@@ -438,7 +438,7 @@ impl Microscope {
         self.stage_resolver.get_mut().update_state(
             &SixAxis::from(state),
             movable.as_ref(),
-            immovable.as_ref(),
+            &immovable,
         )?;
         Ok(())
     }
@@ -457,11 +457,7 @@ impl Microscope {
             .unwrap()
             .1
             .get_mut()
-            .update_state(
-                &LinearState::from(state),
-                movable.as_ref(),
-                immovable.as_ref(),
-            )?;
+            .update_state(&LinearState::from(state), movable.as_ref(), &immovable)?;
         Ok(())
     }
 
@@ -506,7 +502,7 @@ impl Microscope {
             &SixAxis::from(&from),
             &SixAxis::from(state),
             movable.as_ref(),
-            immovable.as_ref(),
+            &immovable,
         );
         CPathResultSixAxis::from(result)
     }
@@ -519,7 +515,7 @@ impl Microscope {
             &LinearState::from(&from),
             &LinearState::from(state),
             movable.as_ref(),
-            immovable.as_ref(),
+            &immovable,
         );
         CPathResultLinearState::from(result)
     }

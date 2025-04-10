@@ -1,7 +1,8 @@
 use crate::path::PathResult;
 use crate::strategy::PathStrategy;
+use collisions::common::Collides;
 use maths::NaNExtension;
-use models::collider::ModelCollider;
+use models::immovable::Immovable;
 use models::movable::Movable;
 use models::position::linear::LinearState;
 use models::position::sixaxis::SixAxis;
@@ -26,7 +27,7 @@ impl PathStrategy<SixAxis> for LinearStrategy<SixAxis> {
         from: &SixAxis,
         to: &SixAxis,
         movable: &dyn Movable<SixAxis>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> PathResult<SixAxis> {
         if immovable.collides_with(&movable.move_to(from)) {
             return PathResult::InvalidStart(*from);
@@ -58,7 +59,7 @@ impl PathStrategy<LinearState> for LinearStrategy<LinearState> {
         from: &LinearState,
         to: &LinearState,
         movable: &dyn Movable<LinearState>,
-        immovable: &dyn ModelCollider,
+        immovable: &Immovable,
     ) -> PathResult<LinearState> {
         if immovable.collides_with(&movable.move_to(from)) {
             return PathResult::InvalidStart(*from);
