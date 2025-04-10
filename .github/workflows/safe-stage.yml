@@ -11,6 +11,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  MSRV: 1.86.0
 
 jobs:
   safe-stage-build:
@@ -29,6 +30,11 @@ jobs:
             ~/.cargo/git/db/
             ./safe-stage/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Rust with MSRV
+        uses: taiki-e/github-actions/install-rust@main
+        with:
+          toolchain: ${{ env.MSRV }}
 
       - name: Check Formatting
         run: cargo fmt --all --check
@@ -66,6 +72,11 @@ jobs:
             ~/.cargo/git/db/
             ./safe-stage/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Rust with MSRV
+        uses: taiki-e/github-actions/install-rust@main
+        with:
+          toolchain: ${{ env.MSRV }}
 
       - name: Add nextest
         uses: taiki-e/install-action@nextest
