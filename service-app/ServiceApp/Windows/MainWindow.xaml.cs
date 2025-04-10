@@ -266,7 +266,27 @@ public partial class MainWindow : ReactiveWindow, IDisposable
                         window.Retracts.AsReadOnly());
                 })
                 .OnUi(() => StatusText = "Updating resolvers ...")
-                .InBack(() => _microscope!.UpdateResolvers())
+                .InBack(() =>
+                {
+                    try
+                    {
+                        _microscope!.UpdateResolvers();
+                    }
+                    catch (Exception ex)
+                    {
+                        return ex;
+                    }
+                    return null;
+                })
+                .OnUi((object? result) =>
+                {
+                    if (result is Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Cannot Change Configuration",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                    }
+                })
                 .Chain(UpdateStageGeometry())
                 .Chain(UpdateStaticGeometry())
                 .OnUi(() =>
@@ -335,7 +355,24 @@ public partial class MainWindow : ReactiveWindow, IDisposable
                         _microscope!.RemoveHolder();
                     }
 
-                    _microscope!.UpdateResolvers();
+                    try
+                    {
+                        _microscope!.UpdateResolvers();
+                    }
+                    catch (Exception ex)
+                    {
+                        return ex;
+                    }
+                    return null;
+                })
+                .OnUi((object? result) =>
+                {
+                    if (result is Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Cannot Change Holder",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                    }
                 })
                 .Chain(UpdateStageGeometry())
                 .OnUi(() => HolderTitle = _lastHolder is not null ? _lastHolder.ToString() : "No Holder")
@@ -363,7 +400,25 @@ public partial class MainWindow : ReactiveWindow, IDisposable
                         dialog.RealX,
                         dialog.RealY
                     );
-                    _microscope!.UpdateResolvers();
+
+                    try
+                    {
+                        _microscope!.UpdateResolvers();
+                    }
+                    catch (Exception ex)
+                    {
+                        return ex;
+                    }
+                    return null;
+                })
+                .OnUi((object? result) =>
+                {
+                    if (result is Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Cannot Change Sample",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                    }
                 })
                 .Chain(UpdateStageGeometry())
                 .OnUi(() => { StatusText = "Sample height map updated"; });
@@ -371,7 +426,24 @@ public partial class MainWindow : ReactiveWindow, IDisposable
             task.InBack(() =>
                 {
                     _microscope!.ClearSample();
-                    _microscope!.UpdateResolvers();
+                    try
+                    {
+                        _microscope!.UpdateResolvers();
+                    }
+                    catch (Exception ex)
+                    {
+                        return ex;
+                    }
+                    return null;
+                })
+                .OnUi((object? result) =>
+                {
+                    if (result is Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Cannot Clear Sample",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                    }
                 })
                 .Chain(UpdateStageGeometry())
                 .OnUi(() => { StatusText = "Sample height map cleared"; });
