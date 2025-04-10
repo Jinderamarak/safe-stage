@@ -13,7 +13,7 @@ pub fn line_of_sight(
     from: &SixAxis,
     to: &SixAxis,
     movable: &dyn Movable<SixAxis>,
-    immovable: &dyn Collides<ColliderGroup<PrimaryCollider>>,
+    immovable: &Immovable,
     move_step: f64,
     rotate_step: f64,
 ) -> bool {
