@@ -1,6 +1,4 @@
 use collisions::common::Collides;
-use collisions::complex::group::ColliderGroup;
-use collisions::PrimaryCollider;
 use maths::NaNExtension;
 use models::immovable::Immovable;
 use models::{movable::Movable, position::sixaxis::SixAxis};
@@ -8,6 +6,9 @@ use rayon::prelude::*;
 
 /// Check if there is a line of sight between two coordinates
 /// by using linear interpolation with fixed step.
+///
+/// Use `line_of_sight_step_par` instead.
+///
 #[deprecated]
 pub fn line_of_sight(
     from: &SixAxis,
