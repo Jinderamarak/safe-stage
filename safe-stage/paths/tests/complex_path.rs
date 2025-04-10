@@ -22,7 +22,7 @@ const END_POSITION: SixAxis = SixAxis {
 };
 
 #[test]
-fn entrypoint() {
+fn complex_path_resolution() {
     let chamber = setup_chamber();
     let equipment = setup_equipment();
     let immovable = chamber
