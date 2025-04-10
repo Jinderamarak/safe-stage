@@ -1,7 +1,7 @@
 name: Cargo Dependencies
 on:
   pull_request:
-    branches: [$default-branch]
+    branches: [ main ]
     paths:
       - "**/Cargo.lock"
       - "**/Cargo.toml"
