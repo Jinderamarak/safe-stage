@@ -23,7 +23,7 @@ jobs:
       - name: Build Safe Stage
         run: |
           cargo run -p bindings
-          cargo build --release -F ffi
+          cargo build --release --features ffi
         working-directory: ./safe-stage
 
       - name: Publish Service Application

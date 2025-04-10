@@ -36,7 +36,7 @@ jobs:
       - name: Build Safe Stage
         run: |
           cargo run -p bindings
-          cargo build -F ffi
+          cargo build --release --features ffi
         working-directory: ./safe-stage
 
       - name: Build Service Application
