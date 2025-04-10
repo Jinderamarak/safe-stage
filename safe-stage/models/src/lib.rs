@@ -1,4 +1,4 @@
-//! # Modellibs
+//! # Models
 //! Focused on modeling the parts of an electron microscope.
 
 pub mod assembly;
