@@ -1,4 +1,4 @@
-name: Check Safe Stage Safety
+name: Safe Stage - Check Safety
 on:
   push:
     branches: [ main ]

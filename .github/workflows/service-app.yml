@@ -1,4 +1,4 @@
-name: Build Service Application
+name: Service App - Build
 on:
   push:
     branches: [ main ]
@@ -39,7 +39,7 @@ jobs:
           cargo build --release --features ffi
         working-directory: ./safe-stage
 
-      - name: Build Service Application
+      - name: Build Service App
         run: |
           dotnet build
         working-directory: ./service-app
