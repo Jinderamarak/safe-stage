@@ -316,7 +316,7 @@ unsafe class VulkanContent : IDisposable
             Disco = (float)disco * 10,
             MinY = _minY,
             MaxY = _maxY,
-            Model = default,
+            Model = model,
             Time = (float)St.Elapsed.TotalSeconds
         };
         api.CmdPushConstants(commandBufferHandle, _pipelineLayout, ShaderStageFlags.VertexBit | ShaderStageFlags.FragmentBit, 0,
