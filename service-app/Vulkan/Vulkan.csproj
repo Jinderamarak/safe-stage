@@ -15,6 +15,7 @@
         <PackageReference Include="Avalonia.Diagnostics" Version="11.3.0-beta1" />
         <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.0-beta1" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0-beta1" />
+        <PackageReference Include="Silk.NET.Shaderc" Version="2.22.0" />
         <PackageReference Include="Silk.NET.Vulkan" Version="2.16.0" />
         <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.16.0" />
         <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.16.0" />
@@ -31,6 +32,10 @@
         <None Remove="VulkanDemo\Assets\Shaders\vert.spirv" />
         <EmbeddedResource Include="VulkanDemo\Assets\Shaders\vert.spirv" />
         <EmbeddedResource Include="teapot.bin" />
+        <None Remove="VulkanDemo\Assets\Shaders\frag.glsl" />
+        <EmbeddedResource Include="VulkanDemo\Assets\Shaders\frag.glsl" />
+        <None Remove="VulkanDemo\Assets\Shaders\vert.glsl" />
+        <EmbeddedResource Include="VulkanDemo\Assets\Shaders\vert.glsl" />
     </ItemGroup>
 
     <ItemGroup>

@@ -204,6 +204,9 @@ unsafe class VulkanContent : IDisposable
 
     private byte[] GetShader(bool fragment)
     {
+        var compiler = new Silk.NET.Shaderc.Compiler();
+        
+        
         var name = typeof(VulkanContent).Assembly.GetManifestResourceNames()
             .First(x => x.Contains((fragment ? "frag" : "vert") + ".spirv"));
         using (var sr = typeof(VulkanContent).Assembly.GetManifestResourceStream(name)!)
