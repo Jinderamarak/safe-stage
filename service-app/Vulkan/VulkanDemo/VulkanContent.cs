@@ -247,11 +247,7 @@ unsafe class VulkanContent : IDisposable
         
         var vertexConstant = new VertextPushConstant()
         {
-            Disco = (float)disco,
-            MinY = _minY,
-            MaxY = _maxY,
-            Model = model,
-            Time = (float)St.Elapsed.TotalSeconds
+            ObjectColor = new Vector3(0.8f, 0.5f, 0.5f)
         };
 
         var commandBuffer = _context.Pool.CreateCommandBuffer();
@@ -318,11 +314,7 @@ unsafe class VulkanContent : IDisposable
 
         var vertexConstant2 = new VertextPushConstant()
         {
-            Disco = (float)disco * 10,
-            MinY = _minY,
-            MaxY = _maxY,
-            Model = model,
-            Time = (float)St.Elapsed.TotalSeconds
+            ObjectColor = new Vector3(0.5f, 0.8f, 0.5f)
         };
         api.CmdPushConstants(commandBufferHandle, _pipelineLayout, ShaderStageFlags.VertexBit | ShaderStageFlags.FragmentBit, 0,
             (uint)Marshal.SizeOf<VertextPushConstant>(), &vertexConstant2);
@@ -774,7 +766,8 @@ unsafe class VulkanContent : IDisposable
                     {
                         new UniformBuffer
                         {
-                            Projection = projView
+                            Projection = projView,
+                            LightPos = new Vector3(25, 25, 25)
                         }
                     });
                 
@@ -937,16 +930,13 @@ unsafe class VulkanContent : IDisposable
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     private struct VertextPushConstant
     {
-        public float MaxY;
-        public float MinY;
-        public float Time;
-        public float Disco;
-        public Matrix4x4 Model;
+        public Vector3 ObjectColor;
     }
     
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     private struct UniformBuffer
     {
         public Matrix4x4 Projection;
+        public Vector3 LightPos;
     }
 }
