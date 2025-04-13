@@ -123,8 +123,6 @@ unsafe class VulkanContent : IDisposable
         var totalPoints = models.Sum(buf => buf.Buffer.Length);
         var indices = new ushort[totalPoints];
         var points = new Vertex[totalPoints];
-        var maxY = float.MinValue;
-        var minY = float.MaxValue;
 
         var offset = 0;
         foreach (var model in models)
@@ -159,13 +157,6 @@ unsafe class VulkanContent : IDisposable
                 indices[offset + i] = (ushort)(offset + i);
                 indices[offset + i + 1] = (ushort)(offset + i + 1);
                 indices[offset + i + 2] = (ushort)(offset + i + 2);
-                
-                maxY = Math.Max(maxY, points[offset + i].Position.Y);
-                minY = Math.Min(minY, points[offset + i].Position.Y);
-                maxY = Math.Max(maxY, points[offset + i + 1].Position.Y);
-                minY = Math.Min(minY, points[offset + i + 1].Position.Y);
-                maxY = Math.Max(maxY, points[offset + i + 2].Position.Y);
-                minY = Math.Min(minY, points[offset + i + 2].Position.Y);
             }
             offset += model.Buffer.Length;
         }
@@ -317,6 +308,16 @@ unsafe class VulkanContent : IDisposable
         api.CmdDrawIndexed(commandBufferHandle, (uint)_indices.Length, 1, 0, 0, 0);
 
 
+        var vertexConstant2 = new VertextPushConstant()
+        {
+            Disco = (float)disco * 10,
+            MinY = _minY,
+            MaxY = _maxY,
+            Model = default,
+            Time = (float)St.Elapsed.TotalSeconds
+        };
+        api.CmdPushConstants(commandBufferHandle, _pipelineLayout, ShaderStageFlags.VertexBit | ShaderStageFlags.FragmentBit, 0,
+            (uint)Marshal.SizeOf<VertextPushConstant>(), &vertexConstant2);
         try
         {
             _stageMutex.WaitOne();
