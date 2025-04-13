@@ -23,7 +23,7 @@ public partial class GpuDemo : UserControl
         _timer.Start();
     }
     
-    private float _yaw = 5;
+    private float _yaw = 0;
 
     public static readonly DirectProperty<GpuDemo, float> YawProperty =
         AvaloniaProperty.RegisterDirect<GpuDemo, float>("Yaw", o => o.Yaw, (o, v) => o.Yaw = v);
@@ -34,7 +34,7 @@ public partial class GpuDemo : UserControl
         set => SetAndRaise(YawProperty, ref _yaw, value);
     }
 
-    private float _pitch = 5;
+    private float _pitch = 0;
 
     public static readonly DirectProperty<GpuDemo, float> PitchProperty =
         AvaloniaProperty.RegisterDirect<GpuDemo, float>("Pitch", o => o.Pitch, (o, v) => o.Pitch = v);
@@ -46,7 +46,7 @@ public partial class GpuDemo : UserControl
     }
 
 
-    private float _roll = 5;
+    private float _roll = 0;
 
     public static readonly DirectProperty<GpuDemo, float> RollProperty =
         AvaloniaProperty.RegisterDirect<GpuDemo, float>("Roll", o => o.Roll, (o, v) => o.Roll = v);

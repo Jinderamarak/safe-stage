@@ -62,7 +62,10 @@ public class VulkanDemoControl : DrawingSurfaceDemoBase
                 var position = new SixAxis(0, 0, 0, 0, 0, double.DegreesToRadians(counter * 1 % 360));
                 
                 var stage = _microscope.PresentStageAt(position);
-                _resources.Content.UpdateStage(stage);
+                if (_resources?.Content != null)
+                {
+                    _resources.Content.UpdateStage(stage);
+                }
             },
             null,
             TimeSpan.FromSeconds(1),

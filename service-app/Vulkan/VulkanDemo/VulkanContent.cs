@@ -243,12 +243,7 @@ unsafe class VulkanContent : IDisposable
 
         _previousImageSize = image.Size;
 
-        
         var model = Matrix4x4.CreateFromYawPitchRoll((float)yaw, (float)pitch, (float)roll);
-        var view = Matrix4x4.CreateLookAt(new Vector3(25, 25, 25), new Vector3(), new Vector3(0, -1, 0));
-        var projection =
-            Matrix4x4.CreatePerspectiveFieldOfView((float)(Math.PI / 4), (float)((float)image.Size.Width / image.Size.Height),
-                0.01f, 1000);
         
         var vertexConstant = new VertextPushConstant()
         {
@@ -288,7 +283,7 @@ unsafe class VulkanContent : IDisposable
 
         var clearValues = new ClearValue[]
         {
-	        new() { Color = new ClearColorValue { Float32_0 = 1, Float32_1 = 0, Float32_2 = 0, Float32_3 = 0.1f } },
+	        new() { Color = new ClearColorValue { Float32_0 = 0.2f, Float32_1 = 0.2f, Float32_2 = 0.2f, Float32_3 = 0.1f } },
 	        new() { DepthStencil = new ClearDepthStencilValue { Depth = 1, Stencil = 0 } }
         };
 
@@ -519,7 +514,7 @@ unsafe class VulkanContent : IDisposable
     {
         DestroyTemporalObjects();
         
-        var view = Matrix4x4.CreateLookAt(new Vector3(25, 25, 25), new Vector3(), new Vector3(0, -1, 0));
+        var view = Matrix4x4.CreateLookAt(new Vector3(25, 25, 25), new Vector3(), new Vector3(0, 0, 1));
         var projection =
             Matrix4x4.CreatePerspectiveFieldOfView((float)(Math.PI / 4), (float)size.Width / size.Height,
                 0.01f, 1000);

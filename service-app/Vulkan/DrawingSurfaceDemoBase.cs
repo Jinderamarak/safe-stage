@@ -78,8 +78,7 @@ public abstract class DrawingSurfaceDemoBase : Control, IGpuDemo
         _visual!.Size = new (Bounds.Width, Bounds.Height);
         var size = PixelSize.FromSize(Bounds.Size, root.RenderScaling);
         RenderFrame(size);
-        if (SupportsDisco && Disco > 0)
-            QueueNextFrame();
+        QueueNextFrame();
     }
     
     void QueueNextFrame()

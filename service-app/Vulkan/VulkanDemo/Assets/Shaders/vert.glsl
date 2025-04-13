@@ -29,8 +29,13 @@
 		scaledPos.x = scaledPos.x * distortionX;
 		
 		scaledPos *= scale;
-		gl_Position = ubo.projection * model * vec4(scaledPos, 1.0);
-		FragPos = vec3(model * vec4(aPos, 1.0));
-		VecPos = aPos;
-		Normal = normalize(vec3(model * vec4(aNormal, 1.0)));
+		//gl_Position = ubo.projection * model * vec4(scaledPos, 1.0);
+		//FragPos = vec3(model * vec4(aPos, 1.0));
+		//VecPos = aPos;
+		//Normal = normalize(vec3(model * vec4(aNormal, 1.0)));
+
+        gl_Position = ubo.projection * vec4(scaledPos, 1.0);
+        FragPos = aPos;
+        VecPos = aPos;
+        Normal = aNormal;
 	}
