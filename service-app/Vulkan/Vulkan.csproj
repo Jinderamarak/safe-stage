@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.3.0-beta1" />
+        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.0-beta1" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.0-beta1" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.0-beta1" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.0-beta1" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0-beta1" />
+        <PackageReference Include="Silk.NET.Vulkan" Version="2.16.0" />
+        <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.16.0" />
+        <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.16.0" />
+        <PackageReference Include="System.Reactive" Version="5.0.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Folder Include="VulkanDemo\Assets\Shaders\Assets" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="VulkanDemo\Assets\Shaders\frag.spirv" />
+        <EmbeddedResource Include="VulkanDemo\Assets\Shaders\frag.spirv" />
+        <None Remove="VulkanDemo\Assets\Shaders\vert.spirv" />
+        <EmbeddedResource Include="VulkanDemo\Assets\Shaders\vert.spirv" />
+        <EmbeddedResource Include="teapot.bin" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\bindings\BindingsCs\BindingsCs.csproj" />
+    </ItemGroup>
+
+</Project>
