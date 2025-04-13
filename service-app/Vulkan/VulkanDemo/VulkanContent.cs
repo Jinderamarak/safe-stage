@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Avalonia;
 using BindingsCs.Safe.Types;
+using shaderc;
 using Silk.NET.Vulkan;
 using SilkNetDemo;
 using Buffer = System.Buffer;
@@ -87,8 +88,8 @@ unsafe class VulkanContent : IDisposable
 
         var api = _context.Api;
         var device = _context.Device;
-        var vertShaderData = GetShader(false);
-        var fragShaderData = GetShader(true);
+        var vertShaderData = GetShader("Vulkan.VulkanDemo.Assets.Shaders.vert.glsl", ShaderKind.GlslVertexShader);
+        var fragShaderData = GetShader("Vulkan.VulkanDemo.Assets.Shaders.frag.glsl", ShaderKind.GlslFragmentShader);
 
         fixed (byte* ptr = vertShaderData)
         {
@@ -202,21 +203,30 @@ unsafe class VulkanContent : IDisposable
         }
     }
 
-    private byte[] GetShader(bool fragment)
+    private byte[] GetShader(string shaderName, ShaderKind shaderKind)
     {
-        var compiler = new Silk.NET.Shaderc.Compiler();
-        
-        
-        var name = typeof(VulkanContent).Assembly.GetManifestResourceNames()
-            .First(x => x.Contains((fragment ? "frag" : "vert") + ".spirv"));
-        using (var sr = typeof(VulkanContent).Assembly.GetManifestResourceStream(name)!)
+        string content;
+        using (var sr = typeof(VulkanContent).Assembly.GetManifestResourceStream(shaderName)!)
         {
-            using (var mem = new MemoryStream())
+            if (sr == null)
+                throw new FileNotFoundException($"Shader file '{shaderName}' not found in assembly resources.");
+            
+            using (var reader = new StreamReader(sr))
             {
-                sr.CopyTo(mem);
-                return mem.ToArray();
+                content = reader.ReadToEnd();
             }
         }
+        
+        using var compiler = new Compiler();
+        using var result = compiler.Compile(content, shaderName, shaderKind);
+        if (result.Status != Status.Success)
+        {
+            throw new Exception($"Shader compilation failed: {result.ErrorMessage}");
+        }
+
+        var data = new byte[result.CodeLength];
+        Marshal.Copy(result.CodePointer, data, 0, (int)result.CodeLength);
+        return data;
     }
 
     private PixelSize? _previousImageSize = PixelSize.Empty;
