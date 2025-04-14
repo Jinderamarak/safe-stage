@@ -4,20 +4,20 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="..\..\safe-stage\target\release\safe_stage.dll">
+        <None Include="..\..\safe-stage\target\release\libsafe_stage.so"
+              Condition="Exists('..\..\safe-stage\target\release\libsafe_stage.so')">
+            <Link>runtimes/linux-x64/native/libsafe_stage.so</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
+        </None>
+        <None Include="..\..\safe-stage\target\release\safe_stage.dll"
+              Condition="Exists('..\..\safe-stage\target\release\safe_stage.dll')">
+            <Link>runtimes/win-x64/native/safe_stage.dll</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
