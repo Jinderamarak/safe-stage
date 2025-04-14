@@ -1,10 +1,9 @@
 using Avalonia;
 using Avalonia.Platform;
-using Avalonia.Rendering;
 using Avalonia.Rendering.Composition;
 using Silk.NET.Vulkan;
 
-namespace GpuInterop.VulkanDemo;
+namespace ServiceApp.Vulkan.Render;
 
 internal class VulkanSwapchain : SwapchainBase<VulkanSwapchainImage>
 {
@@ -119,6 +118,6 @@ internal class VulkanSwapchainImage : ISwapchainImage
             });
 
         LastPresent =
-            _target.UpdateWithSemaphoresAsync(_importedImage, _renderCompletedSemaphore!, _availableSemaphore!);
+            _target.UpdateWithSemaphoresAsync(_importedImage, _renderCompletedSemaphore, _availableSemaphore);
     }
 }

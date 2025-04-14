@@ -1,22 +1,25 @@
-using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Avalonia;
-using BindingsCs.Safe.Types;
 using shaderc;
 using Silk.NET.Vulkan;
-using SilkNetDemo;
 using Buffer = System.Buffer;
 using Image = Silk.NET.Vulkan.Image;
 using Vector3 = System.Numerics.Vector3;
 
-namespace GpuInterop.VulkanDemo;
+namespace ServiceApp.Vulkan.Render;
 
 internal unsafe class VulkanContent : IDisposable
 {
-    private static Stopwatch St = Stopwatch.StartNew();
     private readonly VulkanContext _context;
+    private readonly ShaderModule _fragShader;
+    private readonly ushort[] _indices;
+    private readonly float _maxY;
+    private readonly float _minY;
+
+    private readonly Vertex[] _points;
+    private readonly ShaderModule _vertShader;
     private VulkanImage? _colorAttachment;
 
     private Image _depthImage;
@@ -24,34 +27,19 @@ internal unsafe class VulkanContent : IDisposable
     private ImageView _depthImageView;
     private DescriptorSet _descriptorSet;
     private DescriptorSetLayout _descriptorSetLayout;
-    private readonly ShaderModule _fragShader;
     private Framebuffer _framebuffer;
     private Silk.NET.Vulkan.Buffer _indexBuffer;
     private DeviceMemory _indexBufferMemory;
-    private readonly ushort[] _indices;
     private bool _isInit;
-    private readonly float _maxY;
-    private readonly float _minY;
     private Pipeline _pipeline;
     private PipelineLayout _pipelineLayout;
 
-    private readonly Vertex[] _points;
-
     private PixelSize? _previousImageSize = PixelSize.Empty;
     private RenderPass _renderPass;
-    private Silk.NET.Vulkan.Buffer _stageIndexBuffer;
-    private DeviceMemory _stageIndexBufferMemory;
-    private int _stageIndexBufferSize;
-
-    private readonly Mutex _stageMutex = new();
-    private Silk.NET.Vulkan.Buffer _stageVertexBuffer;
-    private DeviceMemory _stageVertexBufferMemory;
-    private int _stageVertexBufferSize;
     private Silk.NET.Vulkan.Buffer _uniformBuffer;
     private DeviceMemory _uniformBufferMemory;
     private Silk.NET.Vulkan.Buffer _vertexBuffer;
     private DeviceMemory _vertexBufferMemory;
-    private readonly ShaderModule _vertShader;
 
     public VulkanContent(VulkanContext context)
     {
@@ -60,11 +48,11 @@ internal unsafe class VulkanContent : IDisposable
         using (var sr = new BinaryReader(typeof(VulkanContent).Assembly.GetManifestResourceStream(name)!))
         {
             var buf = new byte[sr.ReadInt32()];
-            sr.Read(buf, 0, buf.Length);
+            _ = sr.Read(buf, 0, buf.Length);
             var points = new float[buf.Length / 4];
             Buffer.BlockCopy(buf, 0, points, 0, buf.Length);
             buf = new byte[sr.ReadInt32()];
-            sr.Read(buf, 0, buf.Length);
+            _ = sr.Read(buf, 0, buf.Length);
             _indices = new ushort[buf.Length / 2];
             Buffer.BlockCopy(buf, 0, _indices, 0, buf.Length);
             _points = new Vertex[points.Length / 3];
@@ -126,7 +114,6 @@ internal unsafe class VulkanContent : IDisposable
             api.CreateShaderModule(device, shaderCreateInfo, null, out _fragShader);
         }
 
-        Console.WriteLine($"A> MAX: {_maxY}, MIN: {_minY}");
         CreateBuffers();
     }
 
@@ -150,95 +137,6 @@ internal unsafe class VulkanContent : IDisposable
         }
 
         _isInit = false;
-    }
-
-    public void UpdateStage(List<TriangleBuffer> models)
-    {
-        var totalPoints = models.Sum(buf => buf.Buffer.Length);
-        var indices = new ushort[totalPoints];
-        var points = new Vertex[totalPoints];
-
-        var offset = 0;
-        foreach (var model in models)
-        {
-            for (var i = 0; i < model.Buffer.Length; i += 3)
-            {
-                var a = model.Buffer[i];
-                var b = model.Buffer[i + 1];
-                var c = model.Buffer[i + 2];
-
-                var va = new Vector3((float)a.X * 200, (float)a.Y * 200, (float)a.Z * 200);
-                var vb = new Vector3((float)b.X * 200, (float)b.Y * 200, (float)b.Z * 200);
-                var vc = new Vector3((float)c.X * 200, (float)c.Y * 200, (float)c.Z * 200);
-
-                var normal = Vector3.Normalize(Vector3.Cross(vc - vb, va - vb));
-                points[offset + i] = new Vertex
-                {
-                    Position = va,
-                    Normal = normal
-                };
-                points[offset + i + 1] = new Vertex
-                {
-                    Position = vb,
-                    Normal = normal
-                };
-                points[offset + i + 2] = new Vertex
-                {
-                    Position = vc,
-                    Normal = normal
-                };
-
-                indices[offset + i] = (ushort)(offset + i);
-                indices[offset + i + 1] = (ushort)(offset + i + 1);
-                indices[offset + i + 2] = (ushort)(offset + i + 2);
-            }
-
-            offset += model.Buffer.Length;
-        }
-
-        try
-        {
-            _stageMutex.WaitOne();
-            if (points.Length != _stageVertexBufferSize)
-            {
-                if (_stageVertexBuffer.Handle != 0)
-                {
-                    _context.Api.DestroyBuffer(_context.Device, _stageVertexBuffer, null);
-                    _context.Api.FreeMemory(_context.Device, _stageVertexBufferMemory, null);
-                }
-
-                VulkanBufferHelper.AllocateBuffer<Vertex>(_context, BufferUsageFlags.VertexBufferBit,
-                    out _stageVertexBuffer,
-                    out _stageVertexBufferMemory, points);
-                _stageVertexBufferSize = points.Length;
-            }
-            else
-            {
-                VulkanBufferHelper.UpdateBufferMemory<Vertex>(_context, _stageVertexBufferMemory, points);
-            }
-
-            if (indices.Length != _stageIndexBufferSize)
-            {
-                if (_stageIndexBuffer.Handle != 0)
-                {
-                    _context.Api.DestroyBuffer(_context.Device, _stageIndexBuffer, null);
-                    _context.Api.FreeMemory(_context.Device, _stageIndexBufferMemory, null);
-                }
-
-                VulkanBufferHelper.AllocateBuffer<ushort>(_context, BufferUsageFlags.IndexBufferBit,
-                    out _stageIndexBuffer,
-                    out _stageIndexBufferMemory, indices);
-                _stageIndexBufferSize = indices.Length;
-            }
-            else
-            {
-                VulkanBufferHelper.UpdateBufferMemory<ushort>(_context, _stageIndexBufferMemory, indices);
-            }
-        }
-        finally
-        {
-            _stageMutex.ReleaseMutex();
-        }
     }
 
     private byte[] GetShader(string shaderName, ShaderKind shaderKind)
@@ -354,18 +252,6 @@ internal unsafe class VulkanContent : IDisposable
         api.CmdPushConstants(commandBufferHandle, _pipelineLayout,
             ShaderStageFlags.VertexBit | ShaderStageFlags.FragmentBit, 0,
             (uint)Marshal.SizeOf<VertextPushConstant>(), &vertexConstant2);
-        try
-        {
-            _stageMutex.WaitOne();
-            api.CmdBindVertexBuffers(commandBufferHandle, 0, 1, _stageVertexBuffer, 0);
-            api.CmdBindIndexBuffer(commandBufferHandle, _stageIndexBuffer, 0, IndexType.Uint16);
-            api.CmdDrawIndexed(commandBufferHandle, (uint)_stageIndexBufferSize, 1, 0, 0, 0);
-        }
-        finally
-        {
-            _stageMutex.ReleaseMutex();
-        }
-
 
         api.CmdEndRenderPass(commandBufferHandle);
 
@@ -411,7 +297,7 @@ internal unsafe class VulkanContent : IDisposable
         commandBuffer.Submit();
     }
 
-    public void DestroyTemporalObjects()
+    private void DestroyTemporalObjects()
     {
         if (_isInit)
             if (_renderPass.Handle != 0)
@@ -897,29 +783,23 @@ internal unsafe class VulkanContent : IDisposable
                 InputRate = VertexInputRate.Vertex
             };
 
-        public static VertexInputAttributeDescription[] VertexInputAttributeDescription
-        {
-            get
+        public static VertexInputAttributeDescription[] VertexInputAttributeDescription =>
+        [
+            new VertexInputAttributeDescription
             {
-                return new[]
-                {
-                    new VertexInputAttributeDescription
-                    {
-                        Binding = 0,
-                        Location = 0,
-                        Format = Format.R32G32B32Sfloat,
-                        Offset = (uint)Marshal.OffsetOf<Vertex>("Position")
-                    },
-                    new VertexInputAttributeDescription
-                    {
-                        Binding = 0,
-                        Location = 1,
-                        Format = Format.R32G32B32Sfloat,
-                        Offset = (uint)Marshal.OffsetOf<Vertex>("Normal")
-                    }
-                };
+                Binding = 0,
+                Location = 0,
+                Format = Format.R32G32B32Sfloat,
+                Offset = (uint)Marshal.OffsetOf<Vertex>("Position")
+            },
+            new VertexInputAttributeDescription
+            {
+                Binding = 0,
+                Location = 1,
+                Format = Format.R32G32B32Sfloat,
+                Offset = (uint)Marshal.OffsetOf<Vertex>("Normal")
             }
-        }
+        ];
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 4)]

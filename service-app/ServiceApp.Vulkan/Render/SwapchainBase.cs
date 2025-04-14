@@ -1,6 +1,8 @@
+using System.Reactive.Disposables;
+using Avalonia;
 using Avalonia.Rendering.Composition;
 
-namespace Avalonia.Rendering;
+namespace ServiceApp.Vulkan.Render;
 
 /// <summary>
 ///     A helper class for composition-backed swapchains, should not be a public API yet
