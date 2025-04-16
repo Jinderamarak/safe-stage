@@ -1,94 +1,45 @@
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Avalonia;
-using shaderc;
+using ServiceApp.Vulkan.Data;
+using ServiceApp.Vulkan.Render.Shaders;
 using Silk.NET.Vulkan;
-using Buffer = System.Buffer;
+using Buffer = Silk.NET.Vulkan.Buffer;
 using Image = Silk.NET.Vulkan.Image;
-using Vector3 = System.Numerics.Vector3;
 
 namespace ServiceApp.Vulkan.Render;
 
 internal unsafe class VulkanContent : IDisposable
 {
     private readonly VulkanContext _context;
+
     private readonly ShaderModule _fragShader;
-    private readonly ushort[] _indices;
-    private readonly float _maxY;
-    private readonly float _minY;
-
-    private readonly Vertex[] _points;
     private readonly ShaderModule _vertShader;
-    private VulkanImage? _colorAttachment;
 
+    private VulkanImage? _colorAttachment;
     private Image _depthImage;
     private DeviceMemory _depthImageMemory;
     private ImageView _depthImageView;
     private DescriptorSet _descriptorSet;
     private DescriptorSetLayout _descriptorSetLayout;
     private Framebuffer _framebuffer;
-    private Silk.NET.Vulkan.Buffer _indexBuffer;
-    private DeviceMemory _indexBufferMemory;
     private bool _isInit;
     private Pipeline _pipeline;
     private PipelineLayout _pipelineLayout;
 
     private PixelSize? _previousImageSize = PixelSize.Empty;
     private RenderPass _renderPass;
-    private Silk.NET.Vulkan.Buffer _uniformBuffer;
+    private Buffer _uniformBuffer;
     private DeviceMemory _uniformBufferMemory;
-    private Silk.NET.Vulkan.Buffer _vertexBuffer;
-    private DeviceMemory _vertexBufferMemory;
 
     public VulkanContent(VulkanContext context)
     {
         _context = context;
-        var name = typeof(VulkanContent).Assembly.GetManifestResourceNames().First(x => x.Contains("teapot.bin"));
-        using (var sr = new BinaryReader(typeof(VulkanContent).Assembly.GetManifestResourceStream(name)!))
-        {
-            var buf = new byte[sr.ReadInt32()];
-            _ = sr.Read(buf, 0, buf.Length);
-            var points = new float[buf.Length / 4];
-            Buffer.BlockCopy(buf, 0, points, 0, buf.Length);
-            buf = new byte[sr.ReadInt32()];
-            _ = sr.Read(buf, 0, buf.Length);
-            _indices = new ushort[buf.Length / 2];
-            Buffer.BlockCopy(buf, 0, _indices, 0, buf.Length);
-            _points = new Vertex[points.Length / 3];
-            for (var primitive = 0; primitive < points.Length / 3; primitive++)
-            {
-                var srci = primitive * 3;
-                _points[primitive] = new Vertex
-                {
-                    Position = new Vector3(points[srci], points[srci + 1], points[srci + 2])
-                };
-            }
-
-            for (var i = 0; i < _indices.Length; i += 3)
-            {
-                var a = _points[_indices[i]].Position;
-                var b = _points[_indices[i + 1]].Position;
-                var c = _points[_indices[i + 2]].Position;
-                var normal = Vector3.Normalize(Vector3.Cross(c - b, a - b));
-
-                _points[_indices[i]].Normal += normal;
-                _points[_indices[i + 1]].Normal += normal;
-                _points[_indices[i + 2]].Normal += normal;
-            }
-
-            for (var i = 0; i < _points.Length; i++)
-            {
-                _points[i].Normal = Vector3.Normalize(_points[i].Normal);
-                _maxY = Math.Max(_maxY, _points[i].Position.Y);
-                _minY = Math.Min(_minY, _points[i].Position.Y);
-            }
-        }
 
         var api = _context.Api;
         var device = _context.Device;
-        var vertShaderData = GetShader("Vulkan.VulkanDemo.Assets.Shaders.vert.glsl", ShaderKind.GlslVertexShader);
-        var fragShaderData = GetShader("Vulkan.VulkanDemo.Assets.Shaders.frag.glsl", ShaderKind.GlslFragmentShader);
+        var vertShaderData = EmbeddedShaders.LoadVertexShader();
+        var fragShaderData = EmbeddedShaders.LoadDiffuseShader();
 
         fixed (byte* ptr = vertShaderData)
         {
@@ -113,8 +64,6 @@ internal unsafe class VulkanContent : IDisposable
 
             api.CreateShaderModule(device, shaderCreateInfo, null, out _fragShader);
         }
-
-        CreateBuffers();
     }
 
     public void Dispose()
@@ -128,55 +77,19 @@ internal unsafe class VulkanContent : IDisposable
 
             api.DestroyShaderModule(device, _vertShader, null);
             api.DestroyShaderModule(device, _fragShader, null);
-
-            api.DestroyBuffer(device, _vertexBuffer, null);
-            api.FreeMemory(device, _vertexBufferMemory, null);
-
-            api.DestroyBuffer(device, _indexBuffer, null);
-            api.FreeMemory(device, _indexBufferMemory, null);
         }
 
         _isInit = false;
     }
 
-    private byte[] GetShader(string shaderName, ShaderKind shaderKind)
-    {
-        string content;
-        using (var sr = typeof(VulkanContent).Assembly.GetManifestResourceStream(shaderName)!)
-        {
-            if (sr == null)
-                throw new FileNotFoundException($"Shader file '{shaderName}' not found in assembly resources.");
-
-            using (var reader = new StreamReader(sr))
-            {
-                content = reader.ReadToEnd();
-            }
-        }
-
-        using var compiler = new Compiler();
-        using var result = compiler.Compile(content, shaderName, shaderKind);
-        if (result.Status != Status.Success) throw new Exception($"Shader compilation failed: {result.ErrorMessage}");
-
-        var data = new byte[result.CodeLength];
-        Marshal.Copy(result.CodePointer, data, 0, (int)result.CodeLength);
-        return data;
-    }
-
-
-    public void Render(VulkanImage image,
-        double yaw, double pitch, double roll, double disco, int timeTick)
+    public void Render(VulkanImage image, CameraData camera, LightData light, IEnumerable<SimpleObject3D> objects)
     {
         var api = _context.Api;
 
         if (image.Size != _previousImageSize)
-            CreateTemporalObjects(image.Size);
+            CreateTemporalObjects(image.Size, camera, light);
 
         _previousImageSize = image.Size;
-
-        var vertexConstant = new VertextPushConstant
-        {
-            ObjectColor = new Vector3(0.8f, 0.5f, 0.5f)
-        };
 
         var commandBuffer = _context.Pool.CreateCommandBuffer();
         commandBuffer.BeginRecording();
@@ -209,6 +122,7 @@ internal unsafe class VulkanContent : IDisposable
         {
             new()
             {
+                //  TODO: use background color
                 Color = new ClearColorValue { Float32_0 = 0.2f, Float32_1 = 0.2f, Float32_2 = 0.2f, Float32_3 = 0.1f }
             },
             new() { DepthStencil = new ClearDepthStencilValue { Depth = 1, Stencil = 0 } }
@@ -236,22 +150,7 @@ internal unsafe class VulkanContent : IDisposable
         api.CmdBindDescriptorSets(commandBufferHandle, PipelineBindPoint.Graphics,
             _pipelineLayout, 0, 1, &dset, null);
 
-        api.CmdPushConstants(commandBufferHandle, _pipelineLayout,
-            ShaderStageFlags.VertexBit | ShaderStageFlags.FragmentBit, 0,
-            (uint)Marshal.SizeOf<VertextPushConstant>(), &vertexConstant);
-        api.CmdBindVertexBuffers(commandBufferHandle, 0, 1, _vertexBuffer, 0);
-        api.CmdBindIndexBuffer(commandBufferHandle, _indexBuffer, 0, IndexType.Uint16);
-
-        api.CmdDrawIndexed(commandBufferHandle, (uint)_indices.Length, 1, 0, 0, 0);
-
-
-        var vertexConstant2 = new VertextPushConstant
-        {
-            ObjectColor = new Vector3(0.5f, 0.8f, 0.5f)
-        };
-        api.CmdPushConstants(commandBufferHandle, _pipelineLayout,
-            ShaderStageFlags.VertexBit | ShaderStageFlags.FragmentBit, 0,
-            (uint)Marshal.SizeOf<VertextPushConstant>(), &vertexConstant2);
+        foreach (var simpleObject in objects) simpleObject.Draw(api, commandBufferHandle, _pipelineLayout);
 
         api.CmdEndRenderPass(commandBufferHandle);
 
@@ -259,7 +158,6 @@ internal unsafe class VulkanContent : IDisposable
             AccessFlags.TransferReadBit);
         image.TransitionLayout(commandBuffer.InternalHandle, ImageLayout.TransferDstOptimal,
             AccessFlags.TransferWriteBit);
-
 
         var srcBlitRegion = new ImageBlit
         {
@@ -400,14 +298,9 @@ internal unsafe class VulkanContent : IDisposable
             .ThrowOnError();
     }
 
-    private void CreateTemporalObjects(PixelSize size)
+    private void CreateTemporalObjects(PixelSize size, CameraData camera, LightData light)
     {
         DestroyTemporalObjects();
-
-        var view = Matrix4x4.CreateLookAt(new Vector3(25, 25, 25), new Vector3(), new Vector3(0, 0, 1));
-        var projection =
-            Matrix4x4.CreatePerspectiveFieldOfView((float)(Math.PI / 4), (float)size.Width / size.Height,
-                0.01f, 1000);
 
         _colorAttachment = new VulkanImage(_context, (uint)Format.R8G8B8A8Unorm, size, false, Array.Empty<string>());
         CreateDepthAttachment(size);
@@ -525,8 +418,8 @@ internal unsafe class VulkanContent : IDisposable
 
         var stages = new[] { vertShaderStageInfo, fragShaderStageInfo };
 
-        var bindingDescription = Vertex.VertexInputBindingDescription;
-        var attributeDescription = Vertex.VertexInputAttributeDescription;
+        var bindingDescription = VertexInput.VertexInputBindingDescription;
+        var attributeDescription = VertexInput.VertexInputAttributeDescription;
 
         fixed (VertexInputAttributeDescription* attrPtr = attributeDescription)
         {
@@ -629,14 +522,14 @@ internal unsafe class VulkanContent : IDisposable
                 var vertexPushConstantRange = new PushConstantRange
                 {
                     Offset = 0,
-                    Size = (uint)Marshal.SizeOf<VertextPushConstant>(),
+                    Size = (uint)Marshal.SizeOf<VertexPushConstant>(),
                     StageFlags = ShaderStageFlags.VertexBit
                 };
 
                 var fragPushConstantRange = new PushConstantRange
                 {
-                    //Offset = vertexPushConstantRange.Size,
-                    Size = (uint)Marshal.SizeOf<VertextPushConstant>(),
+                    Offset = 0,
+                    Size = (uint)Marshal.SizeOf<VertexPushConstant>(),
                     StageFlags = ShaderStageFlags.FragmentBit
                 };
 
@@ -657,15 +550,16 @@ internal unsafe class VulkanContent : IDisposable
 
                 api.CreateDescriptorSetLayout(device, &layoutInfo, null, out _descriptorSetLayout).ThrowOnError();
 
-                var projView = view * projection;
-                VulkanBufferHelper.AllocateBuffer<UniformBuffer>(_context, BufferUsageFlags.UniformBufferBit,
+                VulkanBufferHelper.AllocateBuffer<UniformBufferObject>(_context, BufferUsageFlags.UniformBufferBit,
                     out _uniformBuffer,
                     out _uniformBufferMemory, new[]
                     {
-                        new UniformBuffer
+                        new UniformBufferObject
                         {
-                            Projection = projView,
-                            LightPos = new Vector3(25, 25, 25)
+                            Projection = camera.ProjectionView(size.Width, size.Height),
+                            LightPosition = light.Position,
+                            LightColor = light.ColorVector,
+                            LightStrength = light.Strength
                         }
                     });
 
@@ -682,7 +576,7 @@ internal unsafe class VulkanContent : IDisposable
                 var descriptorBufferInfo = new DescriptorBufferInfo
                 {
                     Buffer = _uniformBuffer,
-                    Range = (ulong)Unsafe.SizeOf<UniformBuffer>()
+                    Range = (ulong)Unsafe.SizeOf<UniformBufferObject>()
                 };
                 var descriptorWrite = new WriteDescriptorSet
                 {
@@ -745,14 +639,6 @@ internal unsafe class VulkanContent : IDisposable
         _isInit = true;
     }
 
-    private void CreateBuffers()
-    {
-        VulkanBufferHelper.AllocateBuffer<Vertex>(_context, BufferUsageFlags.VertexBufferBit, out _vertexBuffer,
-            out _vertexBufferMemory, _points);
-        VulkanBufferHelper.AllocateBuffer<ushort>(_context, BufferUsageFlags.IndexBufferBit, out _indexBuffer,
-            out _indexBufferMemory, _indices);
-    }
-
     private static int FindSuitableMemoryTypeIndex(Vk api, PhysicalDevice physicalDevice, uint memoryTypeBits,
         MemoryPropertyFlags flags)
     {
@@ -766,52 +652,5 @@ internal unsafe class VulkanContent : IDisposable
         }
 
         return -1;
-    }
-
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    private struct Vertex
-    {
-        public Vector3 Position;
-        public Vector3 Normal;
-
-        public static VertexInputBindingDescription VertexInputBindingDescription =>
-            new()
-            {
-                Binding = 0,
-                Stride = (uint)Marshal.SizeOf<Vertex>(),
-                InputRate = VertexInputRate.Vertex
-            };
-
-        public static VertexInputAttributeDescription[] VertexInputAttributeDescription =>
-        [
-            new VertexInputAttributeDescription
-            {
-                Binding = 0,
-                Location = 0,
-                Format = Format.R32G32B32Sfloat,
-                Offset = (uint)Marshal.OffsetOf<Vertex>("Position")
-            },
-            new VertexInputAttributeDescription
-            {
-                Binding = 0,
-                Location = 1,
-                Format = Format.R32G32B32Sfloat,
-                Offset = (uint)Marshal.OffsetOf<Vertex>("Normal")
-            }
-        ];
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    private struct VertextPushConstant
-    {
-        public Vector3 ObjectColor;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    private struct UniformBuffer
-    {
-        public Matrix4x4 Projection;
-        public Vector3 LightPos;
     }
 }

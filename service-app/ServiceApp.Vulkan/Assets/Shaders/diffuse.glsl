@@ -11,17 +11,17 @@ layout (push_constant) uniform constants {
 
 layout (binding = 0) uniform UniformBufferObject {
     mat4 projection;
-    vec3 lightPos;
+    vec3 lightPosition;
+    vec3 lightColor;
+    float lightStrength;
 };
 
 void main()
 {
-    float ambientStrength = 0.3;
-    vec3 lightColor = vec3(1.0, 1.0, 1.0);
-    vec3 ambient = ambientStrength * lightColor;
+    vec3 ambient = lightStrength * lightColor;
 
     vec3 norm = normalize(FragNormal);
-    vec3 lightDir = normalize(lightPos - FragPos);
+    vec3 lightDir = normalize(lightPosition - FragPos);
 
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;

@@ -30,6 +30,7 @@ internal unsafe class VulkanContext : IDisposable
 
     public static (VulkanContext? result, string info) TryCreate(ICompositionGpuInterop gpuInterop)
     {
+        //  TODO: Fill with actual information
         using var appName = new ByteString("Vulkan");
         using var engineName = new ByteString("Test");
         var applicationInfo = new ApplicationInfo
@@ -52,7 +53,11 @@ internal unsafe class VulkanContext : IDisposable
         var enabledLayers = new List<string>();
 
         var api = Vk.GetApi();
+
+#if DEBUG
         enabledExtensions.Add("VK_EXT_debug_utils");
+#endif
+
         if (IsLayerAvailable(api, "VK_LAYER_KHRONOS_validation"))
             enabledLayers.Add("VK_LAYER_KHRONOS_validation");
 
@@ -75,7 +80,7 @@ internal unsafe class VulkanContext : IDisposable
                 EnabledLayerCount = pEnabledLayers.UCount
             }, null, out var vkInstance).ThrowOnError();
 
-
+#if DEBUG
             if (api.TryGetInstanceExtension(vkInstance, out ExtDebugUtils debugUtils))
             {
                 var debugCreateInfo = new DebugUtilsMessengerCreateInfoEXT
@@ -92,6 +97,7 @@ internal unsafe class VulkanContext : IDisposable
 
                 debugUtils.CreateDebugUtilsMessenger(vkInstance, debugCreateInfo, null, out _);
             }
+#endif
 
             var requireDeviceExtensions = new List<string>
             {
@@ -99,6 +105,7 @@ internal unsafe class VulkanContext : IDisposable
                 "VK_KHR_external_semaphore"
             };
 
+            //  TODO: Validate if it is really required for it to work on modern Windows
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 if (!(gpuInterop.SupportedImageHandleTypes.Contains(KnownPlatformGraphicsExternalImageHandleTypes

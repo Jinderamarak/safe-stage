@@ -6,13 +6,11 @@ layout (location = 1) in vec3 VertNormal;
 layout (location = 0) out vec3 FragPos;
 layout (location = 1) out vec3 FragNormal;
 
-layout (push_constant) uniform constants {
-    vec3 objectColor;
-} consta;
-
 layout (binding = 0) uniform UniformBufferObject {
     mat4 projection;
-    vec3 lightPos;
+    vec3 lightPosition;
+    vec3 lightColor;
+    float lightStrength;
 };
 
 void main()
