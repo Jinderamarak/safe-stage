@@ -2,17 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="GpuInterop.GpuDemo"
              xmlns:vlk="clr-namespace:ServiceApp.View3D.Controls;assembly=ServiceApp.View3D">
-    <Grid RowDefinitions="Auto,*" ColumnDefinitions="Auto,*">
-        <Grid Grid.Row="0" Grid.Column="1">
-            <TextBlock Text="ZERO ONE" />
-        </Grid>
-        <Grid Grid.Row="1" Grid.Column="0">
-            <TextBlock Text="ONE ZERO" />
-        </Grid>
-        <Grid Grid.Row="0" Grid.Column="0">
-            <TextBlock Text="ZERO ZERO" />
-        </Grid>
-        <Grid Grid.Row="1" Grid.Column="1"
+    <Grid RowDefinitions="*,Auto,Auto" ColumnDefinitions="300,*">
+        <ScrollViewer Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" />
+        <Grid Grid.Row="0" Grid.Column="1"
               PointerMoved="InputElement_OnPointerMoved"
               PointerWheelChanged="InputElement_OnPointerWheelChanged"
               Background="Blue">
@@ -32,5 +24,12 @@
                 </vlk:SimpleView3D.ModelGroup>
             </vlk:SimpleView3D>
         </Grid>
+        <DockPanel Grid.Row="1" Grid.Column="1" IsEnabled="true">
+            <TextBlock DockPanel.Dock="Left" Margin="5" Text="Path Interpolation: " />
+            <Slider Margin="5" x:Name="PathInterpolationSliderAva"
+                    TickFrequency="1" Minimum="0" Maximum="100" />
+        </DockPanel>
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="Ready" Padding="5" />
     </Grid>
 </UserControl>
