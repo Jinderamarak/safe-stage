@@ -1,0 +1,136 @@
+<Window x:Class="ServiceApp.Avalonia.Windows.MicroscopeConfiguration"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:this="clr-namespace:ServiceApp.Avalonia.Windows"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Title="Configure Microscope" Height="600" Width="800"
+        x:DataType="this:MicroscopeConfiguration">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0">
+            <TextBlock DockPanel.Dock="Left" Text="Preset: " Margin="5" />
+            <ComboBox Margin="5"
+                      x:Name="PresetsComboAva"
+                      ItemsSource="{Binding Presets}"
+                      SelectionChanged="OnPresetChanged" />
+        </DockPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical">
+
+                <HeaderedContentControl Header="Chamber" Margin="5" Padding="5">
+                    <StackPanel Orientation="Vertical">
+                        <ComboBox SelectedItem="{Binding ChamberVariant}"
+                                  ItemsSource="{Binding ChamberVariants}" />
+                        <StackPanel Orientation="Vertical">
+                            <ItemsControl ItemsSource="{Binding ChamberVariant.Fields}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ContentControl Content="{Binding}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Header="Equipment" Margin="5" Padding="5">
+                    <StackPanel Orientation="Vertical">
+                        <ComboBox x:Name="EquipmentVariantsComboAva"
+                                  ItemsSource="{Binding EquipmentVariants}"
+                                  SelectionChanged="OnEquipmentVariantSelected" />
+                        <StackPanel>
+                            <ItemsControl ItemsSource="{Binding Equipment}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <HeaderedContentControl Header="{Binding}">
+                                            <StackPanel Orientation="Vertical">
+                                                <ItemsControl ItemsSource="{Binding Equipment.Fields}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <ContentControl Content="{Binding Control}" />
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Header="Stage" Margin="5" Padding="5">
+                    <StackPanel Orientation="Vertical">
+                        <ComboBox SelectedItem="{Binding StageVariant}"
+                                  ItemsSource="{Binding StageVariants}" />
+                        <StackPanel Orientation="Vertical">
+                            <ItemsControl ItemsSource="{Binding StageVariant.Fields}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ContentControl Content="{Binding}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Header="Stage Resolver" Margin="5" Padding="5">
+                    <StackPanel Orientation="Vertical">
+                        <ComboBox SelectedItem="{Binding StageResolverVariant}"
+                                  ItemsSource="{Binding StageResolverVariants}" />
+                        <StackPanel Orientation="Vertical">
+                            <ItemsControl ItemsSource="{Binding StageResolverVariant.Fields}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ContentControl Content="{Binding}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Header="Retracts" Margin="5" Padding="5">
+                    <StackPanel Orientation="Vertical">
+                        <ComboBox x:Name="RetractVariantsComboAva"
+                                  ItemsSource="{Binding RetractVariants}"
+                                  SelectionChanged="OnRetractVariantSelected" />
+                        <StackPanel>
+                            <ItemsControl ItemsSource="{Binding Retracts}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ContentControl Content="{Binding}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </HeaderedContentControl>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Margin="5" Padding="20 5"
+                    IsDefault="True" Content="Save" Click="OnSave" />
+            <Button Grid.Column="2" Margin="5" Padding="20 5"
+                    IsCancel="True" Content="Cancel" Click="OnCancel" />
+        </Grid>
+    </Grid>
+</Window>

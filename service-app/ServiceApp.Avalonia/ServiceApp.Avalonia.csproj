@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!--        <PackageReference Include="Avalonia" Version="11.2.7"/>-->
+        <!--        <PackageReference Include="Avalonia.Desktop" Version="11.2.7"/>-->
+        <!--        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.7"/>-->
+        <!--        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.7"/>-->
+        <!--        &lt;!&ndash;Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.&ndash;&gt;-->
+        <!--        <PackageReference Include="Avalonia.Diagnostics" Version="11.2.7">-->
+        <!--            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>-->
+        <!--            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>-->
+        <!--        </PackageReference>-->
+        <PackageReference Include="MessageBox.Avalonia" Version="3.2.0"/>
+        <PackageReference Include="System.Reactive" Version="6.0.1"/>
+        <PackageReference Include="Avalonia" Version="11.3.0-beta1"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.0-beta1"/>
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.0-beta1"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.0-beta1"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0-beta1"/>
+        <PackageReference Include="shaderc.net" Version="0.1.0"/>
+        <PackageReference Include="Silk.NET.Vulkan" Version="2.22.0"/>
+        <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.22.0"/>
+        <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.22.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\bindings\BindingsCs\BindingsCs.csproj"/>
+        <ProjectReference Include="..\ServiceApp.View3D\ServiceApp.View3D.csproj"/>
+    </ItemGroup>
+</Project>

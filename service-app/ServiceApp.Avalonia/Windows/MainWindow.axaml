@@ -1,0 +1,156 @@
+﻿<Window x:Class="ServiceApp.Avalonia.Windows.MainWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:this="clr-namespace:ServiceApp.Avalonia.Windows"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:fields="clr-namespace:ServiceApp.Avalonia.Config.Fields"
+        xmlns:converters="clr-namespace:ServiceApp.Avalonia.Converters"
+        xmlns:vlk="clr-namespace:ServiceApp.View3D.Controls;assembly=ServiceApp.View3D"
+        mc:Ignorable="d"
+        Title="Safe Stage - Service Application" Height="810" Width="1000"
+        x:DataType="this:MainWindow">
+    <Window.Resources>
+        <converters:NegativeBoolConverter x:Key="Negative" />
+        <converters:NotNullToBoolConverter x:Key="NotNull" />
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical" Margin="5">
+
+                <HeaderedContentControl Header="Configuration" Margin="5 10 5 5" Padding="5">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding ConfigurationTitle}" Margin="2" />
+                        <Button Content="Configure" Click="OnConfigureMicroscope" Margin="2" />
+
+                        <TextBlock Text="{Binding HolderTitle}" Margin="2 5 2 2" />
+                        <Button Content="Change Holder" Click="OnChangeHolder" Margin="2"
+                                IsEnabled="{Binding HasConfiguration}" />
+
+                        <Button Content="Change Sample" Click="OnChangeSampleHeight" Margin="2"
+                                IsEnabled="{Binding HasConfiguration}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Header="Preview" Margin="5 10 5 5" Padding="5"
+                                        IsEnabled="{Binding IsUpdating, Converter={StaticResource Negative}}">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="Obstruction Level" Margin="2" />
+                        <Slider Minimum="0" Maximum="2" IsSnapToTickEnabled="True" TickFrequency="1" Margin="2"
+                                ValueChanged="OnObstructionLevelChanged"
+                                Value="{Binding ObstructionLevel}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Header="Stage" Margin="5 10 5 5" Padding="5"
+                                        IsEnabled="{Binding IsUpdating, Converter={StaticResource Negative}}">
+                    <StackPanel Orientation="Vertical">
+                        <fields:SixAxisField Label="Current" x:Name="StageCurrentAva" />
+                        <Button Content="Update State" Click="StageUpdateCurrent" Margin="2" Padding="10 2" />
+
+                        <Grid Margin="5 15 5 5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0" Padding="10 5" Content="˄" Click="OnCopyTargetToCurrent" />
+                            <Button Grid.Column="2" Padding="10 5" Content="˅" Click="OnCopyCurrentToTarget" />
+                        </Grid>
+
+                        <fields:SixAxisField Label="Target" x:Name="StageTargetAva" />
+                        <Button Content="Find Path" Click="StageFindPath" Margin="2" Padding="10 2" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Header="Retracts" Margin="5 10 5 5" Padding="5"
+                                        IsEnabled="{Binding IsUpdating, Converter={StaticResource Negative}}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="2 5 2 2"
+                                  ItemsSource="{Binding Retracts}"
+                                  SelectedItem="{Binding SelectedRetract}" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="Update Current State:"
+                                   Margin="2 10 2 2" />
+                        <Button Grid.Row="2" Grid.Column="0" Margin="2" Padding="10 2"
+                                Content="Inserted" Click="OnRetractStateInserted"
+                                IsEnabled="{Binding SelectedRetract, Converter={StaticResource NotNull}}" />
+                        <Button Grid.Row="2" Grid.Column="1" Margin="2" Padding="10 2"
+                                Content="Retracted" Click="OnRetractStateRetracted"
+                                IsEnabled="{Binding SelectedRetract, Converter={StaticResource NotNull}}" />
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="Find Path To:"
+                                   Margin="2 10 2 2" />
+                        <Button Grid.Row="4" Grid.Column="0" Margin="2" Padding="10 2"
+                                Content="Inserted" Click="OnRetractFindInserted"
+                                IsEnabled="{Binding SelectedRetract, Converter={StaticResource NotNull}}" />
+                        <Button Grid.Row="4" Grid.Column="1" Margin="2" Padding="10 2"
+                                Content="Retracted" Click="OnRetractFindRetracted"
+                                IsEnabled="{Binding SelectedRetract, Converter={StaticResource NotNull}}" />
+                    </Grid>
+                </HeaderedContentControl>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <Grid
+            Grid.Row="0"
+            Grid.Column="1"
+            Background="Salmon"
+            PointerMoved="OnViewportMouseMove"
+            PointerWheelChanged="OnViewportMouseWheel">
+            <vlk:SimpleView3D>
+                <vlk:SimpleView3D.Camera>
+                    <vlk:Camera3D
+                        x:Name="CameraAva"
+                        Near="0.1"
+                        Far="10" />
+                </vlk:SimpleView3D.Camera>
+                <vlk:SimpleView3D.Light>
+                    <vlk:PointLight x:Name="LightAva" />
+                </vlk:SimpleView3D.Light>
+                <vlk:SimpleView3D.ModelGroup>
+                    <vlk:ModelGroup>
+                        <vlk:ModelGroup.Groups>
+                            <vlk:ModelGroup x:Name="StageModelGroupAva" />
+                            <vlk:ModelGroup x:Name="StaticModelGroupAva" />
+                            <vlk:ModelGroup x:Name="RetractModelGroupAva" />
+                            <vlk:ModelGroup x:Name="PathModelGroupAva" />
+                        </vlk:ModelGroup.Groups>
+                    </vlk:ModelGroup>
+                </vlk:SimpleView3D.ModelGroup>
+            </vlk:SimpleView3D>
+        </Grid>
+
+        <DockPanel Grid.Row="1" Grid.Column="1" IsEnabled="{Binding HasPath}">
+            <TextBlock DockPanel.Dock="Left" Margin="5" Text="Path Interpolation: " />
+            <Slider Margin="5" x:Name="PathInterpolationSliderAva"
+                    TickFrequency="1" Minimum="0" Maximum="{Binding StageInterpolationMax}" />
+        </DockPanel>
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding StatusText}" Padding="5" />
+    </Grid>
+</Window>

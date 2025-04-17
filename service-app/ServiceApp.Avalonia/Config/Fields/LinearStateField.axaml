@@ -1,0 +1,46 @@
+<UserControl x:Class="ServiceApp.Avalonia.Config.Fields.LinearStateField"
+             xmlns:this="clr-namespace:ServiceApp.Avalonia.Config.Fields"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converters="clr-namespace:ServiceApp.Avalonia.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"
+             x:DataType="this:LinearStateField">
+    <UserControl.Resources>
+        <converters:LinearStateToStringConverter x:Key="Linears" />
+        <converters:LinearStateToStringConverter x:Key="LinearsDoubles" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Label}" Margin="5 10 5 5" />
+
+        <TextBox Grid.Row="1" Grid.Column="0" Margin="2"
+                 Text="{
+                     Binding Value,
+                     Mode=TwoWay,
+                     Converter={StaticResource Linears}
+                 }" />
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="%" Margin="2" />
+        <Slider Grid.Row="1" Grid.Column="2" Margin="2"
+                Value="{
+                    Binding Value,
+                    Mode=TwoWay,
+                    Converter={StaticResource LinearsDoubles}
+                }"
+                Minimum="0"
+                Maximum="1"
+                LargeChange="0.01"
+                SmallChange="0.001" />
+    </Grid>
+</UserControl>

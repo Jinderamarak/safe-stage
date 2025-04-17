@@ -1,0 +1,48 @@
+<Window x:Class="ServiceApp.Avalonia.Windows.SelectHolderWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:this="clr-namespace:ServiceApp.Avalonia.Windows"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Title="Configure Selected Holder"
+        Height="450" Width="800"
+        x:DataType="this:SelectHolderWindow">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" Margin="5"
+                  ItemsSource="{Binding HolderVariants}"
+                  SelectedItem="{Binding SelectedHolder}" />
+
+        <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical">
+                <ItemsControl ItemsSource="{Binding SelectedHolder.Fields}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ContentControl Content="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Button Grid.Row="2" Grid.Column="0" Margin="5" Padding="20 5"
+                Content="Save" IsDefault="True" Click="OnSave" />
+        <Button Grid.Row="2" Grid.Column="2" Margin="5" Padding="20 5"
+                Content="No Holder" Click="OnNoHolder" />
+        <Button Grid.Row="2" Grid.Column="4" Margin="5" Padding="20 5"
+                Content="Cancel" IsCancel="True" Click="OnCancel" />
+    </Grid>
+</Window>

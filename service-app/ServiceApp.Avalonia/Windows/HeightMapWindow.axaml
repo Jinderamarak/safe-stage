@@ -1,0 +1,125 @@
+<Window x:Class="ServiceApp.Avalonia.Windows.HeightMapWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:this="clr-namespace:ServiceApp.Avalonia.Windows"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:converters="clr-namespace:ServiceApp.Avalonia.Converters"
+        mc:Ignorable="d"
+        Title="Configure Sample Height Map"
+        Height="450" Width="800"
+        x:DataType="this:HeightMapWindow">
+    <Window.Resources>
+        <converters:DoubleToStringConverter x:Key="Doubles" />
+        <converters:IntToStringConverter x:Key="Ints" />
+    </Window.Resources>
+
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <HeaderedContentControl Grid.Row="0" Grid.Column="0" Header="Actual Size" Margin="5" Padding="5">
+            <StackPanel Orientation="Vertical">
+
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="Size X: " Margin="2" />
+                    <TextBlock DockPanel.Dock="Right" Text="mm" Margin="2" />
+                    <TextBox
+                        Margin="2"
+                        Text="{Binding RealX,
+                        Converter={StaticResource Doubles}, ConverterParameter=1000}" />
+                </DockPanel>
+
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="Size Y: " Margin="2" />
+                    <TextBlock DockPanel.Dock="Right" Text="mm" Margin="2" />
+                    <TextBox
+                        Margin="2"
+                        Text="{Binding RealY,
+                        Converter={StaticResource Doubles}, ConverterParameter=1000}" />
+                </DockPanel>
+
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="Max Height: " Margin="2" />
+                    <TextBlock DockPanel.Dock="Right" Text="mm" Margin="2" />
+                    <TextBox
+                        Margin="2"
+                        Text="{Binding MaxSampleHeight,
+                        Converter={StaticResource Doubles}, ConverterParameter=1000}" />
+                </DockPanel>
+
+            </StackPanel>
+        </HeaderedContentControl>
+
+        <HeaderedContentControl Grid.Row="0" Grid.Column="1" Header="Resolution" Margin="5" Padding="5">
+            <StackPanel Orientation="Vertical">
+
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="Width: " Margin="2" />
+                    <TextBox Margin="2" Text="{Binding ResolutionX, Converter={StaticResource Ints}}" />
+                </DockPanel>
+
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="Height: " Margin="2" />
+                    <TextBox Margin="2" Text="{Binding ResolutionY, Converter={StaticResource Ints}}" />
+                </DockPanel>
+
+            </StackPanel>
+        </HeaderedContentControl>
+
+        <HeaderedContentControl Grid.Row="0" Grid.Column="2" Header="Brush" Margin="5" Padding="5">
+            <StackPanel Orientation="Vertical">
+
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="Size: " Margin="2" />
+                    <TextBlock DockPanel.Dock="Right" Margin="2"
+                               Text="{Binding BrushRadius, Converter={StaticResource Ints}}" />
+                    <Slider Margin="2" Value="{Binding BrushRadius}" Minimum="0" Maximum="{Binding ResolutionX}" />
+                </DockPanel>
+
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="Height: " Margin="2" />
+                    <TextBlock DockPanel.Dock="Right" Text="mm" Margin="2" />
+                    <TextBox DockPanel.Dock="Right" Width="50" Margin="2"
+                             Text="{Binding BrushHeight,
+                             Converter={StaticResource Doubles}, ConverterParameter=1000}" />
+                    <Slider Margin="2" Minimum="0" Maximum="{Binding MaxSampleHeight}"
+                            Value="{Binding BrushHeight}" />
+                </DockPanel>
+
+                <Button Content="Reset Height Map" Click="OnResetHeightMap" Margin="2" Padding="10 2" />
+
+            </StackPanel>
+        </HeaderedContentControl>
+
+        <Image
+            Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+            x:Name="HeightMapImageAva"
+            Stretch="Uniform" />
+
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Margin="5" Padding="20 5"
+                    Content="Save" IsDefault="True" Click="OnSave" />
+            <Button Grid.Column="2" Margin="5" Padding="20 5"
+                    Content="Clear Sample" Click="OnClear" />
+            <Button Grid.Column="4" Margin="5" Padding="20 5"
+                    Content="Cancel" IsCancel="True" Click="OnCancel" />
+        </Grid>
+    </Grid>
+</Window>

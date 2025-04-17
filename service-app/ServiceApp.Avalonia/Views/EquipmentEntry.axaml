@@ -1,0 +1,24 @@
+<UserControl x:Class="ServiceApp.Avalonia.Views.EquipmentEntry"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:this="clr-namespace:ServiceApp.Avalonia.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"
+             x:DataType="this:EquipmentEntry">
+    <HeaderedContentControl Header="{Binding Equipment}" Margin="0 10 0 0" Padding="5">
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Vertical">
+                <ItemsControl ItemsSource="{Binding Equipment.Fields}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ContentControl Content="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+            <Button Content="Remove" Click="OnRemoveEntry" Margin="2 10 2 2" />
+        </StackPanel>
+    </HeaderedContentControl>
+</UserControl>
