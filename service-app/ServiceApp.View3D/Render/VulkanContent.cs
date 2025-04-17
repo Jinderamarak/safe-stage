@@ -88,6 +88,8 @@ internal unsafe class VulkanContent : IDisposable
 
         if (image.Size != _previousImageSize)
             CreateTemporalObjects(image.Size, camera, light);
+        else
+            UpdateTemporalObjects(camera, light);
 
         _previousImageSize = image.Size;
 
@@ -296,6 +298,20 @@ internal unsafe class VulkanContent : IDisposable
         api
             .CreateImageView(device, imageViewCreateInfo, null, out _depthImageView)
             .ThrowOnError();
+    }
+
+    private void UpdateTemporalObjects(CameraData camera, LightData light)
+    {
+        VulkanBufferHelper.UpdateBufferMemory<UniformBufferObject>(_context, _uniformBufferMemory, new[]
+        {
+            new UniformBufferObject
+            {
+                Projection = camera.ProjectionView(_previousImageSize.Value.Width, _previousImageSize.Value.Height),
+                LightPosition = light.Position,
+                LightColor = light.ColorVector,
+                LightStrength = light.Strength
+            }
+        });
     }
 
     private void CreateTemporalObjects(PixelSize size, CameraData camera, LightData light)
