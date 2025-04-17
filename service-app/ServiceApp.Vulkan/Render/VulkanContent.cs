@@ -82,7 +82,7 @@ internal unsafe class VulkanContent : IDisposable
         _isInit = false;
     }
 
-    public void Render(VulkanImage image, CameraData camera, LightData light, IEnumerable<SimpleObject3D> objects)
+    public void Render(VulkanImage image, CameraData camera, LightData light, IEnumerable<BufferedObject> objects)
     {
         var api = _context.Api;
 

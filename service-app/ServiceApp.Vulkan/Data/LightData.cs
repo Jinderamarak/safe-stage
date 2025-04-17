@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace ServiceApp.Vulkan.Data;
 
-public class LightData
+internal class LightData
 {
     public Vector3 Position { get; set; }
     public Color Color { get; set; }

@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace ServiceApp.Vulkan.Data;
 
-public class CameraData
+internal class CameraData
 {
     public Vector3 Position { get; set; } = Vector3.One;
     public Vector3 Target { get; set; } = Vector3.Zero;

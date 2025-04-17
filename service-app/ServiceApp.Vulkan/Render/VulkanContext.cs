@@ -28,7 +28,7 @@ internal unsafe class VulkanContext : IDisposable
         Api.DestroyDevice(Device, null);
     }
 
-    public static (VulkanContext? result, string info) TryCreate(ICompositionGpuInterop gpuInterop)
+    public static VulkanContext Create(ICompositionGpuInterop gpuInterop)
     {
         //  TODO: Fill with actual information
         using var appName = new ByteString("Vulkan");
@@ -113,7 +113,7 @@ internal unsafe class VulkanContext : IDisposable
                       || gpuInterop.SupportedImageHandleTypes.Contains(KnownPlatformGraphicsExternalImageHandleTypes
                           .VulkanOpaqueNtHandle))
                    )
-                    return (null, "Image sharing is not supported by the current backend");
+                    throw new Exception("Image sharing is not supported by the current backend");
                 requireDeviceExtensions.Add(KhrExternalMemoryWin32.ExtensionName);
                 requireDeviceExtensions.Add(KhrExternalSemaphoreWin32.ExtensionName);
                 requireDeviceExtensions.Add("VK_KHR_dedicated_allocation");
@@ -126,7 +126,7 @@ internal unsafe class VulkanContext : IDisposable
                     || !gpuInterop.SupportedSemaphoreTypes.Contains(KnownPlatformGraphicsExternalSemaphoreHandleTypes
                         .VulkanOpaquePosixFileDescriptor)
                    )
-                    return (null, "Image sharing is not supported by the current backend");
+                    throw new Exception("Image sharing is not supported by the current backend");
                 requireDeviceExtensions.Add(KhrExternalMemoryFd.ExtensionName);
                 requireDeviceExtensions.Add(KhrExternalSemaphoreFd.ExtensionName);
             }
@@ -168,8 +168,8 @@ internal unsafe class VulkanContext : IDisposable
 
                 var physicalDevice = physicalDevices[c];
 
+                //  TODO: use device name for something
                 var name = Marshal.PtrToStringAnsi(new IntPtr(physicalDeviceProperties2.Properties.DeviceName))!;
-
 
                 uint queueFamilyCount = 0;
                 api.GetPhysicalDeviceQueueFamilyProperties(physicalDevice, ref queueFamilyCount, null);
@@ -249,8 +249,7 @@ internal unsafe class VulkanContext : IDisposable
                         }
                     });
 
-
-                    return (new VulkanContext
+                    return new VulkanContext
                     {
                         Api = api,
                         Device = device,
@@ -259,17 +258,13 @@ internal unsafe class VulkanContext : IDisposable
                         Pool = pool,
                         DescriptorPool = descriptorPool,
                         GrContext = grContext
-                    }, name);
+                    };
                 }
 
-                return (null, "No suitable device queue found");
+                throw new Exception("No suitable device queue found");
             }
 
-            return (null, "Suitable device not found");
-        }
-        catch (Exception e)
-        {
-            return (null, e.ToString());
+            throw new Exception("No suitable device found");
         }
         finally
         {

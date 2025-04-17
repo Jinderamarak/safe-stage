@@ -8,7 +8,7 @@ using VulkanBuffer = Silk.NET.Vulkan.Buffer;
 
 namespace ServiceApp.Vulkan.Data;
 
-public class SimpleObject3D : IDisposable
+public class BufferedObject : IDisposable
 {
     private readonly VulkanContext _context;
 
@@ -18,7 +18,7 @@ public class SimpleObject3D : IDisposable
     private int _vertexCount;
     private DeviceMemory _vertexMemory;
 
-    internal SimpleObject3D(VertexInput[] vertices, VulkanContext context)
+    internal BufferedObject(Span<VertexInput> vertices, VulkanContext context)
     {
         _context = context;
         UpdateVertices(vertices);
@@ -35,7 +35,7 @@ public class SimpleObject3D : IDisposable
         }
     }
 
-    public void UpdateVertices(VertexInput[] vertices)
+    public void UpdateVertices(Span<VertexInput> vertices)
     {
         lock (_lock)
         {

@@ -8,7 +8,7 @@ using Avalonia.VisualTree;
 
 namespace GpuInterop;
 
-public abstract class DrawingSurfaceDemoBase : Control, IGpuDemo
+public abstract class DrawingSurfaceDemoBase : Control
 {
     private CompositionSurfaceVisual? _visual;
     private Compositor? _compositor;
@@ -16,14 +16,14 @@ public abstract class DrawingSurfaceDemoBase : Control, IGpuDemo
     private string _info = string.Empty;
     private bool _updateQueued;
     private bool _initialized;
-    
+
     protected CompositionDrawingSurface? Surface { get; private set; }
 
     public DrawingSurfaceDemoBase()
     {
         _update = UpdateFrame;
     }
-    
+
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
@@ -42,46 +42,42 @@ public abstract class DrawingSurfaceDemoBase : Control, IGpuDemo
         base.OnDetachedFromLogicalTree(e);
     }
 
-    async void Initialize()
+    private async void Initialize()
     {
         try
         {
             var selfVisual = ElementComposition.GetElementVisual(this)!;
             _compositor = selfVisual.Compositor;
-            
+
             Surface = _compositor.CreateDrawingSurface();
             _visual = _compositor.CreateSurfaceVisual();
-            _visual.Size = new (Bounds.Width, Bounds.Height);
+            _visual.Size = new Vector(Bounds.Width, Bounds.Height);
             _visual.Surface = Surface;
             ElementComposition.SetElementChildVisual(this, _visual);
             var (res, info) = await DoInitialize(_compositor, Surface);
             _info = info;
-            if (ParentControl != null)
-                ParentControl.Info = info;
             _initialized = res;
             QueueNextFrame();
         }
         catch (Exception e)
         {
-            if (ParentControl != null)
-                ParentControl.Info = e.ToString();
         }
     }
 
-    void UpdateFrame()
+    private void UpdateFrame()
     {
         _updateQueued = false;
         var root = this.GetVisualRoot();
         if (root == null)
             return;
-        
-        _visual!.Size = new (Bounds.Width, Bounds.Height);
+
+        _visual!.Size = new Vector(Bounds.Width, Bounds.Height);
         var size = PixelSize.FromSize(Bounds.Size, root.RenderScaling);
         RenderFrame(size);
         QueueNextFrame();
     }
-    
-    void QueueNextFrame()
+
+    private void QueueNextFrame()
     {
         if (_initialized && !_updateQueued && _compositor != null)
         {
@@ -92,12 +88,12 @@ public abstract class DrawingSurfaceDemoBase : Control, IGpuDemo
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
-        if(change.Property == BoundsProperty)
+        if (change.Property == BoundsProperty)
             QueueNextFrame();
         base.OnPropertyChanged(change);
     }
 
-    async Task<(bool success, string info)> DoInitialize(Compositor compositor,
+    private async Task<(bool success, string info)> DoInitialize(Compositor compositor,
         CompositionDrawingSurface compositionDrawingSurface)
     {
         var interop = await compositor.TryGetCompositionGpuInterop();
@@ -105,12 +101,12 @@ public abstract class DrawingSurfaceDemoBase : Control, IGpuDemo
             return (false, "Compositor doesn't support interop for the current backend");
         return InitializeGraphicsResources(compositor, compositionDrawingSurface, interop);
     }
-    
+
     protected abstract (bool success, string info) InitializeGraphicsResources(Compositor compositor,
         CompositionDrawingSurface compositionDrawingSurface, ICompositionGpuInterop gpuInterop);
 
     protected abstract void FreeGraphicsResources();
-    
+
 
     protected abstract void RenderFrame(PixelSize pixelSize);
     protected virtual bool SupportsDisco => false;
@@ -120,8 +116,6 @@ public abstract class DrawingSurfaceDemoBase : Control, IGpuDemo
         ParentControl = parent;
         if (ParentControl != null)
         {
-            ParentControl.Info = _info;
-            ParentControl.DiscoVisible = true;
         }
 
         Yaw = yaw;
@@ -135,7 +129,7 @@ public abstract class DrawingSurfaceDemoBase : Control, IGpuDemo
     public GpuDemo? ParentControl { get; private set; }
 
     public int TimeTick { get; private set; }
-    
+
     public float Disco { get; private set; }
 
     public float Roll { get; private set; }

@@ -17,6 +17,14 @@ internal unsafe class VulkanContent : IDisposable
 {
     private static Stopwatch St = Stopwatch.StartNew();
     private readonly VulkanContext _context;
+    private readonly ShaderModule _fragShader;
+    private readonly ushort[] _indices;
+    private readonly float _maxY;
+    private readonly float _minY;
+
+    private readonly Vertex[] _points;
+    private readonly Mutex _stageMutex = new();
+    private readonly ShaderModule _vertShader;
     private VulkanImage? _colorAttachment;
 
     private Image _depthImage;
@@ -24,34 +32,27 @@ internal unsafe class VulkanContent : IDisposable
     private ImageView _depthImageView;
     private DescriptorSet _descriptorSet;
     private DescriptorSetLayout _descriptorSetLayout;
-    private readonly ShaderModule _fragShader;
     private Framebuffer _framebuffer;
     private Silk.NET.Vulkan.Buffer _indexBuffer;
     private DeviceMemory _indexBufferMemory;
-    private readonly ushort[] _indices;
     private bool _isInit;
-    private readonly float _maxY;
-    private readonly float _minY;
     private Pipeline _pipeline;
     private PipelineLayout _pipelineLayout;
 
-    private readonly Vertex[] _points;
-
     private PixelSize? _previousImageSize = PixelSize.Empty;
     private RenderPass _renderPass;
+
     private Silk.NET.Vulkan.Buffer _stageIndexBuffer;
     private DeviceMemory _stageIndexBufferMemory;
     private int _stageIndexBufferSize;
-
-    private readonly Mutex _stageMutex = new();
     private Silk.NET.Vulkan.Buffer _stageVertexBuffer;
     private DeviceMemory _stageVertexBufferMemory;
     private int _stageVertexBufferSize;
+
     private Silk.NET.Vulkan.Buffer _uniformBuffer;
     private DeviceMemory _uniformBufferMemory;
     private Silk.NET.Vulkan.Buffer _vertexBuffer;
     private DeviceMemory _vertexBufferMemory;
-    private readonly ShaderModule _vertShader;
 
     public VulkanContent(VulkanContext context)
     {
