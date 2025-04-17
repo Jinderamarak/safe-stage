@@ -59,7 +59,7 @@ public class SimpleView3D : Control
         }
     }
 
-    public void UpdateFrame()
+    private void UpdateFrame()
     {
         _updateQueued = false;
         var root = this.GetVisualRoot();
@@ -140,6 +140,22 @@ public class SimpleView3D : Control
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
+        if (change.Property == CameraProperty)
+        {
+            if (change.OldValue is Camera3D oldCamera)
+                oldCamera.PropertyChanged -= ChildChanged;
+            if (change.NewValue is Camera3D newCamera)
+                newCamera.PropertyChanged += ChildChanged;
+        }
+
+        if (change.Property == LightProperty)
+        {
+            if (change.OldValue is PointLight oldLight)
+                oldLight.PropertyChanged -= ChildChanged;
+            if (change.NewValue is PointLight newLight)
+                newLight.PropertyChanged += ChildChanged;
+        }
+
         if (change.Property == ModelGroupsProperty)
         {
             if (change.OldValue is ObservableCollection<ModelGroup> oldModelGroups)
@@ -169,7 +185,6 @@ public class SimpleView3D : Control
 
         using (_resources.Swapchain.BeginDraw(pixelSize, out var image))
         {
-            Console.WriteLine("RENDER");
             _resources.Content.Render(image, camera, light, objects);
         }
     }
@@ -189,14 +204,14 @@ public class SimpleView3D : Control
         QueueNextFrame();
         if (e.NewItems is not null)
             foreach (ModelGroup item in e.NewItems)
-                item.PropertyChanged += ModelGroupChanged;
+                item.PropertyChanged += ChildChanged;
 
         if (e.OldItems is not null)
             foreach (ModelGroup item in e.OldItems)
-                item.PropertyChanged -= ModelGroupChanged;
+                item.PropertyChanged -= ChildChanged;
     }
 
-    private void ModelGroupChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    private void ChildChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         QueueNextFrame();
     }

@@ -1,11 +1,13 @@
 using System.Drawing;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using BindingsCs.Safe;
 using BindingsCs.Safe.Configurations;
 using BindingsCs.Safe.Types;
+using ServiceApp.Utility;
 using ServiceApp.View3D.Controls;
 using Vector3 = System.Numerics.Vector3;
 
@@ -14,6 +16,7 @@ namespace GpuInterop;
 public partial class GpuDemo : UserControl
 {
     private DispatcherTimer _timer;
+    private OrbitControls _orbitControls;
 
     public GpuDemo()
     {
@@ -50,8 +53,6 @@ public partial class GpuDemo : UserControl
         };
         _timer.Tick += (sender, args) =>
         {
-            Console.WriteLine("TICK");
-
             timeTick++;
             var stage = microscope.PresentStageAt(new SixAxis
             {
@@ -82,5 +83,19 @@ public partial class GpuDemo : UserControl
             }
         };
         _timer.Start();
+
+        _orbitControls = new OrbitControls(
+            this.Find<Camera3D>("Camera")!,
+            this.Find<PointLight>("Light")!);
+    }
+
+    private void InputElement_OnPointerMoved(object? sender, PointerEventArgs e)
+    {
+        _orbitControls.MouseMoved(sender, e);
+    }
+
+    private void InputElement_OnPointerWheelChanged(object? sender, PointerWheelEventArgs e)
+    {
+        _orbitControls.MouseScrolled(e);
     }
 }
