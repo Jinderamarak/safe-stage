@@ -46,7 +46,6 @@ public class OrbitControls
         var d = args.Delta.Y * ScrollSensitivity;
         _radialDistance -= args.Delta.Y * ScrollSensitivity;
         _radialDistance = Math.Clamp(_radialDistance, double.Epsilon, double.MaxValue);
-        Console.WriteLine($"R: {_radialDistance}, D: {d}");
         RecalculateSphere();
     }
 
@@ -89,11 +88,14 @@ public class OrbitControls
         var y = _radialDistance * Math.Sin(_polarAngle) * Math.Sin(_azimuthalAngle);
         var z = _radialDistance * Math.Cos(_polarAngle);
 
-        _camera.Position = new Vector3
+        var position = new Vector3
         {
             X = (float)x,
             Y = (float)y,
             Z = (float)z
         };
+
+        _camera.Position = position;
+        _light.Position = position;
     }
 }

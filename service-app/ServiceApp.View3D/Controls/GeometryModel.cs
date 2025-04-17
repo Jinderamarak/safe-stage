@@ -35,7 +35,7 @@ public class GeometryModel : Control
         }
     }
 
-    private IEnumerable<Vector3> _vertices;
+    private IEnumerable<Vector3> _vertices = new List<Vector3>();
 
     public static readonly DirectProperty<GeometryModel, IEnumerable<Vector3>> VerticesProperty =
         AvaloniaProperty.RegisterDirect<GeometryModel, IEnumerable<Vector3>>(nameof(Vertices), o => o.Vertices,

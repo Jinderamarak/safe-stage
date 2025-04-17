@@ -1,5 +1,3 @@
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
@@ -126,16 +124,16 @@ public class SimpleView3D : Control
         set => SetAndRaise(LightProperty, ref _light, value);
     }
 
-    private ObservableCollection<ModelGroup> _modelGroups = new();
+    private ModelGroup? _modelGroup;
 
-    public static readonly DirectProperty<SimpleView3D, ObservableCollection<ModelGroup>> ModelGroupsProperty =
-        AvaloniaProperty.RegisterDirect<SimpleView3D, ObservableCollection<ModelGroup>>(nameof(ModelGroups),
-            o => o.ModelGroups, (o, v) => o.ModelGroups = v);
+    public static readonly DirectProperty<SimpleView3D, ModelGroup?> ModelGroupProperty =
+        AvaloniaProperty.RegisterDirect<SimpleView3D, ModelGroup?>(nameof(ModelGroup), o => o.ModelGroup,
+            (o, v) => o.ModelGroup = v);
 
-    public ObservableCollection<ModelGroup> ModelGroups
+    public ModelGroup? ModelGroup
     {
-        get => _modelGroups;
-        set => SetAndRaise(ModelGroupsProperty, ref _modelGroups, value);
+        get => _modelGroup;
+        set => SetAndRaise(ModelGroupProperty, ref _modelGroup, value);
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -156,18 +154,18 @@ public class SimpleView3D : Control
                 newLight.PropertyChanged += ChildChanged;
         }
 
-        if (change.Property == ModelGroupsProperty)
+        if (change.Property == ModelGroupProperty)
         {
-            if (change.OldValue is ObservableCollection<ModelGroup> oldModelGroups)
-                oldModelGroups.CollectionChanged -= ModelGroupsCollectionChanged;
-            if (change.NewValue is ObservableCollection<ModelGroup> newModelGroups)
-                newModelGroups.CollectionChanged += ModelGroupsCollectionChanged;
+            if (change.OldValue is ModelGroup oldGroup)
+                oldGroup.PropertyChanged -= ChildChanged;
+            if (change.NewValue is ModelGroup newGroup)
+                newGroup.PropertyChanged += ChildChanged;
         }
 
         if (change.Property == BoundsProperty
             || change.Property == CameraProperty
             || change.Property == LightProperty
-            || change.Property == ModelGroupsProperty)
+            || change.Property == ModelGroupProperty)
             QueueNextFrame();
         base.OnPropertyChanged(change);
     }
@@ -179,9 +177,7 @@ public class SimpleView3D : Control
 
         var camera = Camera?.GetCameraData() ?? new CameraData();
         var light = Light?.GetLightData() ?? new LightData();
-        var objects = _modelGroups
-            .SelectMany(g => g.Models
-                .Select(m => m.GetOrCreateBuffered(_resources.Context)));
+        var objects = FlattenGroup(ModelGroup);
 
         using (_resources.Swapchain.BeginDraw(pixelSize, out var image))
         {
@@ -189,26 +185,16 @@ public class SimpleView3D : Control
         }
     }
 
-    public SimpleView3D()
+    private IEnumerable<BufferedObject> FlattenGroup(ModelGroup? group)
     {
-        ModelGroups.CollectionChanged += ModelGroupsCollectionChanged;
-    }
+        if (group is null || _resources is null)
+            yield break;
 
-    ~SimpleView3D()
-    {
-        ModelGroups.CollectionChanged -= ModelGroupsCollectionChanged;
-    }
-
-    private void ModelGroupsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        QueueNextFrame();
-        if (e.NewItems is not null)
-            foreach (ModelGroup item in e.NewItems)
-                item.PropertyChanged += ChildChanged;
-
-        if (e.OldItems is not null)
-            foreach (ModelGroup item in e.OldItems)
-                item.PropertyChanged -= ChildChanged;
+        foreach (var model in group.Models)
+            yield return model.GetOrCreateBuffered(_resources.Context);
+        foreach (var nested in group.Groups)
+        foreach (var inner in FlattenGroup(nested))
+            yield return inner;
     }
 
     private void ChildChanged(object? sender, AvaloniaPropertyChangedEventArgs e)

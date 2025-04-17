@@ -2,19 +2,35 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="GpuInterop.GpuDemo"
              xmlns:vlk="clr-namespace:ServiceApp.View3D.Controls;assembly=ServiceApp.View3D">
-    <Grid PointerMoved="InputElement_OnPointerMoved"
-          PointerWheelChanged="InputElement_OnPointerWheelChanged"
-          Background="Blue">
-        <vlk:SimpleView3D>
-            <vlk:SimpleView3D.Camera>
-                <vlk:Camera3D x:Name="Camera" />
-            </vlk:SimpleView3D.Camera>
-            <vlk:SimpleView3D.Light>
-                <vlk:PointLight x:Name="Light" />
-            </vlk:SimpleView3D.Light>
-            <vlk:SimpleView3D.ModelGroups>
-                <vlk:ModelGroup x:Name="StageGroup" />
-            </vlk:SimpleView3D.ModelGroups>
-        </vlk:SimpleView3D>
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="Auto,*">
+        <Grid Grid.Row="0" Grid.Column="1">
+            <TextBlock Text="ZERO ONE" />
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="0">
+            <TextBlock Text="ONE ZERO" />
+        </Grid>
+        <Grid Grid.Row="0" Grid.Column="0">
+            <TextBlock Text="ZERO ZERO" />
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="1"
+              PointerMoved="InputElement_OnPointerMoved"
+              PointerWheelChanged="InputElement_OnPointerWheelChanged"
+              Background="Blue">
+            <vlk:SimpleView3D>
+                <vlk:SimpleView3D.Camera>
+                    <vlk:Camera3D x:Name="Camera" />
+                </vlk:SimpleView3D.Camera>
+                <vlk:SimpleView3D.Light>
+                    <vlk:PointLight x:Name="Light" />
+                </vlk:SimpleView3D.Light>
+                <vlk:SimpleView3D.ModelGroup>
+                    <vlk:ModelGroup>
+                        <vlk:ModelGroup.Groups>
+                            <vlk:ModelGroup x:Name="StageGroup" />
+                        </vlk:ModelGroup.Groups>
+                    </vlk:ModelGroup>
+                </vlk:SimpleView3D.ModelGroup>
+            </vlk:SimpleView3D>
+        </Grid>
     </Grid>
 </UserControl>
