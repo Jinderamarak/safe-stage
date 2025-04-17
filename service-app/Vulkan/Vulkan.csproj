@@ -19,7 +19,7 @@
         <PackageReference Include="Silk.NET.Vulkan" Version="2.22.0"/>
         <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.22.0"/>
         <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.22.0"/>
-        <PackageReference Include="System.Reactive" Version="6.0.1" />
+        <PackageReference Include="System.Reactive" Version="6.0.1"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -30,7 +30,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\bindings\BindingsCs\BindingsCs.csproj"/>
-        <ProjectReference Include="..\ServiceApp.Vulkan\ServiceApp.Vulkan.csproj"/>
+        <ProjectReference Include="..\ServiceApp.View3D\ServiceApp.View3D.csproj"/>
     </ItemGroup>
 
 </Project>

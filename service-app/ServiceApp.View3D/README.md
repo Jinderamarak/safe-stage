@@ -1,0 +1,1 @@
+Substantial portions of this codebase is a modified sample available in the Avalonia UI repository.

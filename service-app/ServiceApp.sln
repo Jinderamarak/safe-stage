@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BindingsCs", "..\bindings\B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vulkan", "Vulkan\Vulkan.csproj", "{AC1D3EF3-EFF2-40DF-B5E8-01FA3F463723}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceApp.Vulkan", "ServiceApp.Vulkan\ServiceApp.Vulkan.csproj", "{CB85670C-8F19-49CF-B2F2-5DA4BD511E13}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceApp.View3D", "ServiceApp.View3D\ServiceApp.View3D.csproj", "{CB85670C-8F19-49CF-B2F2-5DA4BD511E13}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

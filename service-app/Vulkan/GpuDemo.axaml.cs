@@ -6,7 +6,7 @@ using Avalonia.Threading;
 using BindingsCs.Safe;
 using BindingsCs.Safe.Configurations;
 using BindingsCs.Safe.Types;
-using ServiceApp.Vulkan.Controls;
+using ServiceApp.View3D.Controls;
 using Vector3 = System.Numerics.Vector3;
 
 namespace GpuInterop;
