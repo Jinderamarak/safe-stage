@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Silk.NET.Vulkan;
 
 namespace ServiceApp.View3D.Render.Shaders;
 
@@ -7,4 +8,12 @@ namespace ServiceApp.View3D.Render.Shaders;
 internal struct VertexPushConstant
 {
     public Vector3 ObjectColor;
+    
+    internal static PushConstantRange PushConstantRange =>
+        new()
+        {
+            Offset = 0,
+            StageFlags = ShaderStageFlags.FragmentBit,
+            Size = (uint)Marshal.SizeOf<VertexPushConstant>()
+        };
 }

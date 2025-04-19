@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Silk.NET.Vulkan;
 
 namespace ServiceApp.View3D.Render.Shaders;
 
@@ -10,4 +11,13 @@ internal struct UniformBufferObject
     public Vector3 LightPosition;
     public Vector3 LightColor;
     public float LightStrength;
+    
+    internal static DescriptorSetLayoutBinding DescriptorSetLayoutBinding =>
+        new()
+        {
+            Binding = 0,
+            DescriptorType = DescriptorType.UniformBuffer,
+            DescriptorCount = 1,
+            StageFlags = ShaderStageFlags.VertexBit | ShaderStageFlags.FragmentBit
+        };
 }

@@ -535,28 +535,7 @@ internal unsafe class VulkanContent : IDisposable
                     PDynamicStates = states
                 };
 
-                var vertexPushConstantRange = new PushConstantRange
-                {
-                    Offset = 0,
-                    Size = (uint)Marshal.SizeOf<VertexPushConstant>(),
-                    StageFlags = ShaderStageFlags.VertexBit
-                };
-
-                var fragPushConstantRange = new PushConstantRange
-                {
-                    Offset = 0,
-                    Size = (uint)Marshal.SizeOf<VertexPushConstant>(),
-                    StageFlags = ShaderStageFlags.FragmentBit
-                };
-
-                var layoutBindingInfo = new DescriptorSetLayoutBinding
-                {
-                    Binding = 0,
-                    StageFlags = ShaderStageFlags.VertexBit | ShaderStageFlags.FragmentBit,
-                    DescriptorCount = 1,
-                    DescriptorType = DescriptorType.UniformBuffer
-                };
-
+                var layoutBindingInfo = UniformBufferObject.DescriptorSetLayoutBinding;
                 var layoutInfo = new DescriptorSetLayoutCreateInfo
                 {
                     SType = StructureType.DescriptorSetLayoutCreateInfo,
@@ -604,7 +583,8 @@ internal unsafe class VulkanContent : IDisposable
                 };
                 api.UpdateDescriptorSets(device, 1, &descriptorWrite, 0, null);
 
-                var constants = new[] { vertexPushConstantRange, fragPushConstantRange };
+                var pushConstantRange = VertexPushConstant.PushConstantRange;
+                var constants = new[] { pushConstantRange };
 
                 fixed (PushConstantRange* constant = constants)
                 {

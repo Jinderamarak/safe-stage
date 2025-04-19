@@ -48,7 +48,7 @@ public class BufferedObject : IDisposable
                         _context.Api.FreeMemory(_context.Device, _vertexMemory, null);
                     }
 
-                VulkanBufferHelper.AllocateBuffer<VertexInput>(
+                VulkanBufferHelper.AllocateBuffer(
                     _context,
                     BufferUsageFlags.VertexBufferBit,
                     out _vertexBuffer,
@@ -59,7 +59,7 @@ public class BufferedObject : IDisposable
             }
             else
             {
-                VulkanBufferHelper.UpdateBufferMemory<VertexInput>(_context, _vertexMemory, vertices);
+                VulkanBufferHelper.UpdateBufferMemory(_context, _vertexMemory, vertices);
             }
         }
     }
