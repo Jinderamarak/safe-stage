@@ -552,7 +552,7 @@ internal unsafe class VulkanContent : IDisposable
                 var layoutBindingInfo = new DescriptorSetLayoutBinding
                 {
                     Binding = 0,
-                    StageFlags = ShaderStageFlags.VertexBit,
+                    StageFlags = ShaderStageFlags.VertexBit | ShaderStageFlags.FragmentBit,
                     DescriptorCount = 1,
                     DescriptorType = DescriptorType.UniformBuffer
                 };
