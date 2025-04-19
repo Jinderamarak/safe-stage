@@ -54,6 +54,7 @@ public class SimpleView3D : Control
         catch (Exception e)
         {
             //  TODO: Handle exception
+            Console.WriteLine(e);
         }
     }
 
