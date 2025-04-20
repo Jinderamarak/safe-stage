@@ -24,7 +24,6 @@ using ServiceApp.Avalonia.Tasks;
 using ServiceApp.Avalonia.Utility;
 using ServiceApp.Avalonia.Utility.Extensions;
 using ServiceApp.View3D.Controls;
-using ServiceApp.View3D.Controls.Models;
 using Vertex = System.Numerics.Vector3;
 using MsgBoxIcon = MsBox.Avalonia.Enums.Icon;
 
@@ -161,7 +160,7 @@ public partial class MainWindow : Window, IDisposable
             camera, light,
             2, 1.2, -0.9)
         {
-            ScrollSensitivity = 0.1,
+            ScrollSensitivity = 1e-3,
             DragSensitivity = 5e-3
         };
 
@@ -225,11 +224,8 @@ public partial class MainWindow : Window, IDisposable
                 var materials = Materials.StageRange(positions.Count).ToList();
                 for (var i = 0; i < positions.Count; i++)
                 {
-                    if (StageModelGroup.Models[i] is GeometryModel model)
-                    {
-                        model.Vertices = positions[i];
-                        model.Color = materials[i];
-                    }
+                    StageModelGroup.Models[i].Vertices = positions[i];
+                    StageModelGroup.Models[i].Color = materials[i];
                 }
             });
     }
@@ -261,11 +257,8 @@ public partial class MainWindow : Window, IDisposable
                 var materials = Materials.StaticRange(positions.Count).ToList();
                 for (var i = 0; i < positions.Count; i++)
                 {
-                    if (StaticModelGroup.Models[i] is GeometryModel model)
-                    {
-                        model.Vertices = positions[i];
-                        model.Color = materials[i];
-                    }
+                    StaticModelGroup.Models[i].Vertices = positions[i];
+                    StaticModelGroup.Models[i].Color = materials[i];
                 }
             });
     }
@@ -309,11 +302,8 @@ public partial class MainWindow : Window, IDisposable
                 var materials = Materials.RetractRange(pair.Item1, pair.Item2.Count).ToList();
                 for (var i = 0; i < pair.Item2.Count; i++)
                 {
-                    if (group.Models[i] is GeometryModel model)
-                    {
-                        model.Vertices = pair.Item2[i];
-                        model.Color = materials[i];
-                    }
+                    group.Models[i].Vertices = pair.Item2[i];
+                    group.Models[i].Color = materials[i];
                 }
             });
     }

@@ -119,7 +119,7 @@
         <Grid
             Grid.Row="0"
             Grid.Column="1"
-            Background="Transparent"
+            Background="Salmon"
             PointerMoved="OnViewportMouseMove"
             PointerWheelChanged="OnViewportMouseWheel">
             <vlk:SimpleView3D>

@@ -2,7 +2,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Avalonia;
 using ServiceApp.View3D.Data;
-using ServiceApp.View3D.Data.Models;
 using ServiceApp.View3D.Render.Shaders;
 using Silk.NET.Vulkan;
 using Buffer = Silk.NET.Vulkan.Buffer;
@@ -83,7 +82,7 @@ internal unsafe class VulkanContent : IDisposable
         _isInit = false;
     }
 
-    public void Render(VulkanImage image, CameraData camera, LightData light, IEnumerable<IDrawableObject> objects)
+    public void Render(VulkanImage image, CameraData camera, LightData light, IEnumerable<BufferedObject> objects)
     {
         var api = _context.Api;
 
@@ -303,12 +302,11 @@ internal unsafe class VulkanContent : IDisposable
 
     private void UpdateTemporalObjects(CameraData camera, LightData light)
     {
-        var size = _previousImageSize ?? PixelSize.Empty;
         VulkanBufferHelper.UpdateBufferMemory<UniformBufferObject>(_context, _uniformBufferMemory, new[]
         {
             new UniformBufferObject
             {
-                Projection = camera.ProjectionView(size.Width, size.Height),
+                Projection = camera.ProjectionView(_previousImageSize.Value.Width, _previousImageSize.Value.Height),
                 LightPosition = light.Position,
                 LightColor = light.ColorVector,
                 LightStrength = light.Strength

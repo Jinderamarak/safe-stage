@@ -35,40 +35,4 @@ public struct VertexInput
             Offset = (uint)Marshal.OffsetOf<VertexInput>(nameof(Normal))
         }
     ];
-
-    internal static IEnumerable<VertexInput> VerticesToInputs(IEnumerable<Vector3> vertices)
-    {
-        using var enumerator = vertices.GetEnumerator();
-        while (true)
-        {
-            var has = enumerator.MoveNext();
-            if (!has) yield break;
-            var first = enumerator.Current;
-
-            has = enumerator.MoveNext();
-            if (!has) yield break;
-            var second = enumerator.Current;
-
-            has = enumerator.MoveNext();
-            if (!has) yield break;
-            var third = enumerator.Current;
-
-            var normal = Vector3.Normalize(Vector3.Cross(third - second, first - second));
-            yield return new VertexInput
-            {
-                Position = first,
-                Normal = normal
-            };
-            yield return new VertexInput
-            {
-                Position = second,
-                Normal = normal
-            };
-            yield return new VertexInput
-            {
-                Position = third,
-                Normal = normal
-            };
-        }
-    }
 }

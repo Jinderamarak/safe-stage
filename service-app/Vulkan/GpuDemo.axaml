@@ -19,7 +19,6 @@
                     <vlk:ModelGroup>
                         <vlk:ModelGroup.Groups>
                             <vlk:ModelGroup x:Name="StageGroup" />
-                            <vlk:ModelGroup x:Name="PathGroup" />
                         </vlk:ModelGroup.Groups>
                     </vlk:ModelGroup>
                 </vlk:SimpleView3D.ModelGroup>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using BindingsCs.Safe.Types;
-using ServiceApp.View3D.Controls.Models;
+using ServiceApp.View3D.Controls;
 using Vector3 = System.Numerics.Vector3;
 
 namespace ServiceApp.Avalonia.Utility;
@@ -17,7 +17,7 @@ public static class Shapes
     /// <param name="b">The size of the second edge.</param>
     /// <param name="c">The size of the third edge.</param>
     /// <returns>A Vector3 enumeration representing the cube.</returns>
-    public static (IEnumerable<Vector3>, IEnumerable<ushort>) CreateCubeGeometry(float a, float b, float c)
+    public static IEnumerable<Vector3> CreateCubeGeometry(float a, float b, float c)
     {
         var vertices = new[]
         {
@@ -106,7 +106,7 @@ public static class Shapes
     /// <param name="pointB">The ending point of the line.</param>
     /// <param name="thickness">The thickness of the prism.</param>
     /// <returns>A Vector3 enumeration representing the three-sided prism.</returns>
-    public static (IEnumerable<Vector3>, IEnumerable<ushort>) CreateLineAsPrismGeometry(Vector3 pointA, Vector3 pointB, float thickness)
+    public static IEnumerable<Vector3> CreateLineAsPrismGeometry(Vector3 pointA, Vector3 pointB, float thickness)
     {
         // Direction vector from A to B
         var direction = Vector3.Normalize(pointB - pointA);
@@ -149,20 +149,18 @@ public static class Shapes
     /// </summary>
     /// <param name="nodes">The list of nodes defining the path.</param>
     /// <returns>An enumerable of geometry models representing the path.</returns>
-    public static IEnumerable<IGeometryModel> CreatePathGeometries(List<SixAxis> nodes)
+    public static IEnumerable<GeometryModel> CreatePathGeometries(List<SixAxis> nodes)
     {
-        var nodeGeometry = CreateCubeGeometry(3e-3f, 3e-3f, 3e-3f);
-        var nodeVertices = nodeGeometry.Item1.ToArray();
-        
+        var nodeGeometry = CreateCubeGeometry(3e-3f, 3e-3f, 3e-3f).ToList();
         for (var i = 0; i < nodes.Count; i++)
         {
             var node = nodes[i];
 
-            var transformed = TransformedMesh(nodeVertices, node);
-            yield return new IndexedGeometryModel()
+            var transformed = TransformedMesh(nodeGeometry, node);
+            yield return new GeometryModel
             {
                 Color = Materials.PathNode,
-                VerticesAndIndices = (transformed, nodeGeometry.Item2)
+                Vertices = transformed
             };
 
             if (i < nodes.Count - 1)
@@ -173,10 +171,10 @@ public static class Shapes
                 var to = new Vector3((float)next.X, (float)next.Y, (float)next.Z);
 
                 var line = CreateLineAsPrismGeometry(from, to, 1e-3f);
-                yield return new IndexedGeometryModel()
+                yield return new GeometryModel
                 {
                     Color = Materials.PathEdge,
-                    VerticesAndIndices = line,
+                    Vertices = line
                 };
             }
         }
@@ -187,10 +185,10 @@ public static class Shapes
         return buffer.Buffer.Select(p => new Vector3((float)p.X, (float)p.Y, (float)p.Z));
     }
 
-    private static (IEnumerable<Vector3>, IEnumerable<ushort>) IndexedMesh(Vector3[] vertices, int[] indices)
+    private static IEnumerable<Vector3> IndexedMesh(Vector3[] vertices, int[] indices)
     {
-        var shortIndices = indices.Select(i => (ushort)i);
-        return (vertices, shortIndices);
+        foreach (var index in indices)
+            yield return vertices[index];
     }
 
     private static IEnumerable<Vector3> TransformedMesh(IEnumerable<Vector3> vertices, SixAxis transform)

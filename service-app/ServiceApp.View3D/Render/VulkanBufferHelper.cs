@@ -73,29 +73,4 @@ internal static class VulkanBufferHelper
 
         return -1;
     }
-
-    public static unsafe void UpdateOrReallocateBuffer<T>(
-        VulkanContext vk,
-        BufferUsageFlags bufferUsageFlags,
-        ref Buffer buffer,
-        ref DeviceMemory memory,
-        ref int size,
-        Span<T> data) where T : unmanaged
-    {
-        if (data.Length != size)
-        {
-            if (buffer.Handle != 0)
-            {
-                vk.Api.DestroyBuffer(vk.Device, buffer, null);
-                vk.Api.FreeMemory(vk.Device, memory, null);
-            }
-            
-            AllocateBuffer(vk, bufferUsageFlags, out buffer, out memory, data);
-            size = data.Length;
-        }
-        else
-        {
-            UpdateBufferMemory(vk, memory, data);
-        }
-    }
 }

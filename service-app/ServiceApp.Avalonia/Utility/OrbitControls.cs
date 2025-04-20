@@ -44,6 +44,7 @@ public class OrbitControls
 
     public void MouseScrolled(PointerWheelEventArgs args)
     {
+        var d = args.Delta.Y * ScrollSensitivity;
         _radialDistance -= args.Delta.Y * ScrollSensitivity;
         _radialDistance = Math.Clamp(_radialDistance, double.Epsilon, double.MaxValue);
         RecalculateSphere();

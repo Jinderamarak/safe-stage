@@ -4,7 +4,6 @@ using Avalonia.LogicalTree;
 using Avalonia.Rendering.Composition;
 using Avalonia.VisualTree;
 using ServiceApp.View3D.Data;
-using ServiceApp.View3D.Data.Models;
 using ServiceApp.View3D.Render;
 
 namespace ServiceApp.View3D.Controls;
@@ -187,13 +186,13 @@ public class SimpleView3D : Control
         }
     }
 
-    private IEnumerable<IDrawableObject> FlattenGroup(ModelGroup? group)
+    private IEnumerable<BufferedObject> FlattenGroup(ModelGroup? group)
     {
         if (group is null || _resources is null)
             yield break;
 
         foreach (var model in group.Models)
-            yield return model.GetOrCreateDrawable(_resources.Context);
+            yield return model.GetOrCreateBuffered(_resources.Context);
         foreach (var nested in group.Groups)
         foreach (var inner in FlattenGroup(nested))
             yield return inner;
