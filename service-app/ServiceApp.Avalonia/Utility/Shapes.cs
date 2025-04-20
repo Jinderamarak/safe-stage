@@ -123,15 +123,6 @@ public static class Shapes
         side2 *= thickness / 2;
 
         // Define the 6 vertices of the prism (3 at each end)
-        var p1 = pointA + side1;
-        var p2 = pointA - side1 + side2;
-        var p3 = pointA - side1 - side2;
-
-        var p4 = pointB + side1;
-        var p5 = pointB - side1 + side2;
-        var p6 = pointB - side1 - side2;
-
-        // Add vertices to the mesh
         var vertices = new[]
         {
             pointA + side1,
