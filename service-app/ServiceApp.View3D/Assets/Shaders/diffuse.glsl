@@ -21,6 +21,11 @@ void main()
     vec3 ambient = lightStrength * lightColor;
 
     vec3 norm = normalize(FragNormal);
+    if (dot(norm, lightPosition) < 0.0)
+    {
+        norm = -norm;
+    }
+    
     vec3 lightDir = normalize(lightPosition - FragPos);
 
     float diff = max(dot(norm, lightDir), 0.0);
