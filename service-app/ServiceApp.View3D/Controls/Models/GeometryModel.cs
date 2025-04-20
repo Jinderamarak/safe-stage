@@ -2,15 +2,15 @@ using System.Drawing;
 using System.Numerics;
 using Avalonia;
 using Avalonia.Controls;
-using ServiceApp.View3D.Data;
+using ServiceApp.View3D.Data.Models;
 using ServiceApp.View3D.Render;
 using ServiceApp.View3D.Render.Shaders;
 
-namespace ServiceApp.View3D.Controls;
+namespace ServiceApp.View3D.Controls.Models;
 
-public class GeometryModel : Control
+public class GeometryModel : Control, IGeometryModel
 {
-    private BufferedObject? _cached;
+    private BufferedModel? _cached;
     private object _lock = new();
 
     private Color _color;
@@ -49,7 +49,7 @@ public class GeometryModel : Control
             IEnumerable<Vector3> old;
             lock (_lock)
             {
-                _cached?.UpdateVertices(VerticesToInputs(value).ToArray());
+                _cached?.UpdateModel(VertexInput.VerticesToInputs(value).ToArray());
                 old = _vertices;
                 _vertices = value;
             }
@@ -58,49 +58,13 @@ public class GeometryModel : Control
         }
     }
 
-    internal BufferedObject GetOrCreateBuffered(VulkanContext context)
+    IDrawableObject IGeometryModel.GetOrCreateDrawable(VulkanContext context)
     {
         lock (_lock)
         {
-            return _cached ??= new BufferedObject(VerticesToInputs(_vertices).ToArray(), context)
+            return _cached ??= new BufferedModel(VertexInput.VerticesToInputs(_vertices).ToArray(), context)
             {
                 Color = _color
-            };
-        }
-    }
-
-    private static IEnumerable<VertexInput> VerticesToInputs(IEnumerable<Vector3> vertices)
-    {
-        using var enumerator = vertices.GetEnumerator();
-        while (true)
-        {
-            var has = enumerator.MoveNext();
-            if (!has) yield break;
-            var first = enumerator.Current;
-
-            has = enumerator.MoveNext();
-            if (!has) yield break;
-            var second = enumerator.Current;
-
-            has = enumerator.MoveNext();
-            if (!has) yield break;
-            var third = enumerator.Current;
-
-            var normal = Vector3.Normalize(Vector3.Cross(third - second, first - second));
-            yield return new VertexInput
-            {
-                Position = first,
-                Normal = normal
-            };
-            yield return new VertexInput
-            {
-                Position = second,
-                Normal = normal
-            };
-            yield return new VertexInput
-            {
-                Position = third,
-                Normal = normal
             };
         }
     }

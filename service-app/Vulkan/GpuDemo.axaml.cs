@@ -7,8 +7,10 @@ using Avalonia.Threading;
 using BindingsCs.Safe;
 using BindingsCs.Safe.Configurations;
 using BindingsCs.Safe.Types;
+using ServiceApp.Avalonia.Utility;
 using ServiceApp.Utility;
 using ServiceApp.View3D.Controls;
+using ServiceApp.View3D.Controls.Models;
 using Vector3 = System.Numerics.Vector3;
 
 namespace GpuInterop;
@@ -32,6 +34,21 @@ public partial class GpuDemo : UserControl
         microscope.UpdateHolder(holder);
 
         microscope.UpdateResolvers();
+
+        var nodePath = new[]
+        {
+            new SixAxis(0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+            new SixAxis(1e-1, 0.0, 0.0, 0.0, 0.0, 0.0),
+            new SixAxis(1e-1, 1e-1, 0.0, 0.0, 0.0, 0.0),
+            new SixAxis(1e-1, 1e-1, 1e-1, 0.0, 0.0, 0.0),
+            new SixAxis(1e-1, 1e-1, 1e-1, 1e-1, 0.0, 0.0),
+            new SixAxis(1e-1, 1e-1, 1e-1, 1e-1, 1e-1, 0.0),
+            new SixAxis(1e-1, 1e-1, 1e-1, 1e-1, 1e-1, 1e-1),
+        };
+        var pathGroup = this.Find<ModelGroup>("PathGroup")!;
+        var pathModels = Shapes.CreatePathGeometries(nodePath.ToList());
+        foreach (var model in pathModels)
+            pathGroup.Models.Add(model);
 
         var stageGroup = this.Find<ModelGroup>("StageGroup")!;
         var colors = new[]
@@ -63,9 +80,12 @@ public partial class GpuDemo : UserControl
             {
                 for (var i = 0; i < stageGroup.Models.Count; i++)
                 {
-                    stageGroup.Models[i].Color = colors[i % colors.Length];
-                    stageGroup.Models[i].Vertices =
-                        stage[i].Buffer.Select(v => new Vector3((float)v.X, (float)v.Y, (float)v.Z));
+                    if (stageGroup.Models[i] is GeometryModel model)
+                    {
+                        model.Color = colors[i % colors.Length];
+                        model.Vertices =
+                            stage[i].Buffer.Select(v => new Vector3((float)v.X, (float)v.Y, (float)v.Z));
+                    }
                 }
             }
             else

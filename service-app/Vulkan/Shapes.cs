@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using BindingsCs.Safe.Types;
 using ServiceApp.View3D.Controls.Models;

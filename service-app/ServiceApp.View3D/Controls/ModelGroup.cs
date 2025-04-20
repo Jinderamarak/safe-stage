@@ -2,15 +2,16 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Avalonia;
 using Avalonia.Controls;
+using ServiceApp.View3D.Controls.Models;
 
 namespace ServiceApp.View3D.Controls;
 
 public class ModelGroup : Control
 {
-    public ObservableCollection<GeometryModel> Models { get; } = new();
+    public ObservableCollection<IGeometryModel> Models { get; } = new();
 
-    public static readonly DirectProperty<ModelGroup, ObservableCollection<GeometryModel>> ModelsProperty =
-        AvaloniaProperty.RegisterDirect<ModelGroup, ObservableCollection<GeometryModel>>(nameof(Models), o => o.Models);
+    public static readonly DirectProperty<ModelGroup, ObservableCollection<IGeometryModel>> ModelsProperty =
+        AvaloniaProperty.RegisterDirect<ModelGroup, ObservableCollection<IGeometryModel>>(nameof(Models), o => o.Models);
 
     public ObservableCollection<ModelGroup> Groups { get; } = new();
 
@@ -33,12 +34,22 @@ public class ModelGroup : Control
     {
         RaisePropertyChanged(ModelsProperty, Models, Models);
         if (e.NewItems is not null)
-            foreach (GeometryModel item in e.NewItems)
-                item.PropertyChanged += GeometryModelPropertyChanged;
+            foreach (IGeometryModel item in e.NewItems)
+            {
+                if (item is GeometryModel model)
+                    model.PropertyChanged += GeometryModelPropertyChanged;
+                if (item is IndexedGeometryModel indexed)
+                    indexed.PropertyChanged += GeometryModelPropertyChanged;
+            }
 
         if (e.OldItems is not null)
-            foreach (GeometryModel item in e.OldItems)
-                item.PropertyChanged -= GeometryModelPropertyChanged;
+            foreach (IGeometryModel item in e.OldItems)
+            {
+                if (item is GeometryModel model)
+                    model.PropertyChanged -= GeometryModelPropertyChanged;
+                if (item is IndexedGeometryModel indexed)
+                    indexed.PropertyChanged -= GeometryModelPropertyChanged;
+            }
     }
 
     private void GroupsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
