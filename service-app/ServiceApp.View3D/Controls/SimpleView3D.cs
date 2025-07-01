@@ -5,6 +5,7 @@ using Avalonia.Rendering.Composition;
 using Avalonia.VisualTree;
 using ServiceApp.View3D.Data;
 using ServiceApp.View3D.Render;
+using ServiceApp.View3D.Scene;
 
 namespace ServiceApp.View3D.Controls;
 
@@ -103,12 +104,12 @@ public class SimpleView3D : Control
         _resources = null;
     }
 
-    private Camera3D? _camera;
+    private Camera? _camera;
 
-    public static readonly DirectProperty<SimpleView3D, Camera3D?> CameraProperty =
-        AvaloniaProperty.RegisterDirect<SimpleView3D, Camera3D?>(nameof(Camera), o => o.Camera, (o, v) => o.Camera = v);
+    public static readonly DirectProperty<SimpleView3D, Camera?> CameraProperty =
+        AvaloniaProperty.RegisterDirect<SimpleView3D, Camera?>(nameof(Camera), o => o.Camera, (o, v) => o.Camera = v);
 
-    public Camera3D? Camera
+    public Camera? Camera
     {
         get => _camera;
         set => SetAndRaise(CameraProperty, ref _camera, value);
@@ -141,9 +142,9 @@ public class SimpleView3D : Control
     {
         if (change.Property == CameraProperty)
         {
-            if (change.OldValue is Camera3D oldCamera)
+            if (change.OldValue is Camera oldCamera)
                 oldCamera.PropertyChanged -= ChildChanged;
-            if (change.NewValue is Camera3D newCamera)
+            if (change.NewValue is Camera newCamera)
                 newCamera.PropertyChanged += ChildChanged;
         }
 

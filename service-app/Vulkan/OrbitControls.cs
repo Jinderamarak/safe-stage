@@ -3,6 +3,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using ServiceApp.View3D.Controls;
+using ServiceApp.View3D.Data;
+using ServiceApp.View3D.Scene;
 
 namespace ServiceApp.Utility;
 
@@ -11,7 +13,7 @@ public class OrbitControls
     public double ScrollSensitivity { get; init; } = 0.05;
     public double DragSensitivity { get; init; } = 0.01;
 
-    private readonly Camera3D _camera;
+    private readonly Camera _camera;
     private readonly PointLight _light;
 
     private Point _lastPosition;
@@ -22,7 +24,7 @@ public class OrbitControls
     private double _azimuthalAngle;
 
     public OrbitControls(
-        Camera3D camera,
+        Camera camera,
         PointLight light,
         double radialDistance = 1,
         double polarAngle = 1,

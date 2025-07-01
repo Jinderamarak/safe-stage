@@ -24,6 +24,8 @@ using ServiceApp.Avalonia.Tasks;
 using ServiceApp.Avalonia.Utility;
 using ServiceApp.Avalonia.Utility.Extensions;
 using ServiceApp.View3D.Controls;
+using ServiceApp.View3D.Data;
+using ServiceApp.View3D.Scene;
 using Vertex = System.Numerics.Vector3;
 using MsgBoxIcon = MsBox.Avalonia.Enums.Icon;
 
@@ -153,7 +155,7 @@ public partial class MainWindow : Window, IDisposable
         StageCurrent = this.Find<SixAxisField>("StageCurrentAva")!;
         StageTarget = this.Find<SixAxisField>("StageTargetAva")!;
 
-        var camera = this.Find<Camera3D>("CameraAva")!;
+        var camera = this.Find<Camera>("CameraAva")!;
         var light = this.Find<PointLight>("LightAva")!;
 
         _orbitControls = new OrbitControls(

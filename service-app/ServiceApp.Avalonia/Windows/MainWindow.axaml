@@ -7,6 +7,8 @@
         xmlns:fields="clr-namespace:ServiceApp.Avalonia.Config.Fields"
         xmlns:converters="clr-namespace:ServiceApp.Avalonia.Converters"
         xmlns:vlk="clr-namespace:ServiceApp.View3D.Controls;assembly=ServiceApp.View3D"
+        xmlns:data="clr-namespace:ServiceApp.View3D.Data;assembly=ServiceApp.View3D"
+        xmlns:scene="clr-namespace:ServiceApp.View3D.Scene;assembly=ServiceApp.View3D"
         mc:Ignorable="d"
         Title="Safe Stage - Service Application" Height="810" Width="1000"
         x:DataType="this:MainWindow">
@@ -124,13 +126,13 @@
             PointerWheelChanged="OnViewportMouseWheel">
             <vlk:SimpleView3D>
                 <vlk:SimpleView3D.Camera>
-                    <vlk:Camera3D
+                    <scene:Camera
                         x:Name="CameraAva"
                         Near="0.1"
                         Far="10" />
                 </vlk:SimpleView3D.Camera>
                 <vlk:SimpleView3D.Light>
-                    <vlk:PointLight x:Name="LightAva" />
+                    <scene:PointLight x:Name="LightAva" />
                 </vlk:SimpleView3D.Light>
                 <vlk:SimpleView3D.ModelGroup>
                     <vlk:ModelGroup>

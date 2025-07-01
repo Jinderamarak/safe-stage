@@ -308,7 +308,7 @@ internal unsafe class VulkanContent : IDisposable
             {
                 Projection = camera.ProjectionView(_previousImageSize.Value.Width, _previousImageSize.Value.Height),
                 LightPosition = light.Position,
-                LightColor = light.ColorVector,
+                LightColor = light.ColorVector(),
                 LightStrength = light.Strength
             }
         });
@@ -553,7 +553,7 @@ internal unsafe class VulkanContent : IDisposable
                         {
                             Projection = camera.ProjectionView(size.Width, size.Height),
                             LightPosition = light.Position,
-                            LightColor = light.ColorVector,
+                            LightColor = light.ColorVector(),
                             LightStrength = light.Strength
                         }
                     });

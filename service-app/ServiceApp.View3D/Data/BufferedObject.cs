@@ -8,23 +8,18 @@ using VulkanBuffer = Silk.NET.Vulkan.Buffer;
 
 namespace ServiceApp.View3D.Data;
 
-public class BufferedObject : IDisposable
+internal class BufferedObject : IDisposable
 {
+    public Color Color { get; set; }
+
     private readonly VulkanContext _context;
-
-    private readonly object _lock = new();
-    private VulkanBuffer _vertexBuffer;
-
-    private int _vertexCount;
-    private DeviceMemory _vertexMemory;
+    private VertexBuffer? _vertexBuffer;
 
     internal BufferedObject(Span<VertexInput> vertices, VulkanContext context)
     {
         _context = context;
         UpdateVertices(vertices);
     }
-
-    public Color Color { get; set; }
 
     public void Dispose()
     {

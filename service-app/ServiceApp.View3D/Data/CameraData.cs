@@ -4,17 +4,15 @@ namespace ServiceApp.View3D.Data;
 
 internal class CameraData
 {
-    public Vector3 Position { get; set; } = Vector3.One;
-    public Vector3 Target { get; set; } = Vector3.Zero;
-    public Vector3 Up { get; set; } = Vector3.UnitZ;
+    public Vector3 Position { get; init; }
+    public Vector3 Target { get; init; }
+    public Vector3 Up { get; init; }
 
-    public float Fov { get; set; } = MathF.PI / 4;
-    public float Near { get; set; } = 0.1f;
-    public float Far { get; set; } = 100f;
+    public float Fov { get; init; }
+    public float Near { get; init; }
+    public float Far { get; init; }
 
     internal Matrix4x4 ProjectionView(int width, int height)
-    {
-        return Matrix4x4.CreateLookAt(Position, Target, Up)
-               * Matrix4x4.CreatePerspectiveFieldOfView(Fov, (float)width / height, Near, Far);
-    }
+        => Matrix4x4.CreateLookAt(Position, Target, Up)
+           * Matrix4x4.CreatePerspectiveFieldOfView(Fov, (float)width / height, Near, Far);
 }

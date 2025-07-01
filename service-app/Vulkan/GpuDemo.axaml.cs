@@ -9,6 +9,8 @@ using BindingsCs.Safe.Configurations;
 using BindingsCs.Safe.Types;
 using ServiceApp.Utility;
 using ServiceApp.View3D.Controls;
+using ServiceApp.View3D.Data;
+using ServiceApp.View3D.Scene;
 using Vector3 = System.Numerics.Vector3;
 
 namespace GpuInterop;
@@ -85,7 +87,7 @@ public partial class GpuDemo : UserControl
         _timer.Start();
 
         _orbitControls = new OrbitControls(
-            this.Find<Camera3D>("Camera")!,
+            this.Find<Camera>("Camera")!,
             this.Find<PointLight>("Light")!);
     }
 
